@@ -1,37 +1,23 @@
+/**
+ * @see https://console.firebase.google.com/u/0/project/gdrive-media-hub/
+ * @see https://console.cloud.google.com/apis/credentials?project=gdrive-media-hub
+ * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
+ * @see https://github.com/partnerhero/gapi-script
+ * ...
+ * @see https://www.youtube.com/watch?v=IPyl0igVkH4&t=287s
+ * @see https://www.youtube.com/watch?v=TFIt9o6BWqA (HOWTO: process.env)
+ */
 import React from "react"
-import logo from "./logo.svg"
 import AppMain from './AppMain.tsx'
-import "./App.css"
-//import './firebaseConfig.ts'
-
-/*
-  const button = document.getElementById(‘signout_button’);
-	button.onclick = () => {
-	  google.accounts.id.disableAutoSelect();
-	}
-*/
+import "./bootstrap.min.css"
 
 function App() {
 	return (
-		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<p>Edit <code>src/App.js</code> and save to reload.</p>
-				<a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-					Learn React
-				</a>
+		<div className="container">
+			<header>
+				<h1>Google Drive Media Hub</h1>
 			</header>
 			<AppMain />
-			<section style={{ backgroundColor: '#eee', padding: '2rem' }}>
-				<div id="g_id_onload"
-					data-client_id="293663430835-1se89ppg5maotvqdjhmkesl7o7fsmecc.apps.googleusercontent.com"
-					//data-login_uri="https://gdrive-media-hub.web.app"
-					data-login_uri="https://localhost:3000"
-					data-auto_select="true"
-					data-callback="handleCredentialResponse">
-				</div>
-				<div className="g_id_signout">Sign Out</div>
-			</section>
 		</div>
 	)
 }
