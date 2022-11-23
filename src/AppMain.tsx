@@ -71,7 +71,11 @@ interface IGapiFile {
 	 * @example "3516911"
 	 */
 	size?: string
-	// WORKS
+	/**
+	 * blob from google drive
+	 * - custom property (not in GAPI API)
+	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
+	 */
 	imageBlobUrl: string
 }
 
@@ -87,6 +91,7 @@ export default function AppMain() {
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
 	const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
+	const [updated, setUpdated] = useState('');
 
 	/** fetch images */
 	useEffect(() => {
@@ -185,6 +190,7 @@ export default function AppMain() {
 				const updFiles = gapiFiles
 				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl;
 				setGapiFiles(updFiles)
+				setUpdated(new Date().toISOString())
 			})
 			.catch((err) => console.log(err))
 	}
@@ -200,7 +206,7 @@ export default function AppMain() {
 					<div className='col-auto'><button className='btn btn-primary' type='button' onClick={handleSignOutClick}>Logout</button></div>
 				</div>
 				<div className='p-4 bg-dark mt-4'>
-					<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4'>
+					<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={{ updated }}>
 						{gapiFiles.sort((a, b) => a.modifiedTime < b.modifiedTime ? -1 : 1).map((file) =>
 							<div key={file.id} className='col'>
 								<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
@@ -210,9 +216,11 @@ export default function AppMain() {
 				</div>
 			</section> :
 				<section onClick={() => handleClientLoad()} className="text-center p-4 bg-dark">
-					<img height="100" width="100" src="https://raw.githubusercontent.com/willikay11/React-Google-Drive-Tutorial/master/src/assets/images/google-drive.png" alt="GoogleDriveImage" />
+					<div className='p-4'>
+						<img height="100" width="100" src="https://raw.githubusercontent.com/willikay11/React-Google-Drive-Tutorial/master/src/assets/images/google-drive.png" alt="GoogleDriveImage" />
+					</div>
 					<h5>Google Drive</h5>
-					<span>view media directly from your google drive</span>
+					<p>view media directly from your google drive</p>
 				</section>
 			}
 		</main >
