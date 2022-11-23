@@ -85,19 +85,39 @@ export default function AppMain() {
 	const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 	const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly';
 	//
-	const PAGE_SIZE = 12
+	const [pagingSize, setPagingSize] = useState(12)
+	const [pagingPage, setPagingPage] = useState(0)
 	//
 	const [signedInUser, setSignedInUser] = useState('');
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
+	const [showFiles, setShowFiles] = useState<IGapiFile[]>([]);
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
 	const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
 	const [updated, setUpdated] = useState('');
 
-	/** fetch images */
+	/** fetch images now that files are loaded */
 	useEffect(() => {
-		gapiFiles.forEach((file: IGapiFile) => { downloadFile(file.id) });
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		if (gapiFiles.length > 0) setPagingPage(1);
 	}, [gapiFiles])
+
+	/** set batch of showFiles on page change */
+	useEffect(() => {
+		/*
+		console.log("BEG", ((pagingPage - 1) * pagingSize));
+		console.log("END", ((pagingPage * pagingSize) - 1));
+		*/
+
+		setShowFiles(gapiFiles
+			.sort((a, b) => a.modifiedTime < b.modifiedTime ? -1 : 1)
+			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx < ((pagingPage * pagingSize) - 1) }))
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [pagingPage]);
+
+	useEffect(() => {
+		showFiles.forEach((file: IGapiFile) => { downloadFile(file.id) });
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [showFiles])
 
 	/**
 	 *  Sign in the user upon button click.
@@ -170,7 +190,7 @@ export default function AppMain() {
 		setIsFetchingGoogleDriveFiles(true);
 		gapi.client.drive.files
 			.list({
-				pageSize: PAGE_SIZE,
+				pageSize: 1000,
 				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
 				q: `mimeType = 'image/png' or mimeType = 'image/jpeg'`,
 			})
@@ -178,18 +198,23 @@ export default function AppMain() {
 				setIsFetchingGoogleDriveFiles(false);
 				const res = JSON.parse(response.body);
 				setGapiFiles(res.files);
+				console.log('res.files', res.files);
 			});
 	};
 
+	/**
+	 * load image file blob from google drive api
+	 * @param fileId
+	 */
 	const downloadFile = (fileId: string) => {
 		gapi.client.drive.files.get({ fileId: fileId, alt: "media", })
 			.then((response) => {
 				// 1
 				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }));
 				// 2
-				const updFiles = gapiFiles
+				const updFiles = showFiles
 				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl;
-				setGapiFiles(updFiles)
+				setShowFiles(updFiles)
 				setUpdated(new Date().toISOString())
 			})
 			.catch((err) => console.log(err))
@@ -197,32 +222,46 @@ export default function AppMain() {
 
 	// --------------------------------------------------------------------------------------------
 
+	function renderLogin(): JSX.Element {
+		return (<section onClick={() => handleClientLoad()} className="text-center p-4 bg-dark">
+			<div className='p-4'>
+				<img height="100" width="100" src="https://raw.githubusercontent.com/willikay11/React-Google-Drive-Tutorial/master/src/assets/images/google-drive.png" alt="GoogleDriveImage" />
+			</div>
+			<h5>Google Drive</h5>
+			<p>view media directly from your google drive</p>
+		</section>)
+	}
+
+	function renderImages(): JSX.Element {
+		return (<section>
+			<div className='row align-items-center mb-4'>
+				<div className='col'><h5 className='mb-0'>Welcome {signedInUser}</h5></div>
+				<div className='col-auto'>
+					<div className='badge text-bg-primary'>Total {gapiFiles.length}</div>&nbsp;
+					<div className='badge text-bg-info'>Shown {showFiles.length}</div>
+				</div>
+				<div className='col-auto'>
+					<button className='btn btn-primary' type='button' onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2} >Prev</button>
+				</div>
+				<div className='col-auto'><button className='btn btn-primary' type='button' onClick={() => { setPagingPage(pagingPage + 1) }}>Next</button></div>
+				<div className='col-auto'><button className='btn btn-primary' type='button' onClick={handleSignOutClick}>Logout</button></div>
+			</div>
+			<div className='p-4 bg-dark mt-4'>
+				<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={{ updated }}>
+					{showFiles.map((file) =>
+						<div key={file.id} className='col'>
+							<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
+						</div>
+					)}
+				</div>
+			</div>
+		</section>)
+	}
+
 	return (
 		<main>
 			{isLoadingGoogleDriveApi && <div>LOADING</div>}
-			{signedInUser ? <section>
-				<div className='row align-items-center mb-4'>
-					<div className='col'><h5 className='mb-0'>Welcome {signedInUser}</h5></div>
-					<div className='col-auto'><button className='btn btn-primary' type='button' onClick={handleSignOutClick}>Logout</button></div>
-				</div>
-				<div className='p-4 bg-dark mt-4'>
-					<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={{ updated }}>
-						{gapiFiles.sort((a, b) => a.modifiedTime < b.modifiedTime ? -1 : 1).map((file) =>
-							<div key={file.id} className='col'>
-								<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
-							</div>
-						)}
-					</div>
-				</div>
-			</section> :
-				<section onClick={() => handleClientLoad()} className="text-center p-4 bg-dark">
-					<div className='p-4'>
-						<img height="100" width="100" src="https://raw.githubusercontent.com/willikay11/React-Google-Drive-Tutorial/master/src/assets/images/google-drive.png" alt="GoogleDriveImage" />
-					</div>
-					<h5>Google Drive</h5>
-					<p>view media directly from your google drive</p>
-				</section>
-			}
+			<section>{signedInUser ? renderImages() : renderLogin()}</section>
 		</main >
 	)
 }
