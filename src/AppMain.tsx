@@ -4,7 +4,7 @@
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { gapi } from 'gapi-script';
 
 interface IGapiCurrUser {
@@ -90,7 +90,6 @@ export default function AppMain() {
 	//
 	const [signedInUser, setSignedInUser] = useState('');
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
-	const [showFiles, setShowFiles] = useState<IGapiFile[]>([]);
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
 	const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
 	const [updated, setUpdated] = useState('');
@@ -100,24 +99,23 @@ export default function AppMain() {
 		if (gapiFiles.length > 0) setPagingPage(1);
 	}, [gapiFiles])
 
-	/** set batch of showFiles on page change */
-	useEffect(() => {
+	const showFiles = useMemo(() => {
 		/*
 		console.log("BEG", ((pagingPage - 1) * pagingSize));
 		console.log("END", ((pagingPage * pagingSize) - 1));
 		*/
-
-		setShowFiles(gapiFiles
+		// TODO: sort option!
+		return gapiFiles
 			.sort((a, b) => a.modifiedTime < b.modifiedTime ? -1 : 1)
-			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx < ((pagingPage * pagingSize) - 1) }))
+			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx < ((pagingPage * pagingSize) - 1) })
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [pagingPage]);
+	}, [gapiFiles, pagingPage]);
 
 	useEffect(() => {
-		showFiles.forEach((file: IGapiFile) => { downloadFile(file.id) });
+		gapiFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [showFiles])
+	}, [pagingPage])
 
 	/**
 	 *  Sign in the user upon button click.
@@ -212,9 +210,9 @@ export default function AppMain() {
 				// 1
 				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }));
 				// 2
-				const updFiles = showFiles
+				const updFiles = gapiFiles
 				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl;
-				setShowFiles(updFiles)
+				setGapiFiles(updFiles)
 				setUpdated(new Date().toISOString())
 			})
 			.catch((err) => console.log(err))
