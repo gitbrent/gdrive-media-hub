@@ -7,11 +7,11 @@
  * @see https://www.youtube.com/watch?v=IPyl0igVkH4&t=287s
  * @see https://www.youtube.com/watch?v=TFIt9o6BWqA (HOWTO: process.env)
  */
-import React from "react"
-import AppMain from './AppMain.tsx'
+import React from 'react'
+import AppMain from './AppMain'
 import './css/style.scss'
 
-function App() {
+function App():JSX.Element {
 	return <AppMain />
 }
 

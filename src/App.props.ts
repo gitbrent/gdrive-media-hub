@@ -1,31 +1,31 @@
 export interface IGapiCurrUser {
-	"le": {
-		"wt": {
+	'le': {
+		'wt': {
 			/**
 			 * Full Name
 			 * @example "Git Brent"
 			 */
-			"Ad": string,
+			'Ad': string,
 			/**
 			 * First Name
 			 * @example "Git"
 			 */
-			"rV": string,
+			'rV': string,
 			/**
 			 * Last Name
 			 * @example "Brent"
 			 */
-			"uT": string,
+			'uT': string,
 			/**
 			 * Account Picture
 			 * @example "https://lh3.googleusercontent.com/a/ALm5wu3R_tKI4hZd9DbwPh8SShfBYgaNN95WZYZYvfwy=s96-c"
 			 */
-			"hK": string,
+			'hK': string,
 			/**
 			 * Email
 			 * @example "gitbrent@gmail.com"
 			 */
-			"cu": string
+			'cu': string
 		}
 	},
 }
