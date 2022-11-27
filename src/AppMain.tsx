@@ -89,6 +89,13 @@ enum OPT_SORTDIR {
 	desc = 'Descinding'
 }
 
+enum OPT_PAGESIZE {
+	ps08 = ' 8 items',
+	ps12 = '12 items',
+	ps24 = '24 items',
+	ps48 = '48 items',
+}
+
 export default function AppMain() {
 	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID;
 	const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY;
@@ -98,13 +105,20 @@ export default function AppMain() {
 	const [pagingSize, setPagingSize] = useState(12);
 	const [pagingPage, setPagingPage] = useState(0);
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate);
-	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.asc);
+	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc);
+	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps08);
 	//
 	const [signedInUser, setSignedInUser] = useState('');
-	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
-	const [isFetchingGoogleDriveFiles, setIsFetchingGoogleDriveFiles] = useState(false);
+	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
 	const [updated, setUpdated] = useState('');
+
+	useEffect(() => {
+		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8);
+		else if (optPgeSize === OPT_PAGESIZE.ps12) setPagingSize(12);
+		else if (optPgeSize === OPT_PAGESIZE.ps24) setPagingSize(24);
+		else if (optPgeSize === OPT_PAGESIZE.ps48) setPagingSize(48);
+	}, [optPgeSize])
 
 	/** fetch images now that files are loaded */
 	useEffect(() => {
@@ -135,7 +149,7 @@ export default function AppMain() {
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx < ((pagingPage * pagingSize) - 1) })
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [gapiFiles, pagingPage, optSortBy, optSortDir]);
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir]);
 
 	/**
 	 *  Sign in the user upon button click.
@@ -209,7 +223,6 @@ export default function AppMain() {
 	 * Print files
 	 */
 	const listFiles = (searchTerm = null) => {
-		setIsFetchingGoogleDriveFiles(true);
 		gapi.client.drive.files
 			.list({
 				pageSize: 1000,
@@ -217,7 +230,6 @@ export default function AppMain() {
 				q: `mimeType = 'image/png' or mimeType = 'image/jpeg'`,
 			})
 			.then(function(response) {
-				setIsFetchingGoogleDriveFiles(false);
 				const res = JSON.parse(response.body);
 				setGapiFiles(res.files);
 				console.log('res.files', res.files);
@@ -259,16 +271,25 @@ export default function AppMain() {
 							<li className="nav-item">
 								<a className="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
-							<li className="nav-item dropdown">
+							<li className="nav-item dropdown" data-desc="opt-sortby">
 								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sort Options</a>
 								<ul className="dropdown-menu">
 									<li><h6 className="dropdown-header">Sort By</h6></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>Modified Date</button></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName} onClick={() => setOptSortBy(OPT_SORTBY.filName)}>File Name</button></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>{OPT_SORTBY.modDate}</button></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName} onClick={() => setOptSortBy(OPT_SORTBY.filName)}>{OPT_SORTBY.filName}</button></li>
 									<li><hr className="dropdown-divider" /></li>
 									<li><h6 className="dropdown-header">Sort Direction</h6></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asc} onClick={() => setOptSortDir(OPT_SORTDIR.asc)}>Ascending</button></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc} onClick={() => setOptSortDir(OPT_SORTDIR.desc)}>Descinding</button></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asc} onClick={() => setOptSortDir(OPT_SORTDIR.asc)}>{OPT_SORTDIR.asc}</button></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc} onClick={() => setOptSortDir(OPT_SORTDIR.desc)}>{OPT_SORTDIR.desc}</button></li>
+								</ul>
+							</li>
+							<li className="nav-item dropdown" data-desc="opt-pagesize">
+								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Page Size</a>
+								<ul className="dropdown-menu">
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
 								</ul>
 							</li>
 						</ul>
@@ -299,7 +320,7 @@ export default function AppMain() {
 							</li>
 							<li className="nav-item dropdown">
 								<button type="button" className="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
-									<span className='me-2'>User</span>
+									<span className='me-1'>User</span>
 								</button>
 								<ul className="dropdown-menu dropdown-menu-end">
 									<li>
