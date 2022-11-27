@@ -90,7 +90,7 @@ enum OPT_SORTDIR {
 }
 
 enum OPT_PAGESIZE {
-	ps08 = ' 8 items',
+	ps08 = '8 items',
 	ps12 = '12 items',
 	ps24 = '24 items',
 	ps48 = '48 items',
@@ -227,7 +227,8 @@ export default function AppMain() {
 			.list({
 				pageSize: 1000,
 				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
-				q: `mimeType = 'image/png' or mimeType = 'image/jpeg'`,
+				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
+				q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif'`,
 			})
 			.then(function(response) {
 				const res = JSON.parse(response.body);
@@ -267,12 +268,23 @@ export default function AppMain() {
 						<span className="navbar-toggler-icon"></span>
 					</button>
 					<div className="collapse navbar-collapse" id="navbarSupportedContent">
-						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
+						<ul className="navbar-nav me-auto mb-2 mb-lg-0" data-desc="option-dropdowns">
 							<li className="nav-item">
 								<a className="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
+							<li className="nav-item dropdown" data-desc="opt-pagesize">
+								{/* TODO:
+								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
+								<ul className="dropdown-menu">
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
+								</ul>
+								*/}
+							</li>
 							<li className="nav-item dropdown" data-desc="opt-sortby">
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sort Options</a>
+								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sorting</a>
 								<ul className="dropdown-menu">
 									<li><h6 className="dropdown-header">Sort By</h6></li>
 									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>{OPT_SORTBY.modDate}</button></li>
@@ -284,7 +296,7 @@ export default function AppMain() {
 								</ul>
 							</li>
 							<li className="nav-item dropdown" data-desc="opt-pagesize">
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Page Size</a>
+								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Paging</a>
 								<ul className="dropdown-menu">
 									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
 									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
@@ -293,9 +305,11 @@ export default function AppMain() {
 								</ul>
 							</li>
 						</ul>
-						<div className="d-flex me-5">
-							<div className='badge text-bg-secondary'>Showing {showFiles.length} of {gapiFiles.length}</div>
-						</div>
+						{document.location.hostname === 'localhost' &&
+							<div className="d-flex me-5" data-desc="debug-badges">
+								<div className='badge text-bg-secondary'>Showing {showFiles.length} of {gapiFiles.length}</div>
+							</div>
+						}
 						<form className="d-flex me-5">
 							<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
 							<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} /* TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))} */>Next</button>
@@ -304,7 +318,7 @@ export default function AppMain() {
 							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
 							<button className="btn btn-outline-info" disabled={true} type="button" onClick={() => alert('TODO:')}>Search</button>
 						</form>
-						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
+						<ul className="navbar-nav flex-row flex-nowrap ms-md-auto">
 							<li className="nav-item col-6 col-lg-auto">
 								<a className="nav-link py-2 px-0 px-lg-2" href="https://github.com/gitbrent" target="_blank" rel="noreferrer">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
@@ -357,17 +371,21 @@ export default function AppMain() {
 	function renderImages(): JSX.Element {
 		return (<section>
 			<div className='p-4 bg-dark'>
-				<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={{ updated }}>
+				<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={updated}>
 					{showFiles.map((file) =>
 						<div key={file.id} className='col'>
-							{file.imageBlobUrl ?
-								<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
-								:
-								<div className='text-center'>
-									<div className="spinner-grow text-primary" role="status">
-										<span className="visually-hidden">Loading...</span>
+							{file.imageBlobUrl && file.mimeType.indexOf('video') > -1 ?
+								<video width="320" height="240" controls={true}>
+									<source src={file.imageBlobUrl} type='video/mp4' />
+								</video>
+								: file.imageBlobUrl ?
+									<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
+									:
+									<div className='text-center'>
+										<div className="spinner-grow text-primary" role="status">
+											<span className="visually-hidden">Loading...</span>
+										</div>
 									</div>
-								</div>
 							}
 						</div>
 					)}
@@ -384,6 +402,7 @@ export default function AppMain() {
 			<main>
 				{isLoadingGoogleDriveApi ?
 					<section>
+						{renderLogin()}
 						<div className='text-center bg-dark p-5'>
 							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
 						</div>
