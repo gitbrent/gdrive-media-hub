@@ -5,8 +5,8 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import React, { useEffect, useMemo, useState } from 'react'
-import { gapi } from 'gapi-script'
 import { IGapiCurrUser, IGapiFile, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { gapi } from 'gapi-script'
 import AppImgGrid from './AppImgGrid'
 
 export default function AppMain() {
