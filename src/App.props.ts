@@ -68,6 +68,8 @@ export interface IGapiFile {
 	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
 	 */
 	imageBlobUrl: string
+	imageW: number
+	imageH: number
 }
 
 export enum OPT_SORTBY {

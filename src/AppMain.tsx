@@ -7,7 +7,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { IGapiCurrUser, IGapiFile, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { gapi } from 'gapi-script'
-import AppImgGrid from './AppImgGrid'
+import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
 	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID
@@ -24,7 +24,6 @@ export default function AppMain() {
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
-	const [updated, setUpdated] = useState('')
 
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
@@ -116,13 +115,14 @@ export default function AppMain() {
 
 					// Handle the initial sign-in state.
 					updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get())
+
+					setIsLoadingGoogleDriveApi(false)
 				},
 				(error:any) => {
 					console.error(error)
+					setIsLoadingGoogleDriveApi(false)
 				}
-			).finally(() => {
-				setIsLoadingGoogleDriveApi(false)
-			})
+			)
 	}
 
 	const handleClientLoad = () => {
@@ -145,7 +145,6 @@ export default function AppMain() {
 			.then(function(response:any) {
 				const res = JSON.parse(response.body)
 				setGapiFiles(res.files)
-				console.log('res.files', res.files)
 			})
 	}
 
@@ -158,11 +157,19 @@ export default function AppMain() {
 			.then((response:any) => {
 				// 1
 				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }))
+				const imgBlob = new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' })
 				// 2
-				const updFiles = gapiFiles
-				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl
-				setGapiFiles(updFiles)
-				setUpdated(new Date().toISOString())
+				const img = document.createElement('img')
+				const blob = URL.createObjectURL(imgBlob)
+				img.src = blob
+				img.onload = function() {
+					const updFiles = gapiFiles
+					const imgFile = updFiles.filter((file) => file.id === fileId)[0]
+					imgFile.imageBlobUrl = objectUrl
+					imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
+					imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
+					setGapiFiles(updFiles)
+				}
 			})
 			.catch((err:any) => console.log(err))
 	}
@@ -294,7 +301,7 @@ export default function AppMain() {
 						</div>
 					</section>
 					:
-					<section>{signedInUser ? <AppImgGrid showFiles={showFiles} updTimestamp={updated} /> : renderLogin()}</section>
+					<section>{signedInUser ? <ImageGrid showFiles={showFiles} /> : renderLogin()}</section>
 				}
 			</main>
 		</div>
