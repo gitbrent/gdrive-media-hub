@@ -9,17 +9,10 @@
  */
 import React from "react"
 import AppMain from './AppMain.tsx'
-import "./bootstrap.min.css"
+import './css/style.scss'
 
 function App() {
-	return (
-		<div className="container">
-			<header>
-				<h1>Google Drive Media Hub</h1>
-			</header>
-			<AppMain />
-		</div>
-	)
+	return <AppMain />
 }
 
 export default App
