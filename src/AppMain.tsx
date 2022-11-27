@@ -4,194 +4,104 @@
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { gapi } from 'gapi-script';
-
-interface IGapiCurrUser {
-	"le": {
-		"wt": {
-			/**
-			 * Full Name
-			 * @example "Git Brent"
-			 */
-			"Ad": string,
-			/**
-			 * First Name
-			 * @example "Git"
-			 */
-			"rV": string,
-			/**
-			 * Last Name
-			 * @example "Brent"
-			 */
-			"uT": string,
-			/**
-			 * Account Picture
-			 * @example "https://lh3.googleusercontent.com/a/ALm5wu3R_tKI4hZd9DbwPh8SShfBYgaNN95WZYZYvfwy=s96-c"
-			 */
-			"hK": string,
-			/**
-			 * Email
-			 * @example "gitbrent@gmail.com"
-			 */
-			"cu": string
-		}
-	},
-}
-
-interface IGapiFile {
-	/**
-	 * id
-	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
-	 */
-	id: string
-	/**
-	 * created time (ISO format)
-	 * @example "2022-11-21T14:54:14.453Z"
-	 */
-	createdTime: string
-	/**
-	 * mime type
-	 * @example "application/json"
-	 */
-	mimeType: string
-	/**
-	 * modified time (ISO format)
-	 * @example "2022-11-21T14:54:14.453Z"
-	 */
-	modifiedTime: string
-	/**
-	 * file name
-	 * @example "corp-logo.png"
-	 */
-	name: string
-	/**
-	 * file size (bytes)
-	 * - only populated for files
-	 * @example "3516911"
-	 */
-	size?: string
-	/**
-	 * blob from google drive
-	 * - custom property (not in GAPI API)
-	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
-	 */
-	imageBlobUrl: string
-}
-
-enum OPT_SORTBY {
-	modDate = 'Modified Date',
-	filName = 'File Name'
-}
-
-enum OPT_SORTDIR {
-	asc = 'Ascending',
-	desc = 'Descinding'
-}
-
-enum OPT_PAGESIZE {
-	ps08 = '8 items',
-	ps12 = '12 items',
-	ps24 = '24 items',
-	ps48 = '48 items',
-}
+import React, { useEffect, useMemo, useState } from 'react'
+import { gapi } from 'gapi-script'
+import { IGapiCurrUser, IGapiFile, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import AppImgGrid from './AppImgGrid'
 
 export default function AppMain() {
-	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID;
-	const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY;
-	const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
-	const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly';
+	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID
+	const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY
+	const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+	const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly'
 	//
-	const [pagingSize, setPagingSize] = useState(12);
-	const [pagingPage, setPagingPage] = useState(0);
-	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate);
-	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc);
-	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps08);
+	const [pagingSize, setPagingSize] = useState(12)
+	const [pagingPage, setPagingPage] = useState(0)
+	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
+	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
+	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps08)
 	//
-	const [signedInUser, setSignedInUser] = useState('');
-	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false);
-	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([]);
-	const [updated, setUpdated] = useState('');
+	const [signedInUser, setSignedInUser] = useState('')
+	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
+	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
+	const [updated, setUpdated] = useState('')
 
 	useEffect(() => {
-		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8);
-		else if (optPgeSize === OPT_PAGESIZE.ps12) setPagingSize(12);
-		else if (optPgeSize === OPT_PAGESIZE.ps24) setPagingSize(24);
-		else if (optPgeSize === OPT_PAGESIZE.ps48) setPagingSize(48);
+		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
+		else if (optPgeSize === OPT_PAGESIZE.ps12) setPagingSize(12)
+		else if (optPgeSize === OPT_PAGESIZE.ps24) setPagingSize(24)
+		else if (optPgeSize === OPT_PAGESIZE.ps48) setPagingSize(48)
 	}, [optPgeSize])
 
 	/** fetch images now that files are loaded */
 	useEffect(() => {
-		if (gapiFiles.length > 0) setPagingPage(1);
+		if (gapiFiles.length > 0) setPagingPage(1)
 	}, [gapiFiles])
 
 	useEffect(() => {
-		gapiFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) });
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		gapiFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
 	}, [pagingPage])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1);
+				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedTime < b.modifiedTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1);
+				return a.modifiedTime < b.modifiedTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else {
-				console.error('unknown OPT_SORTBY value');
-				return 1;
+				console.error('unknown OPT_SORTBY value')
+				return 1
 			}
 		}
 
 		return gapiFiles
 			.sort(sorter)
-			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx < ((pagingPage * pagingSize) - 1) })
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir]);
+			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir])
 
 	/**
 	 *  Sign in the user upon button click.
 	 */
 	const handleAuthClick = () => {
-		gapi.auth2.getAuthInstance().signIn();
-	};
+		gapi.auth2.getAuthInstance().signIn()
+	}
 
 	/**
 	 *  Sign out the user upon button click.
 	 */
 	const handleSignOutClick = () => {
-		gapi.auth2.getAuthInstance().signOut();
-		setSignedInUser('');
-		setGapiFiles([]);
-	};
+		gapi.auth2.getAuthInstance().signOut()
+		setSignedInUser('')
+		setGapiFiles([])
+	}
 
 	/**
 	 *  Called when the signed in status changes, to update the UI
 	 *  appropriately. After a sign-in, the API is called.
 	 */
-	const updateSigninStatus = (isSignedIn) => {
+	const updateSigninStatus = (isSignedIn:boolean) => {
 		if (isSignedIn) {
-			const currentUser: IGapiCurrUser = gapi.auth2.getAuthInstance().currentUser;
+			const currentUser: IGapiCurrUser = gapi.auth2.getAuthInstance().currentUser
 
 			// Set the signed in user
-			setSignedInUser(currentUser?.le?.wt?.Ad);
-			setIsLoadingGoogleDriveApi(false);
+			setSignedInUser(currentUser?.le?.wt?.Ad)
+			setIsLoadingGoogleDriveApi(false)
 
 			// list files if user is authenticated
-			listFiles();
+			listFiles()
 		} else {
 			// prompt user to sign in
-			handleAuthClick();
+			handleAuthClick()
 		}
-	};
+	}
 
 	/**
 	 *  Initializes the API client library and sets up sign-in state listeners.
 	 */
 	const initClient = () => {
-		setIsLoadingGoogleDriveApi(true);
+		setIsLoadingGoogleDriveApi(true)
 		gapi.client
 			.init({
 				apiKey: GAPI_API_KEY,
@@ -202,57 +112,59 @@ export default function AppMain() {
 			.then(
 				() => {
 					// Listen for sign-in state changes.
-					gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+					gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus)
 
 					// Handle the initial sign-in state.
-					updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+					updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get())
 				},
-				(error) => {
-					console.error(error);
+				(error:any) => {
+					console.error(error)
 				}
 			).finally(() => {
-				setIsLoadingGoogleDriveApi(false);
-			});
-	};
+				setIsLoadingGoogleDriveApi(false)
+			})
+	}
 
 	const handleClientLoad = () => {
-		gapi.load('client:auth2', initClient);
-	};
+		gapi.load('client:auth2', initClient)
+	}
 
 	/**
 	 * Print files
 	 */
 	const listFiles = (searchTerm = null) => {
+		console.log('TODO:', searchTerm)
+
 		gapi.client.drive.files
 			.list({
 				pageSize: 1000,
 				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
 				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
-				q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif'`,
+				q: 'mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\'',
 			})
-			.then(function(response) {
-				const res = JSON.parse(response.body);
-				setGapiFiles(res.files);
-				console.log('res.files', res.files);
-			});
-	};
+			.then(function(response:any) {
+				const res = JSON.parse(response.body)
+				setGapiFiles(res.files)
+				console.log('res.files', res.files)
+			})
+	}
 
 	/**
 	 * load image file blob from google drive api
 	 * @param fileId
 	 */
 	const downloadFile = (fileId: string) => {
-		gapi.client.drive.files.get({ fileId: fileId, alt: "media", })
-			.then((response) => {
+		gapi.client.drive.files.get({ fileId: fileId, alt: 'media' })
+			.then((response:any) => {
 				// 1
-				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }));
+				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }))
 				// 2
 				const updFiles = gapiFiles
-				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl;
+				updFiles.filter((file) => file.id === fileId)[0].imageBlobUrl = objectUrl
 				setGapiFiles(updFiles)
 				setUpdated(new Date().toISOString())
 			})
-			.catch((err) => console.log(err))
+			.catch((err:any) => console.log(err))
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -318,8 +230,8 @@ export default function AppMain() {
 							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
 							<button className="btn btn-outline-info" disabled={true} type="button" onClick={() => alert('TODO:')}>Search</button>
 						</form>
-						<ul className="navbar-nav flex-row flex-nowrap ms-md-auto">
-							<li className="nav-item col-6 col-lg-auto">
+						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
+							<li className="nav-item d-none d-lg-list-item col-6 col-lg-auto">
 								<a className="nav-link py-2 px-0 px-lg-2" href="https://github.com/gitbrent" target="_blank" rel="noreferrer">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
 										<title>GitHub</title>
@@ -328,7 +240,7 @@ export default function AppMain() {
 									<small className="d-lg-none ms-2">GitHub</small>
 								</a>
 							</li>
-							<li className="nav-item py-1 col-12 col-lg-auto">
+							<li className="nav-item d-none d-lg-list-item py-1 col-12 col-lg-auto">
 								<div className="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
 								<hr className="d-lg-none text-white-50" />
 							</li>
@@ -368,32 +280,6 @@ export default function AppMain() {
 		</section>)
 	}
 
-	function renderImages(): JSX.Element {
-		return (<section>
-			<div className='p-4 bg-dark'>
-				<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={updated}>
-					{showFiles.map((file) =>
-						<div key={file.id} className='col'>
-							{file.imageBlobUrl && file.mimeType.indexOf('video') > -1 ?
-								<video width="320" height="240" controls={true}>
-									<source src={file.imageBlobUrl} type='video/mp4' />
-								</video>
-								: file.imageBlobUrl ?
-									<img src={file.imageBlobUrl} alt={file.name} style={{ width: '100%', height: '100%' }} />
-									:
-									<div className='text-center'>
-										<div className="spinner-grow text-primary" role="status">
-											<span className="visually-hidden">Loading...</span>
-										</div>
-									</div>
-							}
-						</div>
-					)}
-				</div>
-			</div>
-		</section>)
-	}
-
 	return (
 		<div className="container-fluid">
 			<header>
@@ -408,7 +294,7 @@ export default function AppMain() {
 						</div>
 					</section>
 					:
-					<section>{signedInUser ? renderImages() : renderLogin()}</section>
+					<section>{signedInUser ? <AppImgGrid showFiles={showFiles} updTimestamp={updated} /> : renderLogin()}</section>
 				}
 			</main>
 		</div>
