@@ -6,7 +6,7 @@ export interface IProps {
 	updTimestamp: string
 }
 
-// TODO: click-to-play-gif (https://stackoverflow.com/a/53256978/3027591)
+// TODO: use this component for VIDEO files
 
 export default function AppImgGrid(props: IProps) {
 	return (<section>
