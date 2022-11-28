@@ -20,6 +20,7 @@ export default function AppMain() {
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
+	const [optSchWord, setOptSchWord] = useState('')
 	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
@@ -40,7 +41,7 @@ export default function AppMain() {
 
 	useEffect(() => {
 		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-	}, [pagingPage])
+	}, [pagingPage, optSchWord])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
@@ -58,8 +59,9 @@ export default function AppMain() {
 
 		return gapiFiles
 			.sort(sorter)
+			.filter((item)=>{ return !optSchWord || item.name.toLowerCase().indexOf(optSchWord) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated])
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated, optSchWord])
 
 	/**
 	 *  Sign in the user upon button click.
@@ -242,8 +244,7 @@ export default function AppMain() {
 						}
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
 						<form className="d-flex d-none d-lg-flex" role="search">
-							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-							<button className="btn btn-outline-info" disabled={true} type="button" onClick={() => alert('TODO:')}>Search</button>
+							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev)=>{ setOptSchWord(ev.currentTarget.value) }} />
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
 							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
