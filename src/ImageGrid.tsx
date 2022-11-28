@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { IGapiFile } from './App.props'
 import { CustomImage } from './ImageGrid.props'
 import { Gallery } from 'react-grid-gallery'
-import Lightbox from 'react-image-lightbox'
+import Lightbox from 'react-18-image-lightbox'
 import 'react-image-lightbox/style.css'
 
 interface IProps {
