@@ -15,11 +15,14 @@ export default function ImageGrid(props:IProps) {
 
 		props.showFiles.forEach((file) => {
 			showImages.push({
-				src: file.imageBlobUrl,
-				original: file.imageBlobUrl,
-				width: file.imageW,
-				height: file.imageH,
-				caption: file.name,
+				src: file.imageBlobUrl || '/loading-dots.gif',
+				original: file.imageBlobUrl || '/loading-dots.gif',
+				/*tags: [
+					{ value: 'Nature', title: 'Nature' },
+				],*/
+				width: file.imageW || (64),
+				height: file.imageH || (64),
+				caption: file.name || 'loading',
 			})
 		})
 

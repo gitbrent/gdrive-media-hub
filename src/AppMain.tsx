@@ -19,11 +19,12 @@ export default function AppMain() {
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
-	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps08)
+	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
+	const [updated, setUpdated] = useState('')
 
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
@@ -58,7 +59,7 @@ export default function AppMain() {
 		return gapiFiles
 			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir])
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated])
 
 	/**
 	 *  Sign in the user upon button click.
@@ -140,7 +141,7 @@ export default function AppMain() {
 				pageSize: 1000,
 				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
 				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
-				q: 'mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\'',
+				q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
 			})
 			.then(function(response:any) {
 				const res = JSON.parse(response.body)
@@ -169,6 +170,7 @@ export default function AppMain() {
 					imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
 					imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
 					setGapiFiles(updFiles)
+					setUpdated(new Date().toISOString())
 				}
 			})
 			.catch((err:any) => console.log(err))
@@ -177,12 +179,20 @@ export default function AppMain() {
 	// --------------------------------------------------------------------------------------------
 
 	function renderNavbar(): JSX.Element {
+		function renderPrevNext(): JSX.Element {
+			return (<form className="d-flex me-0 me-lg-5">
+				<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
+				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} /* TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))} */>Next</button>
+			</form>)
+		}
+
 		return (
 			<nav className="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
 				<div className="container-fluid">
 					<a className="navbar-brand" href="/">
 						<img src="/google-drive.png" alt="Google Drive Media Hub" width="32" height="32" />
 					</a>
+					<div className='d-lg-none'>{renderPrevNext()}</div>
 					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span className="navbar-toggler-icon"></span>
 					</button>
@@ -225,20 +235,17 @@ export default function AppMain() {
 							</li>
 						</ul>
 						{document.location.hostname === 'localhost' &&
-							<div className="d-flex me-5" data-desc="debug-badges">
+							<div className="d-flex d-none d-xl-block me-5" data-desc="debug-badges">
 								<div className='badge text-bg-secondary'>Showing {showFiles.length} of {gapiFiles.length}</div>
 							</div>
 						}
-						<form className="d-flex me-5">
-							<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-							<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} /* TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))} */>Next</button>
-						</form>
-						<form className="d-flex" role="search">
+						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
+						<form className="d-flex d-none d-lg-flex" role="search">
 							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
 							<button className="btn btn-outline-info" disabled={true} type="button" onClick={() => alert('TODO:')}>Search</button>
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
-							<li className="nav-item d-none d-lg-list-item col-6 col-lg-auto">
+							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
 								<a className="nav-link py-2 px-0 px-lg-2" href="https://github.com/gitbrent" target="_blank" rel="noreferrer">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
 										<title>GitHub</title>
@@ -247,7 +254,7 @@ export default function AppMain() {
 									<small className="d-lg-none ms-2">GitHub</small>
 								</a>
 							</li>
-							<li className="nav-item d-none d-lg-list-item py-1 col-12 col-lg-auto">
+							<li className="nav-item d-none d-lg-block py-1 col-12 col-lg-auto">
 								<div className="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
 								<hr className="d-lg-none text-white-50" />
 							</li>

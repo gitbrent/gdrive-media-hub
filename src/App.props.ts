@@ -70,6 +70,12 @@ export interface IGapiFile {
 	imageBlobUrl: string
 	imageW: number
 	imageH: number
+	/**
+	 * FUTURE: show parent folder
+	 * `application/vnd.google-apps.folder`
+	 * @example ["1jjOs28hGj3as3vorJveCI00NY1PmDbTr"]
+	 */
+	// parents: string[]
 }
 
 export enum OPT_SORTBY {
