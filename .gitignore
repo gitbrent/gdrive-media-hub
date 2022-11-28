@@ -103,5 +103,9 @@ dist
 # TernJS port file
 .tern-port
 
-# MacOS
+# [bde] MacOS
 .DS_Store
+
+# [bde] firebase/create-react-app
+.firebase
+build
