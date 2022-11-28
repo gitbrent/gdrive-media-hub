@@ -107,5 +107,5 @@ dist
 .DS_Store
 
 # [bde] firebase/create-react-app
-.firebase
-build
+.firebase/
+build/
