@@ -180,9 +180,12 @@ export default function AppMain() {
 
 	function renderNavbar(): JSX.Element {
 		function renderPrevNext(): JSX.Element {
+			const isDisabledNext = showFiles.length === 0
+			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
+
 			return (<form className="d-flex me-0 me-lg-5">
 				<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} /* TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))} */>Next</button>
+				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
 			</form>)
 		}
 
@@ -203,13 +206,11 @@ export default function AppMain() {
 							</li>
 							<li className="nav-item dropdown" data-desc="opt-pagesize">
 								{/* TODO:
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
-								<ul className="dropdown-menu">
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
-								</ul>
+									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
+									<ul className="dropdown-menu">
+										<li>images</button></li>
+										<li>Video</button></li>
+									</ul>
 								*/}
 							</li>
 							<li className="nav-item dropdown" data-desc="opt-sortby">
