@@ -1,6 +1,6 @@
 {
   "name": "gdrive-media-hub",
-  "version": "1.0.0-beta1",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@popperjs/core": "^2.11.6",
