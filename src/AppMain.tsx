@@ -59,7 +59,7 @@ export default function AppMain() {
 
 		return gapiFiles
 			.sort(sorter)
-			.filter((item)=>{ return !optSchWord || item.name.toLowerCase().indexOf(optSchWord) > -1 })
+			.filter((item)=>{ return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated, optSchWord])
 
