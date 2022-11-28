@@ -39,7 +39,7 @@ export default function AppMain() {
 	}, [gapiFiles])
 
 	useEffect(() => {
-		gapiFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
 	}, [pagingPage])
 
 	const showFiles = useMemo(() => {
@@ -304,7 +304,7 @@ export default function AppMain() {
 				{isLoadingGoogleDriveApi ?
 					<section>
 						{renderLogin()}
-						<div className='text-center bg-dark p-5'>
+						<div className='text-center bg-dark p-3'>
 							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
 						</div>
 					</section>
