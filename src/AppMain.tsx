@@ -42,7 +42,7 @@ export default function AppMain() {
 
 	useEffect(() => {
 		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-	}, [pagingPage, optSchWord])
+	}, [pagingPage, pagingSize, optSchWord])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
