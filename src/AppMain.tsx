@@ -1,6 +1,7 @@
 /**
  * @see https://developers.google.com/drive/api/guides/about-sdk
  * @see https://developers.google.com/drive/api/guides/search-files#node.js
+ * @see https://developers.google.com/drive/api/guides/fields-parameter
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
@@ -243,7 +244,7 @@ export default function AppMain() {
 							</div>
 						}
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
-						<form className="d-flex d-none d-lg-flex" role="search">
+						<form className="d-flex" role="search">
 							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev)=>{ setOptSchWord(ev.currentTarget.value) }} />
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
