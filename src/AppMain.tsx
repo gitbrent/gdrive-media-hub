@@ -193,7 +193,7 @@ export default function AppMain() {
 		}
 
 		return (
-			<nav className="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
+			<nav className="navbar navbar-expand-lg navbar-dark bg-primary">
 				<div className="container-fluid">
 					<a className="navbar-brand" href="/">
 						<img src="/google-drive.png" alt="Google Drive Media Hub" width="32" height="32" />
@@ -298,22 +298,24 @@ export default function AppMain() {
 	}
 
 	return (
-		<div className="container-fluid">
+		<>
 			<header>
 				{renderNavbar()}
 			</header>
 			<main>
-				{isLoadingGoogleDriveApi ?
-					<section>
-						{renderLogin()}
-						<div className='text-center bg-dark p-3'>
-							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-						</div>
-					</section>
-					:
-					<section>{signedInUser ? <ImageGrid showFiles={showFiles} /> : renderLogin()}</section>
-				}
+				<div className="container-fluid">
+					{isLoadingGoogleDriveApi ?
+						<section>
+							{renderLogin()}
+							<div className='text-center bg-dark p-3'>
+								<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
+							</div>
+						</section>
+						:
+						<section>{signedInUser ? <ImageGrid showFiles={showFiles} /> : renderLogin()}</section>
+					}
+				</div>
 			</main>
-		</div>
+		</>
 	)
 }

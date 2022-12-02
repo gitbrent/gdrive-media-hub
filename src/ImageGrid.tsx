@@ -76,7 +76,7 @@ export default function ImageGrid(props:IProps) {
 					onMovePrevRequest={handleMovePrev}
 					onMoveNextRequest={handleMoveNext}
 					clickOutsideToClose={true}
-					reactModalStyle={{ content: { top: '76px' } }} // bootstrap navbar is 76px
+					reactModalStyle={{ overlay: { zIndex: 10000 } }} // cover bootstrap navbar
 				/>
 			)}
 		</div>
