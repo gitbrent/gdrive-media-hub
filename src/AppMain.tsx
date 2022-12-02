@@ -94,6 +94,7 @@ export default function AppMain() {
 
 			// list files if user is authenticated
 			listFiles()
+			//fetchFolders() // WIP:
 		} else {
 			// prompt user to sign in
 			handleAuthClick()
@@ -137,7 +138,7 @@ export default function AppMain() {
 	 * Print files
 	 */
 	const listFiles = (searchTerm = null) => {
-		console.log('TODO:', searchTerm)
+		console.log('TODO: `searchTerm`', searchTerm)
 
 		gapi.client.drive.files
 			.list({
@@ -151,6 +152,28 @@ export default function AppMain() {
 				setGapiFiles(res.files)
 			})
 	}
+
+	// WIP:
+	// get root-level folders, then get all and build up structure
+	// NOTE: it is possible to have recursive ownership in gdrive "folder1">"folder2">"folder1" (!!!)
+	const fetchFolders = () => {
+		gapi.client.drive.files
+			.list({
+				pageSize: 1000,
+				fields: 'nextPageToken, files(id, name, parents, mimeType)',
+				q: 'mimeType=\'application/vnd.google-apps.folder\' and \'root\' in parents', // get root-level folders
+			})
+			.then(function(response:any) {
+				const res = JSON.parse(response.body)
+				//setGapiFiles(res.files)
+				console.log('res.files', res.files) // DEBUG:
+
+				const folders = res.files.sort((a:any,b:any)=>a.parents[0]<b.parents[0]?-1:1).map((item:any)=>`${item.parents[0]} - ${item.id}/${item.name}`)
+				console.log('FOLDERS', folders)
+			})
+	}
+
+
 
 	/**
 	 * load image file blob from google drive api
@@ -290,7 +313,7 @@ export default function AppMain() {
 	function renderLogin(): JSX.Element {
 		return (<section onClick={handleClientLoad} className="text-center p-4 bg-dark">
 			<div className='p-4'>
-				<img height="100" width="100" src="/google-drive.png" alt="GoogleDriveImage" />
+				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveImage" />
 			</div>
 			<h5>Google Drive</h5>
 			<p>view media directly from your google drive</p>
@@ -298,12 +321,12 @@ export default function AppMain() {
 	}
 
 	return (
-		<>
+		<div className="container-fluid">
 			<header>
 				{renderNavbar()}
 			</header>
 			<main>
-				<div className="container-fluid">
+				<div>
 					{isLoadingGoogleDriveApi ?
 						<section>
 							{renderLogin()}
@@ -316,6 +339,6 @@ export default function AppMain() {
 					}
 				</div>
 			</main>
-		</>
+		</div>
 	)
 }
