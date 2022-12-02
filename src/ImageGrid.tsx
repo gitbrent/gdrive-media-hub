@@ -56,9 +56,12 @@ export default function ImageGrid(props:IProps) {
 				enableImageSelection={false}
 			/>
 			{!images || images.length === 0 &&
-				<div className='text-center p-5'>
-					<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-				</div>
+				<section className='bg-secondary my-5'>
+					<div className='row row-cols-auto justify-content-center align-items-center'>
+						<div className='col'><span style={{ fontSize:'3rem' }}>&#9888;</span></div>
+						<div className='col'>(no images to display)</div>
+					</div>
+				</section>
 			}
 			{isOpen && currentImage && (
 				<Lightbox
