@@ -6,15 +6,16 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiCurrUser, IGapiFile, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { gapi } from 'gapi-script'
+import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { appdata } from './appdata'
 import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
-	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID
-	const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY
-	const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-	const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly'
+	const DEF_AUTH_STATE: IAuthState = {
+		status: AuthState.Unauthenticated,
+		userName: '',
+		userPhoto: '',
+	}
 	//
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
@@ -23,10 +24,30 @@ export default function AppMain() {
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
 	//
+	const [appdataSvc, setAppdataSvc] = useState<appdata>()
+	const [authState, setAuthState] = useState<IAuthState>(DEF_AUTH_STATE)
+	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
-	const [updated, setUpdated] = useState('')
+	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
+
+	useEffect(() => {
+		if (!appdataSvc) {
+			const appInst = new appdata(() => { setDataSvcLoadTime(new Date().toISOString()) })
+			setAppdataSvc(appInst)
+		}
+	}, [])
+
+	useEffect(() => {
+		if (appdataSvc && dataSvcLoadTime) {
+			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = ${appdataSvc.authState.status}`)
+			setAuthState(appdataSvc.authState)
+			// FIXME: `undefined` (called too soon)
+			console.log(appdataSvc.imageFiles)
+			//setIsBusyLoad(false)
+		}
+	}, [appdataSvc, dataSvcLoadTime])
 
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
@@ -47,10 +68,10 @@ export default function AppMain() {
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.title < b.title ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedTime < b.modifiedTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.modifiedDate < b.modifiedDate ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -60,15 +81,17 @@ export default function AppMain() {
 
 		return gapiFiles
 			.sort(sorter)
-			.filter((item)=>{ return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.filter((item) => { return !optSchWord || item.title.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated, optSchWord])
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord])
 
 	/**
 	 *  Sign in the user upon button click.
 	 */
 	const handleAuthClick = () => {
-		gapi.auth2.getAuthInstance().signIn()
+		// TODO: gapi.auth2.getAuthInstance().signIn()
+		alert('TODO: WIP:')
+		// TODO: get list files
 	}
 
 	/**
@@ -81,9 +104,6 @@ export default function AppMain() {
 	}
 
 	/**
-	 *  Called when the signed in status changes, to update the UI
-	 *  appropriately. After a sign-in, the API is called.
-	 */
 	const updateSigninStatus = (isSignedIn:boolean) => {
 		if (isSignedIn) {
 			const currentUser: IGapiCurrUser = gapi.auth2.getAuthInstance().currentUser
@@ -100,54 +120,20 @@ export default function AppMain() {
 			handleAuthClick()
 		}
 	}
+	 */
 
 	/**
-	 *  Initializes the API client library and sets up sign-in state listeners.
-	 */
-	const initClient = () => {
-		setIsLoadingGoogleDriveApi(true)
-		gapi.client
-			.init({
-				apiKey: GAPI_API_KEY,
-				clientId: GAPI_CLIENT_ID,
-				discoveryDocs: GAPI_DISC_DOCS,
-				scope: GAPI_SCOPES,
-			})
-			.then(
-				() => {
-					// Listen for sign-in state changes.
-					gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus)
-
-					// Handle the initial sign-in state.
-					updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get())
-
-					setIsLoadingGoogleDriveApi(false)
-				},
-				(error:any) => {
-					console.error(error)
-					setIsLoadingGoogleDriveApi(false)
-				}
-			)
-	}
-
-	const handleClientLoad = () => {
-		gapi.load('client:auth2', initClient)
-	}
-
-	/**
-	 * Print files
-	 */
 	const listFiles = (searchTerm = null) => {
 		console.log('TODO: `searchTerm`', searchTerm)
 
 		gapi.client.drive.files
 			.list({
 				pageSize: 1000,
-				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
+				fields: 'nextPageToken, files(id, title, createdTime, mimeType, modifiedTime, size)',
 				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
 				q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
 			})
-			.then(function(response:any) {
+			.then(function(response: any) {
 				const res = JSON.parse(response.body)
 				setGapiFiles(res.files)
 			})
@@ -160,19 +146,19 @@ export default function AppMain() {
 		gapi.client.drive.files
 			.list({
 				pageSize: 1000,
-				fields: 'nextPageToken, files(id, name, parents, mimeType)',
+				fields: 'nextPageToken, files(id, title, parents, mimeType)',
 				q: 'mimeType=\'application/vnd.google-apps.folder\' and \'root\' in parents', // get root-level folders
 			})
-			.then(function(response:any) {
+			.then(function(response: any) {
 				const res = JSON.parse(response.body)
 				//setGapiFiles(res.files)
 				console.log('res.files', res.files) // DEBUG:
 
-				const folders = res.files.sort((a:any,b:any)=>a.parents[0]<b.parents[0]?-1:1).map((item:any)=>`${item.parents[0]} - ${item.id}/${item.name}`)
+				const folders = res.files.sort((a: any, b: any) => a.parents[0] < b.parents[0] ? -1 : 1).map((item: any) => `${item.parents[0]} - ${item.id}/${item.title}`)
 				console.log('FOLDERS', folders)
 			})
 	}
-
+	 */
 
 
 	/**
@@ -180,8 +166,11 @@ export default function AppMain() {
 	 * @param fileId
 	 */
 	const downloadFile = (fileId: string) => {
+		console.log('TODO: WIP:')
+		return
+		/*
 		gapi.client.drive.files.get({ fileId: fileId, alt: 'media' })
-			.then((response:any) => {
+			.then((response: any) => {
 				// 1
 				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }))
 				const imgBlob = new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' })
@@ -199,7 +188,8 @@ export default function AppMain() {
 					setUpdated(new Date().toISOString())
 				}
 			})
-			.catch((err:any) => console.log(err))
+			.catch((err: any) => console.log(err))
+		*/
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -268,7 +258,7 @@ export default function AppMain() {
 						}
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
 						<form className="d-flex" role="search">
-							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev)=>{ setOptSchWord(ev.currentTarget.value) }} />
+							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
 							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
@@ -311,13 +301,13 @@ export default function AppMain() {
 	}
 
 	function renderLogin(): JSX.Element {
-		return (<section onClick={handleClientLoad} className="text-center p-4 bg-dark">
+		return (<section onClick={() => handleAuthClick()} className="text-center p-4 bg-dark">
 			<div className='p-4'>
 				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveImage" />
 			</div>
 			<h5>Google Drive</h5>
 			<p>view media directly from your google drive</p>
-		</section>)
+		</section >)
 	}
 
 	return (

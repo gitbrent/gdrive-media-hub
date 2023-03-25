@@ -1,3 +1,23 @@
+// APP
+export const APP_BLD = '20230346-0940'
+//export const APP_VER = `1.3.0-WIP ${APP_BLD}`
+export const APP_VER = '1.2.0'
+export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
+
+// ============================================================================
+
+export enum AuthState {
+	Authenticated = 'Authenticated',
+	Unauthenticated = 'Unauthenticated',
+	Expired = 'Expired',
+}
+export interface IAuthState {
+	status: AuthState
+	userName: string
+	userPhoto: string
+}
+
+// OLD:
 export interface IGapiCurrUser {
 	'le': {
 		'wt': {
@@ -40,7 +60,7 @@ export interface IGapiFile {
 	 * created time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	createdTime: string
+	createdDate: string
 	/**
 	 * mime type
 	 * @example "application/json"
@@ -50,12 +70,12 @@ export interface IGapiFile {
 	 * modified time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	modifiedTime: string
+	modifiedDate: string
 	/**
 	 * file name
 	 * @example "corp-logo.png"
 	 */
-	name: string
+	title: string
 	/**
 	 * file size (bytes)
 	 * - only populated for files
@@ -67,9 +87,9 @@ export interface IGapiFile {
 	 * - custom property (not in GAPI API)
 	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
 	 */
-	imageBlobUrl: string
-	imageW: number
-	imageH: number
+	imageBlobUrl?: string
+	imageW?: number
+	imageH?: number
 	/**
 	 * FUTURE: show parent folder
 	 * `application/vnd.google-apps.folder`
