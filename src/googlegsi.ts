@@ -10,6 +10,8 @@
  * Design: "Using the token model"
  * @see https://developers.google.com/identity/oauth2/web/guides/use-token-model
  * ========================================================
+ * @see https://developers.googleblog.com/2022/03/gis-jsweb-authz-migration.html
+ * @see https://developers.google.com/identity/oauth2/web/guides/migration-to-gis
  *
  * NOTE: `this.GAPI_API_KEY` will always be empty unless the "private initGapiClient = (): void => {}" style of function declaration is used!!
  */
@@ -63,7 +65,7 @@ export class googlegsi {
 		// check for current token
 		const tokenData = sessionStorage.getItem('googleTokenData')
 		const tokenJson: TokenResponse = tokenData ? JSON.parse(tokenData) : null
-		const isExp = tokenJson && tokenJson?.expiresTime <= Date.now() ? false : true
+		const isExp = !tokenJson || (tokenJson && tokenJson?.expiresTime <= Date.now()) ? true : false
 		if (IS_LOCALHOST) console.log(`[doLoadInit] tokenJson=${tokenJson?.expiresTime} <= dateNow=${Date.now()} ??? (isExp = ${isExp})`)
 		if (!isExp) this.tokenResponse = tokenJson
 
