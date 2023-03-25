@@ -23,8 +23,10 @@ export class appdata {
 
 	private doUpdateAndCallback = () => {
 		// A: Set vars
-		this.driveAuthState = this.googleapi.authState
-		this.gapiFiles = this.googleapi.imageFiles
+		// IMPORTANT: follow tertiary set method below (if `this.gapiFiles = this.googleapi.imageFiles` is used instead, that's a closure and will be empty every time!!!)
+		this.driveAuthState = this.googleapi.authState ? this.googleapi.authState : this.DEF_AUTH_STATE
+		this.gapiFiles = this.googleapi.imageFiles ? this.googleapi.imageFiles : []
+
 		// B: Notify caller
 		this.clientCallback()
 	}

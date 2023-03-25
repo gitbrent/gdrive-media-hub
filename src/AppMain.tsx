@@ -42,9 +42,9 @@ export default function AppMain() {
 	useEffect(() => {
 		if (appdataSvc && dataSvcLoadTime) {
 			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = ${appdataSvc.authState.status}`)
-			setAuthState(appdataSvc.authState)
-			// FIXME: `undefined` (called too soon)
-			console.log(appdataSvc.imageFiles)
+			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
+			setAuthState(appdataSvc.authState ? appdataSvc.authState : DEF_AUTH_STATE)
+			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
 			//setIsBusyLoad(false)
 		}
 	}, [appdataSvc, dataSvcLoadTime])
@@ -166,7 +166,8 @@ export default function AppMain() {
 	 * @param fileId
 	 */
 	const downloadFile = (fileId: string) => {
-		console.log('TODO: WIP:')
+		// TODO: WIP:
+		console.log(`downloadFile = ${fileId}`)
 		return
 		/*
 		gapi.client.drive.files.get({ fileId: fileId, alt: 'media' })
