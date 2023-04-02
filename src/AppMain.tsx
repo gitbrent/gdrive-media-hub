@@ -17,17 +17,17 @@ export default function AppMain() {
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
-	const [updated, setUpdated] = useState('')
 	//
 	const [appdataSvc, setAppdataSvc] = useState<appdata>()
 	const [signedInUser, setSignedInUser] = useState('')
-	//
-	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
-	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
+	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
 	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
+	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
+	const [updated, setUpdated] = useState('')
 
 	useEffect(() => {
 		if (!appdataSvc) {
+			setIsBusyGapiLoad(true)
 			const appInst = new appdata(() => { setDataSvcLoadTime(new Date().toISOString()) })
 			setAppdataSvc(appInst)
 		}
@@ -38,7 +38,7 @@ export default function AppMain() {
 			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = "${appdataSvc.authState ? appdataSvc.authState.status : ''}"`)
 			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
 			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
-			setIsLoadingGoogleDriveApi(false)
+			setIsBusyGapiLoad(false)
 		}
 	}, [appdataSvc, dataSvcLoadTime])
 
@@ -252,7 +252,7 @@ export default function AppMain() {
 			</header>
 			<main>
 				<div>
-					{isLoadingGoogleDriveApi ?
+					{isBusyGapiLoad ?
 						<section>
 							{renderLogin()}
 							<div className='text-center bg-dark p-3'>
