@@ -6,16 +6,11 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import React, { useEffect, useMemo, useState } from 'react'
-import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { appdata } from './appdata'
 import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
-	const DEF_AUTH_STATE: IAuthState = {
-		status: AuthState.Unauthenticated,
-		userName: '',
-	}
-	//
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
@@ -25,9 +20,8 @@ export default function AppMain() {
 	const [updated, setUpdated] = useState('')
 	//
 	const [appdataSvc, setAppdataSvc] = useState<appdata>()
-	const [authState, setAuthState] = useState<IAuthState>(DEF_AUTH_STATE)
-	//
 	const [signedInUser, setSignedInUser] = useState('')
+	//
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
 	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
@@ -42,10 +36,9 @@ export default function AppMain() {
 	useEffect(() => {
 		if (appdataSvc && dataSvcLoadTime) {
 			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = "${appdataSvc.authState ? appdataSvc.authState.status : ''}"`)
-			setAuthState(appdataSvc.authState ? appdataSvc.authState : DEF_AUTH_STATE)
 			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
 			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
-			//setIsBusyLoad(false)
+			setIsLoadingGoogleDriveApi(false)
 		}
 	}, [appdataSvc, dataSvcLoadTime])
 
@@ -103,48 +96,6 @@ export default function AppMain() {
 		setSignedInUser('')
 		setGapiFiles([])
 	}
-
-	/**
-	const updateSigninStatus = (isSignedIn:boolean) => {
-		if (isSignedIn) {
-			const currentUser: IGapiCurrUser = gapi.auth2.getAuthInstance().currentUser
-
-			// Set the signed in user
-			setSignedInUser(currentUser?.le?.wt?.Ad)
-			setIsLoadingGoogleDriveApi(false)
-
-			// list files if user is authenticated
-			listFiles()
-			//fetchFolders() // WIP:
-		} else {
-			// prompt user to sign in
-			handleAuthClick()
-		}
-	}
-	 */
-
-	/**
-	// WIP:
-	// get root-level folders, then get all and build up structure
-	// NOTE: it is possible to have recursive ownership in gdrive "folder1">"folder2">"folder1" (!!!)
-	const fetchFolders = () => {
-		gapi.client.drive.files
-			.list({
-				pageSize: 1000,
-				fields: 'nextPageToken, files(id, title, parents, mimeType)',
-				q: 'mimeType=\'application/vnd.google-apps.folder\' and \'root\' in parents', // get root-level folders
-			})
-			.then(function(response: any) {
-				const res = JSON.parse(response.body)
-				//setGapiFiles(res.files)
-				console.log('res.files', res.files) // DEBUG:
-
-				const folders = res.files.sort((a: any, b: any) => a.parents[0] < b.parents[0] ? -1 : 1).map((item: any) => `${item.parents[0]} - ${item.id}/${item.title}`)
-				console.log('FOLDERS', folders)
-			})
-	}
-	 */
-
 
 	/**
 	 * load image file blob from google drive api
