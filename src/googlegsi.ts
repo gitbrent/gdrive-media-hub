@@ -239,6 +239,29 @@ export class googlegsi {
 			headers: { Authorization: `Bearer ${this.tokenResponse.access_token}` },
 		})
 	}
+	//#endregion
+
+	/**
+	// WIP:
+	// get root-level folders, then get all and build up structure
+	// NOTE: it is possible to have recursive ownership in gdrive "folder1">"folder2">"folder1" (!!!)
+	const fetchFolders = () => {
+		gapi.client.drive.files
+			.list({
+				pageSize: 1000,
+				fields: 'nextPageToken, files(id, title, parents, mimeType)',
+				q: 'mimeType=\'application/vnd.google-apps.folder\' and \'root\' in parents', // get root-level folders
+			})
+			.then(function(response: any) {
+				const res = JSON.parse(response.body)
+				//setGapiFiles(res.files)
+				console.log('res.files', res.files) // DEBUG:
+
+				const folders = res.files.sort((a: any, b: any) => a.parents[0] < b.parents[0] ? -1 : 1).map((item: any) => `${item.parents[0]} - ${item.id}/${item.title}`)
+				console.log('FOLDERS', folders)
+			})
+	}
+	*/
 
 	//#region getters
 	get authState(): IAuthState {
