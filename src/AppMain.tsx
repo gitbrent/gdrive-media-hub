@@ -6,27 +6,41 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiCurrUser, IGapiFile, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { gapi } from 'gapi-script'
+import { IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { appdata } from './appdata'
 import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
-	const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID
-	const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY
-	const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-	const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.readonly'
-	//
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [updated, setUpdated] = useState('')
 	//
+	const [appdataSvc, setAppdataSvc] = useState<appdata>()
 	const [signedInUser, setSignedInUser] = useState('')
+	//
 	const [isLoadingGoogleDriveApi, setIsLoadingGoogleDriveApi] = useState(false)
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
-	const [updated, setUpdated] = useState('')
+	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
+
+	useEffect(() => {
+		if (!appdataSvc) {
+			const appInst = new appdata(() => { setDataSvcLoadTime(new Date().toISOString()) })
+			setAppdataSvc(appInst)
+		}
+	}, [])
+
+	useEffect(() => {
+		if (appdataSvc && dataSvcLoadTime) {
+			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = "${appdataSvc.authState ? appdataSvc.authState.status : ''}"`)
+			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
+			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
+			setIsLoadingGoogleDriveApi(false)
+		}
+	}, [appdataSvc, dataSvcLoadTime])
 
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
@@ -41,16 +55,18 @@ export default function AppMain() {
 	}, [gapiFiles])
 
 	useEffect(() => {
-		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+		if (appdataSvc) {
+			showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+		}
 	}, [pagingPage, pagingSize, optSchWord])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.title < b.title ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedTime < b.modifiedTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.modifiedDate < b.modifiedDate ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -60,15 +76,16 @@ export default function AppMain() {
 
 		return gapiFiles
 			.sort(sorter)
-			.filter((item)=>{ return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.filter((item) => { return !optSchWord || item.title.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, updated, optSchWord])
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
 	/**
 	 *  Sign in the user upon button click.
 	 */
 	const handleAuthClick = () => {
-		gapi.auth2.getAuthInstance().signIn()
+		// NOTE: this triggers callback above (dataSvcLoadTime is set)
+		appdataSvc?.doAuthSignIn()
 	}
 
 	/**
@@ -81,125 +98,26 @@ export default function AppMain() {
 	}
 
 	/**
-	 *  Called when the signed in status changes, to update the UI
-	 *  appropriately. After a sign-in, the API is called.
-	 */
-	const updateSigninStatus = (isSignedIn:boolean) => {
-		if (isSignedIn) {
-			const currentUser: IGapiCurrUser = gapi.auth2.getAuthInstance().currentUser
-
-			// Set the signed in user
-			setSignedInUser(currentUser?.le?.wt?.Ad)
-			setIsLoadingGoogleDriveApi(false)
-
-			// list files if user is authenticated
-			listFiles()
-			//fetchFolders() // WIP:
-		} else {
-			// prompt user to sign in
-			handleAuthClick()
-		}
-	}
-
-	/**
-	 *  Initializes the API client library and sets up sign-in state listeners.
-	 */
-	const initClient = () => {
-		setIsLoadingGoogleDriveApi(true)
-		gapi.client
-			.init({
-				apiKey: GAPI_API_KEY,
-				clientId: GAPI_CLIENT_ID,
-				discoveryDocs: GAPI_DISC_DOCS,
-				scope: GAPI_SCOPES,
-			})
-			.then(
-				() => {
-					// Listen for sign-in state changes.
-					gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus)
-
-					// Handle the initial sign-in state.
-					updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get())
-
-					setIsLoadingGoogleDriveApi(false)
-				},
-				(error:any) => {
-					console.error(error)
-					setIsLoadingGoogleDriveApi(false)
-				}
-			)
-	}
-
-	const handleClientLoad = () => {
-		gapi.load('client:auth2', initClient)
-	}
-
-	/**
-	 * Print files
-	 */
-	const listFiles = (searchTerm = null) => {
-		console.log('TODO: `searchTerm`', searchTerm)
-
-		gapi.client.drive.files
-			.list({
-				pageSize: 1000,
-				fields: 'nextPageToken, files(id, name, createdTime, mimeType, modifiedTime, size)',
-				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
-				q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
-			})
-			.then(function(response:any) {
-				const res = JSON.parse(response.body)
-				setGapiFiles(res.files)
-			})
-	}
-
-	// WIP:
-	// get root-level folders, then get all and build up structure
-	// NOTE: it is possible to have recursive ownership in gdrive "folder1">"folder2">"folder1" (!!!)
-	const fetchFolders = () => {
-		gapi.client.drive.files
-			.list({
-				pageSize: 1000,
-				fields: 'nextPageToken, files(id, name, parents, mimeType)',
-				q: 'mimeType=\'application/vnd.google-apps.folder\' and \'root\' in parents', // get root-level folders
-			})
-			.then(function(response:any) {
-				const res = JSON.parse(response.body)
-				//setGapiFiles(res.files)
-				console.log('res.files', res.files) // DEBUG:
-
-				const folders = res.files.sort((a:any,b:any)=>a.parents[0]<b.parents[0]?-1:1).map((item:any)=>`${item.parents[0]} - ${item.id}/${item.name}`)
-				console.log('FOLDERS', folders)
-			})
-	}
-
-
-
-	/**
 	 * load image file blob from google drive api
 	 * @param fileId
 	 */
-	const downloadFile = (fileId: string) => {
-		gapi.client.drive.files.get({ fileId: fileId, alt: 'media' })
-			.then((response:any) => {
-				// 1
-				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }))
-				const imgBlob = new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' })
-				// 2
-				const img = document.createElement('img')
-				const blob = URL.createObjectURL(imgBlob)
-				img.src = blob
-				img.onload = function() {
-					const updFiles = gapiFiles
-					const imgFile = updFiles.filter((file) => file.id === fileId)[0]
-					imgFile.imageBlobUrl = objectUrl
-					imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-					imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-					setGapiFiles(updFiles)
-					setUpdated(new Date().toISOString())
-				}
-			})
-			.catch((err:any) => console.log(err))
+	const downloadFile = async (fileId: string) => {
+		const response = await appdataSvc?.doFetchFileBlob(fileId)
+		if (response) {
+			const blob = await response.blob()
+			const objectUrl = URL.createObjectURL(blob)
+			const img = document.createElement('img')
+			img.src = objectUrl
+			img.onload = function() {
+				const updFiles = gapiFiles
+				const imgFile = updFiles.filter((file) => file.id === fileId)[0]
+				imgFile.imageBlobUrl = objectUrl
+				imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
+				imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
+				setGapiFiles(updFiles)
+				setUpdated(new Date().toISOString())
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -268,7 +186,7 @@ export default function AppMain() {
 						}
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
 						<form className="d-flex" role="search">
-							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev)=>{ setOptSchWord(ev.currentTarget.value) }} />
+							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
 							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
@@ -311,13 +229,13 @@ export default function AppMain() {
 	}
 
 	function renderLogin(): JSX.Element {
-		return (<section onClick={handleClientLoad} className="text-center p-4 bg-dark">
+		return (<section onClick={() => handleAuthClick()} className="text-center p-4 bg-dark">
 			<div className='p-4'>
 				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveImage" />
 			</div>
 			<h5>Google Drive</h5>
 			<p>view media directly from your google drive</p>
-		</section>)
+		</section >)
 	}
 
 	return (
