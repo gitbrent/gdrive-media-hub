@@ -80,6 +80,8 @@ export default function AppMain() {
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
+	// --------------------------------------------------------------------------------------------
+
 	/**
 	 *  Sign in the user upon button click.
 	 */
@@ -148,6 +150,16 @@ export default function AppMain() {
 							<li className="nav-item">
 								<a className="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
+							{(document.location.hostname === 'localhost' || location.href.toLowerCase().includes('debug')) &&
+								<li className="nav-item dropdown" data-desc="opt-debug">
+									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">DEBUG</a>
+									<ul className="dropdown-menu">
+										<li><h6 className="dropdown-header">Items</h6></li>
+										<li><button className="dropdown-item" disabled={true}>{showFiles?.length} showing</button></li>
+										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.length} total</button></li>
+									</ul>
+								</li>
+							}
 							<li className="nav-item dropdown" data-desc="opt-pagesize">
 								{/* TODO:
 									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
@@ -179,11 +191,6 @@ export default function AppMain() {
 								</ul>
 							</li>
 						</ul>
-						{document.location.hostname === 'localhost' &&
-							<div className="d-flex d-none d-xl-block me-5" data-desc="debug-badges">
-								<div className='badge text-bg-secondary'>Showing {showFiles.length} of {gapiFiles.length}</div>
-							</div>
-						}
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
 						<form className="d-flex" role="search">
 							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
