@@ -19,7 +19,7 @@ export default function AppImgGrid(props: IProps) {
 								<source src={file.imageBlobUrl} type='video/mp4' />
 							</video>
 							: file.imageBlobUrl ?
-								<img src={file.imageBlobUrl} alt={file.title} />
+								<img src={file.imageBlobUrl} alt={file.name} />
 								:
 								<div className='text-center'>
 									<div className="spinner-grow text-primary" role="status">

@@ -1,6 +1,6 @@
 // APP
-export const APP_BLD = '20230401-1940'
-export const APP_VER = '1.2.0'
+export const APP_BLD = '20230402-1301'
+export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
 // ============================================================================
@@ -15,17 +15,12 @@ export interface IAuthState {
 	userName: string
 }
 
-export interface IGapiFile {
+export interface IGapiFile extends gapi.client.drive.File {
 	/**
 	 * id
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
 	 */
 	id: string
-	/**
-	 * created time (ISO format)
-	 * @example "2022-11-21T14:54:14.453Z"
-	 */
-	createdDate: string
 	/**
 	 * mime type
 	 * @example "application/json"
@@ -35,12 +30,12 @@ export interface IGapiFile {
 	 * modified time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	modifiedDate: string
+	modifiedByMeTime: string
 	/**
 	 * file name
 	 * @example "corp-logo.png"
 	 */
-	title: string
+	name: string
 	/**
 	 * file size (bytes)
 	 * - only populated for files

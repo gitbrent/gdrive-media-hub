@@ -115,7 +115,7 @@ export class googlegsi {
 			const script = document.createElement('script')
 			script.src = 'https://apis.google.com/js/api.js'
 			// Load gapi script, load client, load gapi drive client (`drive` must be loaded!) = ready
-			script.onload = () => gapi.load('client', () => gapi.client.load('drive', 'v2').then(() => resolve(true)))
+			script.onload = () => gapi.load('client', () => gapi.client.load('drive', 'v3').then(() => resolve(true)))
 			document.body.appendChild(script)
 		})
 	}
@@ -223,13 +223,18 @@ export class googlegsi {
 
 	//#region file operations
 	private listFiles = async () => {
-		const response: { body: string } = await gapi.client.drive.files.list({
-			q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')'
+		const response = await gapi.client.drive.files.list({
+			q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
+			fields: 'files(id,mimeType,modifiedByMeTime,name,size)',
+			orderBy: 'modifiedByMeTime desc',
+			pageSize: 500,
 		})
-		const respBody = JSON.parse(response.body)
-		const respFiles: IGapiFile[] = respBody.items
-		if (IS_LOCALHOST) console.log(`- respFiles.length = ${respFiles.length}`)
-		this.gapiFiles = respFiles
+		const driveFiles = response.result.files || []
+		this.gapiFiles = driveFiles as IGapiFile[]
+		if (IS_LOCALHOST) {
+			console.log(`- this.gapiFiles.length = ${this.gapiFiles.length}`)
+			if (this.gapiFiles.length > 0) console.log(this.gapiFiles[0])
+		}
 		return
 	}
 

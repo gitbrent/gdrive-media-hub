@@ -63,10 +63,10 @@ export default function AppMain() {
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.title < b.title ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedDate < b.modifiedDate ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+				return a.modifiedByMeTime < b.modifiedByMeTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -76,7 +76,7 @@ export default function AppMain() {
 
 		return gapiFiles
 			.sort(sorter)
-			.filter((item) => { return !optSchWord || item.title.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 

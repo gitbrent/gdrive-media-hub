@@ -22,7 +22,7 @@ export default function ImageGrid(props:IProps) {
 				],*/
 				width: file.imageW || 750,
 				height: file.imageH || 750,
-				caption: file.title || 'loading',
+				caption: file.name || 'loading',
 			})
 		})
 		//console.log('DEBUG:showImages', showImages)
