@@ -1,6 +1,5 @@
 // APP
-export const APP_BLD = '20230346-0940'
-//export const APP_VER = `1.3.0-WIP ${APP_BLD}`
+export const APP_BLD = '20230401-1940'
 export const APP_VER = '1.2.0'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
@@ -14,39 +13,6 @@ export enum AuthState {
 export interface IAuthState {
 	status: AuthState
 	userName: string
-}
-
-// OLD:
-export interface IGapiCurrUser {
-	'le': {
-		'wt': {
-			/**
-			 * Full Name
-			 * @example "Git Brent"
-			 */
-			'Ad': string,
-			/**
-			 * First Name
-			 * @example "Git"
-			 */
-			'rV': string,
-			/**
-			 * Last Name
-			 * @example "Brent"
-			 */
-			'uT': string,
-			/**
-			 * Account Picture
-			 * @example "https://lh3.googleusercontent.com/a/ALm5wu3R_tKI4hZd9DbwPh8SShfBYgaNN95WZYZYvfwy=s96-c"
-			 */
-			'hK': string,
-			/**
-			 * Email
-			 * @example "gitbrent@gmail.com"
-			 */
-			'cu': string
-		}
-	},
 }
 
 export interface IGapiFile {
