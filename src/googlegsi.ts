@@ -18,8 +18,8 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="google-one-tap" />
 /// <reference types="gapi" />
-import { AuthState, IAuthState, IS_LOCALHOST } from './App.props'
-import { TokenResponse, IGapiFile, TokenClientConfig } from './googlegsi.types'
+import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST } from './App.props'
+import { TokenResponse, TokenClientConfig } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
 
@@ -99,7 +99,7 @@ export class googlegsi {
 		if (IS_LOCALHOST) console.log('\nGSI-STEP-4: updateUserAuthStatus() ---')
 		await this.updateUserAuthStatus()
 
-		// STEP 4: download app files if authorized
+		// STEP 4: download all image files
 		if (IS_LOCALHOST) console.log('\nGSI-STEP-5: listFiles() --------------')
 		if (this.isAuthorized) await this.listFiles()
 
@@ -233,20 +233,24 @@ export class googlegsi {
 		return
 	}
 
+	private fetchFileImgBlob = async (chgFile: IGapiFile) => {
+		return await fetch(`https://www.googleapis.com/drive/v3/files/${chgFile.id}?alt=media`, {
+			method: 'GET',
+			headers: { Authorization: `Bearer ${this.tokenResponse.access_token}` },
+		})
+	}
+
 	//#region getters
 	get authState(): IAuthState {
 		if (IS_LOCALHOST) console.log('returning this.isAuthorized:', this.isAuthorized)
-		//if (IS_LOCALHOST) console.log(window.google.accounts.oauth2.hasGrantedAllScopes(this.tokenResponse, this.GAPI_SCOPES))
-
 		return {
-			status: this.isAuthorized ? AuthState.Authenticated : AuthState.Unauthenticated,
-			userName: this.signedInUser,
-			userPhoto: ''
+			status: this.isAuthorized === true ? AuthState.Authenticated : AuthState.Unauthenticated,
+			userName: this.signedInUser ? this.signedInUser : '',
 		}
 	}
 
 	get imageFiles(): IGapiFile[] {
-		return this.gapiFiles
+		return this.gapiFiles ? this.gapiFiles : []
 	}
 	//#endregion
 
@@ -258,6 +262,11 @@ export class googlegsi {
 	public doAuthSignOut = async () => {
 		console.log('TODO: doAuthSignOut')
 		return
+	}
+
+	public doFetchFileBlob = async (fileId: IGapiFile['id']) => {
+		const chgFile = this.gapiFiles.filter(item => item.id === fileId)[0]
+		return this.fetchFileImgBlob(chgFile)
 	}
 	//#endregion
 }

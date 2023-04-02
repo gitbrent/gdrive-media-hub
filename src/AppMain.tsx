@@ -14,7 +14,6 @@ export default function AppMain() {
 	const DEF_AUTH_STATE: IAuthState = {
 		status: AuthState.Unauthenticated,
 		userName: '',
-		userPhoto: '',
 	}
 	//
 	const [pagingSize, setPagingSize] = useState(12)
@@ -23,6 +22,7 @@ export default function AppMain() {
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [updated, setUpdated] = useState('')
 	//
 	const [appdataSvc, setAppdataSvc] = useState<appdata>()
 	const [authState, setAuthState] = useState<IAuthState>(DEF_AUTH_STATE)
@@ -41,9 +41,9 @@ export default function AppMain() {
 
 	useEffect(() => {
 		if (appdataSvc && dataSvcLoadTime) {
-			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = ${appdataSvc.authState.status}`)
-			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
+			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = "${appdataSvc.authState ? appdataSvc.authState.status : ''}"`)
 			setAuthState(appdataSvc.authState ? appdataSvc.authState : DEF_AUTH_STATE)
+			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
 			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
 			//setIsBusyLoad(false)
 		}
@@ -62,7 +62,9 @@ export default function AppMain() {
 	}, [gapiFiles])
 
 	useEffect(() => {
-		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+		if (appdataSvc) {
+			showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+		}
 	}, [pagingPage, pagingSize, optSchWord])
 
 	const showFiles = useMemo(() => {
@@ -83,15 +85,14 @@ export default function AppMain() {
 			.sort(sorter)
 			.filter((item) => { return !optSchWord || item.title.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord])
+	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
 	/**
 	 *  Sign in the user upon button click.
 	 */
 	const handleAuthClick = () => {
-		// TODO: gapi.auth2.getAuthInstance().signIn()
-		alert('TODO: WIP:')
-		// TODO: get list files
+		// NOTE: this triggers callback above (dataSvcLoadTime is set)
+		appdataSvc?.doAuthSignIn()
 	}
 
 	/**
@@ -123,22 +124,6 @@ export default function AppMain() {
 	 */
 
 	/**
-	const listFiles = (searchTerm = null) => {
-		console.log('TODO: `searchTerm`', searchTerm)
-
-		gapi.client.drive.files
-			.list({
-				pageSize: 1000,
-				fields: 'nextPageToken, files(id, title, createdTime, mimeType, modifiedTime, size)',
-				// TODO: works! but we need to add filter/scaling for videos q: `mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif' or mimeType = 'video/mp4'`,
-				q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
-			})
-			.then(function(response: any) {
-				const res = JSON.parse(response.body)
-				setGapiFiles(res.files)
-			})
-	}
-
 	// WIP:
 	// get root-level folders, then get all and build up structure
 	// NOTE: it is possible to have recursive ownership in gdrive "folder1">"folder2">"folder1" (!!!)
@@ -165,32 +150,23 @@ export default function AppMain() {
 	 * load image file blob from google drive api
 	 * @param fileId
 	 */
-	const downloadFile = (fileId: string) => {
-		// TODO: WIP:
-		console.log(`downloadFile = ${fileId}`)
-		return
-		/*
-		gapi.client.drive.files.get({ fileId: fileId, alt: 'media' })
-			.then((response: any) => {
-				// 1
-				const objectUrl = URL.createObjectURL(new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' }))
-				const imgBlob = new Blob([new Uint8Array(response.body.length).map((_, i) => response.body.charCodeAt(i))], { type: 'image/png' })
-				// 2
-				const img = document.createElement('img')
-				const blob = URL.createObjectURL(imgBlob)
-				img.src = blob
-				img.onload = function() {
-					const updFiles = gapiFiles
-					const imgFile = updFiles.filter((file) => file.id === fileId)[0]
-					imgFile.imageBlobUrl = objectUrl
-					imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-					imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-					setGapiFiles(updFiles)
-					setUpdated(new Date().toISOString())
-				}
-			})
-			.catch((err: any) => console.log(err))
-		*/
+	const downloadFile = async (fileId: string) => {
+		const response = await appdataSvc?.doFetchFileBlob(fileId)
+		if (response) {
+			const blob = await response.blob()
+			const objectUrl = URL.createObjectURL(blob)
+			const img = document.createElement('img')
+			img.src = objectUrl
+			img.onload = function() {
+				const updFiles = gapiFiles
+				const imgFile = updFiles.filter((file) => file.id === fileId)[0]
+				imgFile.imageBlobUrl = objectUrl
+				imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
+				imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
+				setGapiFiles(updFiles)
+				setUpdated(new Date().toISOString())
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------------------

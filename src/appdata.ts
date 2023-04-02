@@ -9,7 +9,6 @@ export class appdata {
 	private readonly DEF_AUTH_STATE: IAuthState = {
 		status: AuthState.Unauthenticated,
 		userName: '',
-		userPhoto: '',
 	}
 	private driveAuthState: IAuthState = this.DEF_AUTH_STATE
 	private gapiFiles!: IGapiFile[]
@@ -49,5 +48,9 @@ export class appdata {
 
 	public doAuthSignOut = async () => {
 		return this.googleapi.doAuthSignOut()
+	}
+
+	public doFetchFileBlob = async (fileId: IGapiFile['id']) => {
+		return this.googleapi.doFetchFileBlob(fileId)
 	}
 }

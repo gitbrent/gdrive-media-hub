@@ -14,7 +14,6 @@ export enum AuthState {
 export interface IAuthState {
 	status: AuthState
 	userName: string
-	userPhoto: string
 }
 
 // OLD:
