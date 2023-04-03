@@ -1,0 +1,59 @@
+.grid {
+	display: grid;
+	grid-gap: 1rem;
+	/*grid-template-rows: 1fr auto;*/
+	/*grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));*/
+	align-items: end;
+	/*justify-items: center;*/
+	transition: all .2s ease-in-out;
+}
+
+.grid img {
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	/*box-shadow: 2px 2px 6px 0px rgba(0, 0, 0, 0.8);*/
+	box-shadow: 3px 3px 6px 2px rgb(0 0 0 / 50%);
+	margin: auto;
+}
+
+.grid img:hover {
+	transform: scale(1.05);
+	box-shadow: 2px 2px 4px 1px rgb(0 0 0 / 50%);
+}
+
+/* @see https://codepen.io/rachelandrew/pen/QWEmPMK */
+
+img {
+	max-width: 100%;
+	display: block;
+}
+
+figure {
+	margin: 0;
+	display: grid;
+	grid-template-rows: 1fr auto;
+}
+
+figure>img {
+	grid-row: 1 / -1;
+	grid-column: 1;
+}
+
+figure a {
+	color: black;
+	text-decoration: none;
+}
+
+figcaption {
+	/*grid-row: 2; = overlap picture*/
+	grid-column: 1;
+	color: rgba(255, 255, 255, .75);
+	background-color: rgba(255, 255, 255, .15);
+	padding: .6em .4em;
+	justify-self: start;
+	width: 100%;
+	font-size: .7rem;
+}
+
+.landscape {
+	grid-column-end: span 2;
+}

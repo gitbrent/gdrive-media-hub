@@ -6,7 +6,7 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { appdata } from './appdata'
 import ImageGrid from './ImageGrid'
 
@@ -260,7 +260,7 @@ export default function AppMain() {
 							</div>
 						</section>
 						:
-						<section>{signedInUser ? <ImageGrid showFiles={showFiles} /> : renderLogin()}</section>
+						<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
 					}
 				</div>
 			</main>
