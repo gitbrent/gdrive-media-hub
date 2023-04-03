@@ -46,6 +46,8 @@ export default function ImageGrid(props: IProps) {
 		</Gallery>
 	) :
 		(
-			<div className='alter alert-info'>(no images to display)</div>
+			<section className='text-center my-5'>
+				<div className='alert alert-warning d-inline-block align-middle' role='alert'><span className='h2 fw-light me-2'>⚠️</span>(no images to display)</div>
+			</section>
 		)
 }
