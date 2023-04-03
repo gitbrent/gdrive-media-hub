@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { IGapiFile, IGridSize } from './App.props'
 import { FixedItemProps } from './ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
@@ -29,30 +29,13 @@ export default function ImageGrid(props: IProps) {
 		return showImages
 	}, [props.gapiFiles])
 
-	const [photoIndex, setPhotoIndex] = useState(-1)
-	const [isOpen, setIsOpen] = useState(false)
-
-	//const currentImage = useMemo(() => { return images[photoIndex] }, [photoIndex]) // stil comes up empty on first click
-	const currentImage = galleryItems[photoIndex]
-	const nextIndex = (photoIndex + 1) % galleryItems.length
-	const nextImage = galleryItems[nextIndex] || currentImage
-	const prevIndex = (photoIndex + galleryItems.length - 1) % galleryItems.length
-	const prevImage = galleryItems[prevIndex] || currentImage
-
-	const handleClick = (index: number) => {
-		setPhotoIndex(index)
-		setIsOpen(true)
-	}
-	const handleClose = () => setIsOpen(false)
-	const handleMovePrev = () => setPhotoIndex(prevIndex)
-	const handleMoveNext = () => setPhotoIndex(nextIndex)
-
 	return galleryItems && galleryItems.length > 0 ? (
 		<Gallery id="galleryItems" withCaption={props.isShowCap}>
-			<div className="grid" style={{ gridTemplateColumns: `repeat(auto-fill, minMax(${props.selGridSize.css}, 1fr)` }}>
+			{/*<div className="gallery" style={{ '--num-columns': 6 } as React.CSSProperties}>*/}
+			<div className="gallery">
 				{galleryItems.map((item) => (<Item {...item} key={item.id}>
 					{({ ref, open }) => (
-						<figure className={item.width > item.height ? 'landscape' : ''}>
+						<figure>
 							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
 							{props.isShowCap && <figcaption>{item.caption}</figcaption>}
 						</figure>
