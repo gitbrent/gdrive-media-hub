@@ -1,9 +1,29 @@
 // APP
-export const APP_BLD = '20230402-1301'
+export const APP_BLD = '20230412-2201'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
 // ============================================================================
+
+// ----------------------------------------------------------------------------
+
+export interface IPageSize { title: string, size: number }
+export const PageSizes: IPageSize[] = [
+	{ title: '8 posts', size: 8 },
+	{ title: '16 posts', size: 16 },
+	{ title: '24 posts', size: 24 },
+	{ title: '48 posts', size: 48 },
+]
+
+export interface IGridSize { title: string, css: string }
+export const GridSizes: IGridSize[] = [
+	{ title: '4 (sml)', css: '4rem' },
+	{ title: '8 (med)', css: '8rem' },
+	{ title: '12 (lg)', css: '12rem' },
+	{ title: '16 (xl)', css: '16rem' },
+]
+
+// ----------------------------------------------------------------------------
 
 export enum AuthState {
 	Authenticated = 'Authenticated',

@@ -1,0 +1,44 @@
+.gallery {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 -0.25rem;
+}
+
+.gallery figure {
+	margin: 0.25rem;
+	flex: 1 0 auto;
+}
+
+.gallery figure img {
+	display: block;
+	height: 200px;
+	max-width: 100%;
+}
+
+@media (min-width: 768px) {
+	.gallery {
+		--num-columns: 4;
+	}
+}
+
+@media (min-width: 992px) {
+	.gallery {
+		--num-columns: 6;
+	}
+}
+
+@media (min-width: 1200px) {
+	.gallery {
+		--num-columns: 8;
+	}
+}
+
+@media (min-width: 1400px) {
+	.gallery {
+		--num-columns: 10;
+	}
+}
+
+.gallery img {
+	flex-basis: calc(100% / var(--num-columns) - 0.25rem);
+}

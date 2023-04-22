@@ -53,4 +53,10 @@ export class appdata {
 	public doFetchFileBlob = async (fileId: IGapiFile['id']) => {
 		return this.googleapi.doFetchFileBlob(fileId)
 	}
+
+	public doSearchFilesByName = async (searchText: string) => {
+		await this.googleapi.doSearchFilesByName(searchText)
+		this.gapiFiles = this.googleapi.imageFiles ? this.googleapi.imageFiles : []
+		return true
+	}
 }
