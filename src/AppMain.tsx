@@ -7,9 +7,9 @@
  */
 import React, { useEffect, useMemo, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { appdata } from './appdata'
-import ImageGrid from './ImageGrid'
+import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob } from './GoogleApi'
 import ImageSlideshow from './ImageSlideshow'
+import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
 	const [pagingSize, setPagingSize] = useState(12)
@@ -20,7 +20,6 @@ export default function AppMain() {
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optSlideshow, setOptSlideshow] = useState(false)
 	//
-	const [appdataSvc, setAppdataSvc] = useState<appdata>()
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
 	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
@@ -30,21 +29,18 @@ export default function AppMain() {
 	const [debugShowFileNames, setDebugShowFileNames] = useState(false)
 
 	useEffect(() => {
-		if (!appdataSvc) {
-			setIsBusyGapiLoad(true)
-			const appInst = new appdata(() => { setDataSvcLoadTime(new Date().toISOString()) })
-			setAppdataSvc(appInst)
-		}
+		initGoogleApi((authState) => setSignedInUser(authState.userName))
 	}, [])
 
 	useEffect(() => {
-		if (appdataSvc && dataSvcLoadTime) {
-			if (IS_LOCALHOST) console.log(`[MAIN] appdataSvc.authState = "${appdataSvc.authState ? appdataSvc.authState.status : ''}"`)
-			setSignedInUser(appdataSvc.authState ? appdataSvc.authState.userName : '')
-			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
-			setIsBusyGapiLoad(false)
+		if (signedInUser) {
+			if (IS_LOCALHOST) console.log(`[MAIN] signedInUser = "${signedInUser}"`)
+			fetchDriveFiles().then((files) => {
+				setGapiFiles(files)
+				setIsBusyGapiLoad(false)
+			})
 		}
-	}, [appdataSvc, dataSvcLoadTime])
+	}, [signedInUser])
 
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
@@ -59,9 +55,7 @@ export default function AppMain() {
 	}, [gapiFiles])
 
 	useEffect(() => {
-		if (appdataSvc) {
-			showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-		}
+		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
 	}, [pagingPage, pagingSize, optSchWord, dataSvcLoadTime])
 
 	const showFiles = useMemo(() => {
@@ -91,7 +85,7 @@ export default function AppMain() {
 	 */
 	const handleAuthClick = () => {
 		// NOTE: this triggers callback above (dataSvcLoadTime is set)
-		appdataSvc?.doAuthSignIn()
+		doAuthSignIn()
 	}
 
 	/**
@@ -108,7 +102,8 @@ export default function AppMain() {
 	 * @param fileId
 	 */
 	const downloadFile = async (fileId: string) => {
-		const response = await appdataSvc?.doFetchFileBlob(fileId)
+		const file = gapiFiles.filter(item => item.id === fileId)[0]
+		const response = await fetchFileImgBlob(file)
 		if (response) {
 			const blob = await response.blob()
 			const objectUrl = URL.createObjectURL(blob)
@@ -128,13 +123,10 @@ export default function AppMain() {
 
 	// NEW: WIP:
 	const doSearchFiles = async () => {
-		if (appdataSvc) {
-			setIsBusyGapiLoad(true)
-			await appdataSvc.doSearchFilesByName(optSchWord)
-			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
-			setIsBusyGapiLoad(false)
-			setDataSvcLoadTime(new Date().toISOString()) // download any inmages not fetched yet
-		}
+		setIsBusyGapiLoad(true)
+		const files = await fetchDriveFiles()
+		setGapiFiles(files)
+		setIsBusyGapiLoad(false)
 	}
 
 	// --------------------------------------------------------------------------------------------
