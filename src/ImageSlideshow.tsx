@@ -20,7 +20,7 @@ const Slideshow: React.FC<Props> = ({ images, duration }) => {
 	return (
 		<div>
 			{images[currentIndex] && (
-				<img src={images[currentIndex].imageBlobUrl} style={{ width: '100%' }} />
+				<img src={images[currentIndex].imageBlobUrl} style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }} />
 			)}
 		</div>
 	)
