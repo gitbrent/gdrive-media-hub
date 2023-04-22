@@ -9,6 +9,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { appdata } from './appdata'
 import ImageGrid from './ImageGrid'
+import ImageSlideshow from './ImageSlideshow'
 
 export default function AppMain() {
 	const [pagingSize, setPagingSize] = useState(12)
@@ -17,6 +18,7 @@ export default function AppMain() {
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [optSlideshow, setOptSlideshow] = useState(false)
 	//
 	const [appdataSvc, setAppdataSvc] = useState<appdata>()
 	const [signedInUser, setSignedInUser] = useState('')
@@ -24,6 +26,8 @@ export default function AppMain() {
 	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
 	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
 	const [updated, setUpdated] = useState('')
+	//
+	const [debugShowFileNames, setDebugShowFileNames] = useState(false)
 
 	useEffect(() => {
 		if (!appdataSvc) {
@@ -58,7 +62,7 @@ export default function AppMain() {
 		if (appdataSvc) {
 			showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
 		}
-	}, [pagingPage, pagingSize, optSchWord])
+	}, [pagingPage, pagingSize, optSchWord, dataSvcLoadTime])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
@@ -122,6 +126,17 @@ export default function AppMain() {
 		}
 	}
 
+	// NEW: WIP:
+	const doSearchFiles = async () => {
+		if (appdataSvc) {
+			setIsBusyGapiLoad(true)
+			await appdataSvc.doSearchFilesByName(optSchWord)
+			setGapiFiles(appdataSvc.imageFiles ? appdataSvc.imageFiles : [])
+			setIsBusyGapiLoad(false)
+			setDataSvcLoadTime(new Date().toISOString()) // download any inmages not fetched yet
+		}
+	}
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderNavbar(): JSX.Element {
@@ -154,9 +169,18 @@ export default function AppMain() {
 								<li className="nav-item dropdown" data-desc="opt-debug">
 									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">DEBUG</a>
 									<ul className="dropdown-menu">
-										<li><h6 className="dropdown-header">Items</h6></li>
-										<li><button className="dropdown-item" disabled={true}>{showFiles?.length} showing</button></li>
-										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.length} total</button></li>
+										<li><h6 className="dropdown-header">Display</h6></li>
+										<li><button className="dropdown-item" disabled={true}>{showFiles?.length} images shown</button></li>
+										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.length} images total</button></li>
+										<li>
+											<hr className="dropdown-divider" />
+										</li>
+										<li><h6 className="dropdown-header">Search</h6></li>
+										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.filter((item) => !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1).length} images (searching for &quot;{optSchWord}&quot;)</button></li>
+										<li>
+											<hr className="dropdown-divider" />
+										</li>
+										<li><button className="dropdown-item" onClick={() => setDebugShowFileNames(!debugShowFileNames)}>{debugShowFileNames ? 'Hide' : 'Show'}&nbsp;file.names</button></li>
 									</ul>
 								</li>
 							}
@@ -191,9 +215,11 @@ export default function AppMain() {
 								</ul>
 							</li>
 						</ul>
+						<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>SlideShow</button>
 						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
 						<form className="d-flex" role="search">
 							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+							<button type='button' className='btn btn-sm btn-outline-info ms-2' disabled={!optSchWord} onClick={() => doSearchFiles()}>Search</button>
 						</form>
 						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
 							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
@@ -218,7 +244,11 @@ export default function AppMain() {
 										<h6 className="dropdown-header">Logged In As</h6>
 									</li>
 									<li>
-										<button className="dropdown-item disabled">{signedInUser || '(no user)'}</button>
+										{signedInUser ?
+											<button className="dropdown-item disabled">{signedInUser}</button>
+											:
+											<button className="dropdown-item" onClick={() => setDataSvcLoadTime(new Date().toISOString())}>(click to refresh)</button>
+										}
 									</li>
 									<li>
 										<hr className="dropdown-divider" />
@@ -260,10 +290,15 @@ export default function AppMain() {
 							</div>
 						</section>
 						:
-						<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
+						optSlideshow ? <ImageSlideshow images={showFiles} duration={4} />
+							:
+							debugShowFileNames ?
+								<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
+								:
+								<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
 					}
 				</div>
-			</main>
-		</div>
+			</main >
+		</div >
 	)
 }
