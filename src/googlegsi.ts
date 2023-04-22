@@ -222,12 +222,13 @@ export class googlegsi {
 	//#endregion
 
 	//#region file operations
-	private listFiles = async () => {
+	private listFiles = async (searchText?: string) => {
 		const response = await gapi.client.drive.files.list({
-			q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
+			//q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
+			q: searchText ? `trashed=false and name contains "${searchText}"` : 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
 			fields: 'files(id,mimeType,modifiedByMeTime,name,size)',
 			orderBy: 'modifiedByMeTime desc',
-			pageSize: 500,
+			pageSize: 1000,
 		})
 		const driveFiles = response.result.files || []
 		this.gapiFiles = driveFiles as IGapiFile[]
@@ -295,6 +296,10 @@ export class googlegsi {
 	public doFetchFileBlob = async (fileId: IGapiFile['id']) => {
 		const chgFile = this.gapiFiles.filter(item => item.id === fileId)[0]
 		return this.fetchFileImgBlob(chgFile)
+	}
+
+	public doSearchFilesByName = async (searchText: string) => {
+		return this.listFiles(searchText)
 	}
 	//#endregion
 }
