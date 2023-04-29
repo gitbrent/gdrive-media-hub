@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { IGapiFile } from './App.props'
 
 interface Props {
-	images: IGapiFile[];
 	duration: number;
+	images: IGapiFile[];
 }
 
 const Slideshow: React.FC<Props> = ({ images, duration }) => {
@@ -11,7 +11,7 @@ const Slideshow: React.FC<Props> = ({ images, duration }) => {
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			setCurrentIndex((currentIndex + 1) % images.length)
+			setCurrentIndex(Math.floor(Math.random() * images.length))
 		}, duration * 1000)
 
 		return () => clearInterval(interval)
