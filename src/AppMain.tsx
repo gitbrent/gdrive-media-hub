@@ -132,11 +132,12 @@ export default function AppMain() {
 	// --------------------------------------------------------------------------------------------
 
 	function renderNavbar(): JSX.Element {
-		function renderPrevNext(): JSX.Element {
+		function renderBtns(): JSX.Element {
 			const isDisabledNext = showFiles.length === 0
 			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
 
 			return (<form className="d-flex me-0 me-lg-5">
+				<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>SlideShow</button>
 				<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
 				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
 			</form>)
@@ -148,7 +149,7 @@ export default function AppMain() {
 					<a className="navbar-brand" href="/">
 						<img src="/google-drive.png" alt="Google Drive Media Hub" width="32" height="32" />
 					</a>
-					<div className='d-lg-none'>{renderPrevNext()}</div>
+					<div className='d-lg-none'>{renderBtns()}</div>
 					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span className="navbar-toggler-icon"></span>
 					</button>
@@ -207,8 +208,7 @@ export default function AppMain() {
 								</ul>
 							</li>
 						</ul>
-						<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>SlideShow</button>
-						<div className='d-none d-lg-block'>{renderPrevNext()}</div>
+						<div className='d-none d-lg-block'>{renderBtns()}</div>
 						<form className="d-flex" role="search">
 							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							<button type='button' className='btn btn-sm btn-outline-info ms-2' disabled={!optSchWord} onClick={() => doSearchFiles()}>Search</button>
