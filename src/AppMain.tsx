@@ -7,7 +7,7 @@
  */
 import React, { useEffect, useMemo, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob } from './GoogleApi'
+import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders, buildFolderHierarchy } from './GoogleApi'
 import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
 
@@ -38,6 +38,11 @@ export default function AppMain() {
 			fetchDriveFiles().then((files) => {
 				setGapiFiles(files)
 				setIsBusyGapiLoad(false)
+			})
+			buildFolderHierarchy().then((res) => {
+			//fetchDriveFolders().then((res) => {
+				// WIP: can we get/show folders?
+				console.log('fetchDriveFolders', res)
 			})
 		}
 	}, [signedInUser])

@@ -75,6 +75,12 @@ export interface IGapiCurrUser {
 	},
 }
 
+export interface IGapiFolder {
+	id: string
+	name: string
+	children?: IGapiFolder[]
+}
+
 export interface IGapiFile {
 	kind: 'drive#file',
 	/**

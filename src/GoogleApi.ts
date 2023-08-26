@@ -16,7 +16,7 @@
  * NOTE: `GAPI_API_KEY` will always be empty unless the "private initGapiClient = (): void => {}" style of function declaration is used!!
  */
 import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST } from './App.props'
-import { TokenClientConfig, TokenResponse } from './googlegsi.types'
+import { IGapiFolder, TokenClientConfig, TokenResponse } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
 
@@ -224,6 +224,88 @@ export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 	doLoadInitGsiGapi()
 }
 
+// WIP:
+export async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
+	const response = await gapi.client.drive.files.list({
+		q: 'mimeType=\'application/vnd.google-apps.folder\' and trashed = false',
+		fields: 'nextPageToken, files(id, name, parents)',
+	})
+
+	const folderMap = new Map<string, IGapiFolder>()
+	const rootFolders: IGapiFolder[] = []
+
+	response.result.files?.forEach((folder) => {
+		let currentFolder = folderMap.get(folder.id || '')
+
+		if (!currentFolder) {
+			currentFolder = { id: folder.id || '', name: folder.name || '', children: [] }
+			if (currentFolder) folderMap.set(currentFolder.id, currentFolder)
+		}
+
+		const parentIds = folder.parents
+
+		if ((!parentIds || parentIds.length === 0) && currentFolder) {
+			rootFolders.push(currentFolder)
+			return
+		}
+
+		parentIds?.forEach((parentId) => {
+			let parentFolder = folderMap.get(parentId)
+
+			if (!parentFolder) {
+				parentFolder = { id: parentId, name: '', children: [] }
+				folderMap.set(parentFolder.id, parentFolder)
+			}
+
+			if (!parentFolder.children) {
+				parentFolder.children = []
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			if (!parentFolder.children.includes(currentFolder!)) {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				parentFolder.children.push(currentFolder!)
+			}
+		})
+	})
+
+	console.log('rootFolders', rootFolders) // DEBUG:
+	return rootFolders
+}
+
+
+export const fetchDriveFolders = async () => {
+	function buildFolderHierarchy(items: gapi.client.drive.File[], parentId: string | null = null): IGapiFolder[] {
+		const folders: IGapiFolder[] = []
+		for (const item of items) {
+			if (item.parents?.[0] === parentId) {
+				const folder: IGapiFolder = {
+					id: item.id || 'id',
+					name: item.name || 'name',
+					children: buildFolderHierarchy(items, item.id),
+				}
+				folders.push(folder)
+			}
+		}
+		return folders
+	}
+
+	const response = await gapi.client.drive.files.list({
+		q: 'trashed=false and mimeType = \'application/vnd.google-apps.folder\'',
+		fields: 'nextPageToken, files(id, name, parents)',
+		pageSize: 1000,
+	})
+	const folderHierarchy = response.result.files ? buildFolderHierarchy(response.result.files) : []
+	if (IS_LOCALHOST) console.log(`response.result.files length = ${response.result.files?.length}`)
+	console.log('===========================')
+	console.log('folderHierarchy', folderHierarchy)
+	console.log('=========================== NEW NEW NEW NEW')
+
+	// WIP: return real value!
+	return true
+}
+// WIP:
+
 export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]> => {
 	const response = await gapi.client.drive.files.list({
 		//q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
@@ -237,7 +319,7 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 
 	if (IS_LOCALHOST) {
 		console.log(`- gapiFiles.length = ${gapiFiles.length}`)
-		if (gapiFiles.length > 0) console.log(gapiFiles[0])
+		//if (gapiFiles.length > 0) console.log(gapiFiles[0])
 	}
 
 	return gapiFiles
