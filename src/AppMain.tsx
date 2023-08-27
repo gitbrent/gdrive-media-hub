@@ -136,11 +136,16 @@ export default function AppMain() {
 			const isDisabledNext = showFiles.length === 0
 			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
 
-			return (<form className="d-flex me-0 me-lg-5">
-				<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>SlideShow</button>
-				<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
-			</form>)
+			return optSlideshow ?
+				(<form className="d-flex me-0 me-lg-5">
+					<button className="btn btn-success" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>Stop SlideShow</button>
+				</form>)
+				:
+				(<form className="d-flex me-0 me-lg-5">
+					<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>Start SlideShow</button>
+					<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
+					<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
+				</form>)
 		}
 
 		return (
@@ -290,7 +295,7 @@ export default function AppMain() {
 								<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
 					}
 				</div>
-			</main >
+			</main>
 		</div >
 	)
 }
