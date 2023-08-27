@@ -74,8 +74,8 @@ export default function AppMain() {
 		}
 
 		return gapiFiles
-			.sort(sorter)
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
@@ -134,8 +134,7 @@ export default function AppMain() {
 
 	function renderNavbar(): JSX.Element {
 		function renderBtns(): JSX.Element {
-			const isDisabledNext = showFiles.length === 0
-			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
+			const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= gapiFiles.length)
 
 			return optIsSlideshow ?
 				(<form className="d-flex me-0 me-lg-5">
@@ -148,7 +147,7 @@ export default function AppMain() {
 				</form>)
 				:
 				(<form className="d-flex me-0 me-lg-5">
-					<button className="btn btn-success me-2" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>Start SlideShow</button>
+					<button className="btn btn-success me-2 me-lg-4" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>Start SlideShow</button>
 					<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
 					<button className="btn btn-info me-0" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
 				</form>)
@@ -157,7 +156,7 @@ export default function AppMain() {
 		return (
 			<nav className="navbar navbar-expand-lg navbar-dark bg-primary">
 				<div className="container-fluid">
-					<a className="navbar-brand" href="/">
+					<a className="navbar-brand d-none d-lg-block" href="/">
 						<img src="/google-drive.png" alt="Google Drive Media Hub" width="32" height="32" />
 					</a>
 					<div className='d-lg-none'>{renderBtns()}</div>
@@ -293,7 +292,7 @@ export default function AppMain() {
 					</section>
 					:
 					optIsSlideshow ?
-						<ImageSlideshow images={showFiles} duration={optSlideshowSecs} />
+						<ImageSlideshow images={gapiFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })} duration={optSlideshowSecs} />
 						:
 						debugShowFileNames ?
 							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
