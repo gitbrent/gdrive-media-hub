@@ -18,7 +18,8 @@ export default function AppMain() {
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
-	const [optSlideshow, setOptSlideshow] = useState(false)
+	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
+	const [optSlideshowSecs, setOptSlideshowSecs] = useState(4)
 	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
@@ -136,15 +137,20 @@ export default function AppMain() {
 			const isDisabledNext = showFiles.length === 0
 			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
 
-			return optSlideshow ?
+			return optIsSlideshow ?
 				(<form className="d-flex me-0 me-lg-5">
-					<button className="btn btn-success" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>Stop SlideShow</button>
+					{optSlideshowSecs === 999 ?
+						<button className="btn btn-warning me-2" type="button" onClick={() => { setOptSlideshowSecs(4) }}>Unpause SlideShow</button>
+						:
+						<button className="btn btn-warning me-2" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause SlideShow</button>
+					}
+					<button className="btn btn-danger me-0" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop SlideShow</button>
 				</form>)
 				:
 				(<form className="d-flex me-0 me-lg-5">
-					<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>Start SlideShow</button>
+					<button className="btn btn-success me-2" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>Start SlideShow</button>
 					<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-					<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
+					<button className="btn btn-info me-0" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
 				</form>)
 		}
 
@@ -278,23 +284,22 @@ export default function AppMain() {
 				{renderNavbar()}
 			</header>
 			<main>
-				<div>
-					{isBusyGapiLoad ?
-						<section>
-							{renderLogin()}
-							<div className='text-center bg-dark p-3'>
-								<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-							</div>
-						</section>
+				{isBusyGapiLoad ?
+					<section>
+						{renderLogin()}
+						<div className='text-center bg-dark p-3'>
+							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
+						</div>
+					</section>
+					:
+					optIsSlideshow ?
+						<ImageSlideshow images={showFiles} duration={optSlideshowSecs} />
 						:
-						optSlideshow ? <ImageSlideshow images={showFiles} duration={4} />
+						debugShowFileNames ?
+							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
 							:
-							debugShowFileNames ?
-								<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
-								:
-								<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
-					}
-				</div>
+							<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
+				}
 			</main>
 		</div >
 	)
