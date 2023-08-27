@@ -139,11 +139,11 @@ export default function AppMain() {
 			return optIsSlideshow ?
 				(<form className="d-flex me-0 me-lg-5">
 					{optSlideshowSecs === 999 ?
-						<button className="btn btn-warning me-2" type="button" onClick={() => { setOptSlideshowSecs(4) }}>Unpause SlideShow</button>
+						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(4) }}>Resume Slideshow</button>
 						:
-						<button className="btn btn-warning me-2" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause SlideShow</button>
+						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause Slideshow</button>
 					}
-					<button className="btn btn-danger me-0" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop SlideShow</button>
+					<button className="btn btn-danger me-0" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop</button>
 				</form>)
 				:
 				(<form className="d-flex me-0 me-lg-5">
