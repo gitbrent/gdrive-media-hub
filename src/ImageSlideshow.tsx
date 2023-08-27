@@ -18,10 +18,12 @@ const Slideshow: React.FC<Props> = ({ images, duration }) => {
 	}, [currentIndex, duration, images.length])
 
 	return (
-		<div>
-			{images[currentIndex] && (
-				<img src={images[currentIndex].imageBlobUrl} style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }} />
-			)}
+		<div className='slideShowContainer'>
+			<div className='slideShowMain'>
+				{images[currentIndex] && (
+					<img src={images[currentIndex].imageBlobUrl} />
+				)}
+			</div>
 		</div>
 	)
 }
