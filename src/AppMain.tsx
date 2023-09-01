@@ -12,6 +12,7 @@ import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
+	const DEFAULT_SLIDE_DELAY = 4
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
@@ -19,7 +20,7 @@ export default function AppMain() {
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
-	const [optSlideshowSecs, setOptSlideshowSecs] = useState(4)
+	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
 	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
@@ -29,10 +30,17 @@ export default function AppMain() {
 	//
 	const [debugShowFileNames, setDebugShowFileNames] = useState(false)
 
+	/**
+	 * Initializes the Google API when the component mounts.
+	 */
 	useEffect(() => {
 		initGoogleApi((authState) => setSignedInUser(authState.userName))
 	}, [])
 
+	/**
+	 * Fetches Google Drive files when a user is signed in.
+	 * It updates the `gapiFiles` state with the fetched files.
+	 */
 	useEffect(() => {
 		if (signedInUser) {
 			if (IS_LOCALHOST) console.log(`[MAIN] signedInUser = "${signedInUser}"`)
@@ -43,6 +51,9 @@ export default function AppMain() {
 		}
 	}, [signedInUser])
 
+	/**
+	 * Updates the `pagingSize` state based on the selected `optPgeSize`.
+	 */
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
 		else if (optPgeSize === OPT_PAGESIZE.ps12) setPagingSize(12)
@@ -50,11 +61,17 @@ export default function AppMain() {
 		else if (optPgeSize === OPT_PAGESIZE.ps48) setPagingSize(48)
 	}, [optPgeSize])
 
-	/** fetch images now that files are loaded */
+	/**
+	 * Sets the initial paging page when Google Drive files are loaded.
+	 */
 	useEffect(() => {
 		if (gapiFiles.length > 0) setPagingPage(1)
 	}, [gapiFiles])
 
+	/**
+	 * Fetches image blobs for files displayed on the current page.
+	 * It triggers when the page, page size, or other related variables change.
+	 */
 	useEffect(() => {
 		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
 	}, [pagingPage, pagingSize, optSchWord, dataSvcLoadTime])
@@ -122,34 +139,58 @@ export default function AppMain() {
 		}
 	}
 
-	// NEW: WIP:
-	const doSearchFiles = async () => {
-		setIsBusyGapiLoad(true)
-		const files = await fetchDriveFiles()
-		setGapiFiles(files)
-		setIsBusyGapiLoad(false)
-	}
-
 	// --------------------------------------------------------------------------------------------
 
 	function renderNavbar(): JSX.Element {
 		function renderBtns(): JSX.Element {
 			const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= gapiFiles.length)
+			const isSlidePaused = optSlideshowSecs === 999
 
 			return optIsSlideshow ?
-				(<form className="d-flex me-0 me-lg-5">
-					{optSlideshowSecs === 999 ?
-						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(4) }}>Resume Slideshow</button>
-						:
-						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause Slideshow</button>
-					}
-					<button className="btn btn-danger me-0" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop</button>
+				(<form className="row">
+					<div className="col">
+						<input type="number"
+							min={1}
+							max={10}
+							disabled={isSlidePaused}
+							value={optSlideshowSecs}
+							onChange={(ev) => setOptSlideshowSecs(Number(ev.currentTarget.value))}
+							className="form-control"
+							aria-describedby="slideshow delay" />
+					</div>
+					<div className="col">
+						{isSlidePaused ?
+							<button className="btn btn-warning text-nowrap w-100 px-5" type="button" onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>Resume Slideshow</button>
+							:
+							<button className="btn btn-warning text-nowrap w-100 px-5" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause Slideshow</button>
+						}
+					</div>
+					<div className="col">
+						<button className="btn btn-danger" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop</button>
+					</div>
 				</form>)
 				:
-				(<form className="d-flex me-0 me-lg-5">
-					<button className="btn btn-success me-2 me-lg-4" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>Start SlideShow</button>
-					<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-					<button className="btn btn-info me-0" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
+				(<form className="container-fluid">
+					<div className="row">
+						<div className="col-lg-4 col-md-4 col-sm-12 mb-2">
+							<button className="btn btn-success w-100" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>
+								Start SlideShow
+							</button>
+						</div>
+						<div className="col-lg-2 col-md-2 col-6 mb-2">
+							<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
+								Prev
+							</button>
+						</div>
+						<div className="col-lg-2 col-md-2 col-6 mb-2">
+							<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
+								Next
+							</button>
+						</div>
+						<div className="col-lg-4 col-md-4 col-sm-12">
+							<input className="form-control text-nowrap w-100" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+						</div>
+					</div>
 				</form>)
 		}
 
@@ -219,11 +260,7 @@ export default function AppMain() {
 							</li>
 						</ul>
 						<div className='d-none d-lg-block'>{renderBtns()}</div>
-						<form className="d-flex" role="search">
-							<input className="form-control" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							<button type='button' className='btn btn-sm btn-outline-info ms-2' disabled={!optSchWord} onClick={() => doSearchFiles()}>Search</button>
-						</form>
-						<ul className="navbar-nav flex-row flex-wrap ms-md-auto">
+						<ul className="navbar-nav flex-row ms-md-auto">
 							<li className="nav-item d-none d-lg-block col-6 col-lg-auto">
 								<a className="nav-link py-2 px-0 px-lg-2" href="https://github.com/gitbrent" target="_blank" rel="noreferrer">
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" className="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
