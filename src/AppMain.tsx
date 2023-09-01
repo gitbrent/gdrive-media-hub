@@ -18,7 +18,8 @@ export default function AppMain() {
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
-	const [optSlideshow, setOptSlideshow] = useState(false)
+	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
+	const [optSlideshowSecs, setOptSlideshowSecs] = useState(4)
 	//
 	const [signedInUser, setSignedInUser] = useState('')
 	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
@@ -73,8 +74,8 @@ export default function AppMain() {
 		}
 
 		return gapiFiles
-			.sort(sorter)
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
@@ -133,20 +134,29 @@ export default function AppMain() {
 
 	function renderNavbar(): JSX.Element {
 		function renderBtns(): JSX.Element {
-			const isDisabledNext = showFiles.length === 0
-			// TODO: disabled={pagingPage<(showFiles.length > (pagingSize+1))}
+			const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= gapiFiles.length)
 
-			return (<form className="d-flex me-0 me-lg-5">
-				<button className="btn btn-success me-2" type="button" onClick={() => { setOptSlideshow(!optSlideshow) }}>SlideShow</button>
-				<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
-				<button className="btn btn-info" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
-			</form>)
+			return optIsSlideshow ?
+				(<form className="d-flex me-0 me-lg-5">
+					{optSlideshowSecs === 999 ?
+						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(4) }}>Resume Slideshow</button>
+						:
+						<button className="btn btn-warning w-100 me-2" type="button" onClick={() => { setOptSlideshowSecs(999) }}>Pause Slideshow</button>
+					}
+					<button className="btn btn-danger me-0" type="button" onClick={() => { setOptIsSlideshow(false) }}>Stop</button>
+				</form>)
+				:
+				(<form className="d-flex me-0 me-lg-5">
+					<button className="btn btn-success me-2 me-lg-4" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>Start SlideShow</button>
+					<button className="btn btn-info me-2" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>Prev</button>
+					<button className="btn btn-info me-0" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>Next</button>
+				</form>)
 		}
 
 		return (
 			<nav className="navbar navbar-expand-lg navbar-dark bg-primary">
 				<div className="container-fluid">
-					<a className="navbar-brand" href="/">
+					<a className="navbar-brand d-none d-lg-block" href="/">
 						<img src="/google-drive.png" alt="Google Drive Media Hub" width="32" height="32" />
 					</a>
 					<div className='d-lg-none'>{renderBtns()}</div>
@@ -273,24 +283,27 @@ export default function AppMain() {
 				{renderNavbar()}
 			</header>
 			<main>
-				<div>
-					{isBusyGapiLoad ?
-						<section>
-							{renderLogin()}
-							<div className='text-center bg-dark p-3'>
-								<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-							</div>
-						</section>
+				{isBusyGapiLoad ?
+					<section>
+						{renderLogin()}
+						<div className='text-center bg-dark p-3'>
+							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
+						</div>
+					</section>
+					:
+					optIsSlideshow ?
+						<ImageSlideshow
+							images={gapiFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
+							duration={optSlideshowSecs}
+							downloadFile={downloadFile}
+						/>
 						:
-						optSlideshow ? <ImageSlideshow images={showFiles} duration={4} />
+						debugShowFileNames ?
+							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
 							:
-							debugShowFileNames ?
-								<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
-								:
-								<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
-					}
-				</div>
-			</main >
+							<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
+				}
+			</main>
 		</div >
 	)
 }
