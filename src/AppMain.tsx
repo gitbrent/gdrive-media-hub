@@ -292,7 +292,11 @@ export default function AppMain() {
 					</section>
 					:
 					optIsSlideshow ?
-						<ImageSlideshow images={gapiFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })} duration={optSlideshowSecs} />
+						<ImageSlideshow
+							images={gapiFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
+							duration={optSlideshowSecs}
+							downloadFile={downloadFile}
+						/>
 						:
 						debugShowFileNames ?
 							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
