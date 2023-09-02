@@ -13,6 +13,7 @@ import ImageGrid from './ImageGrid'
 
 export default function AppMain() {
 	const DEFAULT_SLIDE_DELAY = 4
+	//
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
