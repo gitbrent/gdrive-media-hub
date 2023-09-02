@@ -9,6 +9,11 @@
 	flex: 1 0 auto;
 }
 
+/* by default, captions are shown in the gird and shaodwbox, this hides the grid caption! */
+.gallery figure figcaption {
+	display: none;
+}
+
 .gallery figure img {
 	display: block;
 	height: 200px;

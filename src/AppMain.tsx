@@ -20,6 +20,7 @@ export default function AppMain() {
 	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
+	const [optIsShowCap, setOptIsShowCap] = useState(true)
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
 	//
 	const [signedInUser, setSignedInUser] = useState('')
@@ -70,11 +71,11 @@ export default function AppMain() {
 
 	/**
 	 * Fetches image blobs for files displayed on the current page.
-	 * It triggers when the page, page size, or other related variables change.
+	 * It triggers when the page, page size, sort, or other related options change.
 	 */
 	useEffect(() => {
 		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-	}, [pagingPage, pagingSize, optSchWord, dataSvcLoadTime])
+	}, [pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord])
 
 	const showFiles = useMemo(() => {
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
@@ -172,17 +173,17 @@ export default function AppMain() {
 				:
 				(<form className="container-fluid">
 					<div className="row">
-						<div className="col-lg-4 col-md-4 col-sm-12 mb-2">
+						<div className="col-lg-4 col-md-4 col-sm-12 mb-2 mb-md-0">
 							<button className="btn btn-success w-100" type="button" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>
 								Start SlideShow
 							</button>
 						</div>
-						<div className="col-lg-2 col-md-2 col-6 mb-2">
+						<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
 							<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
 								Prev
 							</button>
 						</div>
-						<div className="col-lg-2 col-md-2 col-6 mb-2">
+						<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
 							<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
 								Next
 							</button>
@@ -209,6 +210,36 @@ export default function AppMain() {
 							<li className="nav-item">
 								<a className="nav-link active" aria-current="page" href="/">Home</a>
 							</li>
+							<li className="nav-item dropdown" data-desc="opt-pagesize">
+								{/* TODO:
+									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
+									<ul className="dropdown-menu">
+										<li>images</button></li>
+										<li>Video</button></li>
+									</ul>
+								*/}
+							</li>
+							<li className="nav-item dropdown" data-desc="opt-grid">
+								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Grid Options</a>
+								<ul className="dropdown-menu">
+									<li><h6 className="dropdown-header">Sort By</h6></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>{OPT_SORTBY.modDate}</button></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName} onClick={() => setOptSortBy(OPT_SORTBY.filName)}>{OPT_SORTBY.filName}</button></li>
+									<li><hr className="dropdown-divider" /></li>
+									<li><h6 className="dropdown-header">Sort Direction</h6></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asc} onClick={() => setOptSortDir(OPT_SORTDIR.asc)}>{OPT_SORTDIR.asc}</button></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc} onClick={() => setOptSortDir(OPT_SORTDIR.desc)}>{OPT_SORTDIR.desc}</button></li>
+									<li><hr className="dropdown-divider" /></li>
+									<li><h6 className="dropdown-header">Page Size</h6></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
+									<li><hr className="dropdown-divider" /></li>
+									<li><h6 className="dropdown-header">Images</h6></li>
+									<li><button className="dropdown-item" onClick={() => setOptIsShowCap(!optIsShowCap)}>{optIsShowCap ? 'Show' : 'No'} Captions</button></li>
+								</ul>
+							</li>
 							{(document.location.hostname === 'localhost' || location.href.toLowerCase().includes('debug')) &&
 								<li className="nav-item dropdown" data-desc="opt-debug">
 									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">DEBUG</a>
@@ -228,36 +259,6 @@ export default function AppMain() {
 									</ul>
 								</li>
 							}
-							<li className="nav-item dropdown" data-desc="opt-pagesize">
-								{/* TODO:
-									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Media</a>
-									<ul className="dropdown-menu">
-										<li>images</button></li>
-										<li>Video</button></li>
-									</ul>
-								*/}
-							</li>
-							<li className="nav-item dropdown" data-desc="opt-sortby">
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sorting</a>
-								<ul className="dropdown-menu">
-									<li><h6 className="dropdown-header">Sort By</h6></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>{OPT_SORTBY.modDate}</button></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName} onClick={() => setOptSortBy(OPT_SORTBY.filName)}>{OPT_SORTBY.filName}</button></li>
-									<li><hr className="dropdown-divider" /></li>
-									<li><h6 className="dropdown-header">Sort Direction</h6></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asc} onClick={() => setOptSortDir(OPT_SORTDIR.asc)}>{OPT_SORTDIR.asc}</button></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc} onClick={() => setOptSortDir(OPT_SORTDIR.desc)}>{OPT_SORTDIR.desc}</button></li>
-								</ul>
-							</li>
-							<li className="nav-item dropdown" data-desc="opt-pagesize">
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Paging</a>
-								<ul className="dropdown-menu">
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
-								</ul>
-							</li>
 						</ul>
 						<div className='d-none d-lg-block'>{renderBtns()}</div>
 						<ul className="navbar-nav flex-row ms-md-auto">
@@ -338,7 +339,7 @@ export default function AppMain() {
 						debugShowFileNames ?
 							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
 							:
-							<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={false} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
+							<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
 				}
 			</main>
 		</div >

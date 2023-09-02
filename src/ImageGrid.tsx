@@ -33,14 +33,15 @@ export default function ImageGrid(props: IProps) {
 		<Gallery id="galleryItems" withCaption={props.isShowCap}>
 			{/*<div className="gallery" style={{ '--num-columns': 6 } as React.CSSProperties}>*/}
 			<div className="gallery">
-				{galleryItems.map((item) => (<Item {...item} key={item.id}>
-					{({ ref, open }) => (
-						<figure>
-							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
-							{props.isShowCap && <figcaption>{item.caption}</figcaption>}
-						</figure>
-					)}
-				</Item>
+				{galleryItems.map((item) => (
+					<Item {...item} key={item.id}>
+						{({ ref, open }) => (
+							<figure>
+								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
+								{props.isShowCap && <figcaption>{item.caption}</figcaption>}
+							</figure>
+						)}
+					</Item>
 				))}
 			</div>
 		</Gallery>
