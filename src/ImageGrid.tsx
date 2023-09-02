@@ -33,21 +33,24 @@ export default function ImageGrid(props: IProps) {
 		<Gallery id="galleryItems" withCaption={props.isShowCap}>
 			{/*<div className="gallery" style={{ '--num-columns': 6 } as React.CSSProperties}>*/}
 			<div className="gallery">
-				{galleryItems.map((item) => (<Item {...item} key={item.id}>
-					{({ ref, open }) => (
-						<figure>
-							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
-							{props.isShowCap && <figcaption>{item.caption}</figcaption>}
-						</figure>
-					)}
-				</Item>
+				{galleryItems.map((item) => (
+					<Item {...item} key={item.id}>
+						{({ ref, open }) => (
+							<figure>
+								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
+								{props.isShowCap && <figcaption>{item.caption}</figcaption>}
+							</figure>
+						)}
+					</Item>
 				))}
 			</div>
 		</Gallery>
 	) :
 		(
 			<section className='text-center my-5'>
-				<div className='alert alert-warning d-inline-block align-middle' role='alert'><span className='h2 fw-light me-2'>⚠️</span>(no images to display)</div>
+				<div className="alert alert-warning d-inline-flex align-items-center" role="alert">
+					<span className="h1 fw-light mb-0 me-3">⚠️</span>no images to display
+				</div>
 			</section>
 		)
 }

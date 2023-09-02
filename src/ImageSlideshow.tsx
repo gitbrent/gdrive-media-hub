@@ -4,9 +4,10 @@ import { IGapiFile } from './App.props'
 interface Props {
 	duration: number;
 	images: IGapiFile[];
+	downloadFile: (fileId: string) => Promise<void>;
 }
 
-const Slideshow: React.FC<Props> = ({ images, duration }) => {
+const Slideshow: React.FC<Props> = ({ images, duration, downloadFile }) => {
 	const [currentIndex, setCurrentIndex] = useState(0)
 
 	useEffect(() => {
@@ -15,13 +16,22 @@ const Slideshow: React.FC<Props> = ({ images, duration }) => {
 		}, duration * 1000)
 
 		return () => clearInterval(interval)
-	}, [currentIndex, duration, images.length])
+	}, [duration, images.length])
+
+	useEffect(() => {
+		const idxImage = images[currentIndex]
+		if (!idxImage.imageBlobUrl) {
+			downloadFile(idxImage.id)
+		}
+	}, [currentIndex])
+
+	const currentImage = images[currentIndex]
 
 	return (
-		<div>
-			{images[currentIndex] && (
-				<img src={images[currentIndex].imageBlobUrl} style={{ maxWidth: '100%', maxHeight: '100%', display: 'block', margin: 'auto' }} />
-			)}
+		<div className='slideShowContainer'>
+			<div className='slideShowMain'>
+				<img src={currentImage.imageBlobUrl} />
+			</div>
 		</div>
 	)
 }
