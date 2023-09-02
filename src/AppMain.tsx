@@ -245,16 +245,34 @@ export default function AppMain() {
 									<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">DEBUG</a>
 									<ul className="dropdown-menu">
 										<li><h6 className="dropdown-header">Display</h6></li>
-										<li><button className="dropdown-item" disabled={true}>{showFiles?.length} images shown</button></li>
-										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.length} images total</button></li>
+										<li>
+											<button className="dropdown-item" disabled={true}>
+												<div className='row flex-nowrap'><div className='col'>Total Images</div><div className='col-auto'>{gapiFiles?.length}</div></div>
+											</button>
+										</li>
+										<li>
+											<button className="dropdown-item" disabled={true}>
+												<div className='row flex-nowrap'><div className='col'>Show Images</div><div className='col-auto'>{showFiles?.length}</div></div>
+											</button>
+										</li>
 										<li>
 											<hr className="dropdown-divider" />
 										</li>
 										<li><h6 className="dropdown-header">Search</h6></li>
-										<li><button className="dropdown-item" disabled={true}>{gapiFiles?.filter((item) => !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1).length} images (searching for &quot;{optSchWord}&quot;)</button></li>
+										<li>
+											<button className="dropdown-item" disabled={true}>
+												<div className='row flex-nowrap'><div className='col'>Keyword</div><div className='col-auto'>&quot;{optSchWord}&quot;</div></div>
+											</button>
+										</li>
+										<li>
+											<button className="dropdown-item" disabled={true}>
+												<div className='row flex-nowrap'><div className='col'>Show Images</div><div className='col-auto'>{showFiles?.length}</div></div>
+											</button>
+										</li>
 										<li>
 											<hr className="dropdown-divider" />
 										</li>
+										<li><h6 className="dropdown-header">Raw Data</h6></li>
 										<li><button className="dropdown-item" onClick={() => setDebugShowFileNames(!debugShowFileNames)}>{debugShowFileNames ? 'Hide' : 'Show'}&nbsp;file.names</button></li>
 									</ul>
 								</li>
