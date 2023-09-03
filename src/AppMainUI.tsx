@@ -1,17 +1,12 @@
-/**
- * @see https://developers.google.com/drive/api/guides/about-sdk
- * @see https://developers.google.com/drive/api/guides/search-files#node.js
- * @see https://developers.google.com/drive/api/guides/fields-parameter
- * @see https://developers.google.com/drive/api/v3/reference/files/get
- * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
- */
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob } from './GoogleApi'
 import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
+import { useAppMain } from './useAppMain'
 
-export default function AppMain() {
+export default function AppMainUI() {
+	const { allFiles, signedInUser, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
+
 	const DEFAULT_SLIDE_DELAY = 4
 	//
 	const [pagingSize, setPagingSize] = useState(12)
@@ -24,34 +19,17 @@ export default function AppMain() {
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
 	//
-	const [signedInUser, setSignedInUser] = useState('')
-	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState(false)
-	const [dataSvcLoadTime, setDataSvcLoadTime] = useState('')
-	const [gapiFiles, setGapiFiles] = useState<IGapiFile[]>([])
-	const [updated, setUpdated] = useState('')
-	//
 	const [debugShowFileNames, setDebugShowFileNames] = useState(false)
+	//
+	const [showFiles, setShowFiles] = useState<IGapiFile[]>([])
 
 	/**
 	 * Initializes the Google API when the component mounts.
 	 */
 	useEffect(() => {
-		initGoogleApi((authState) => setSignedInUser(authState.userName))
-	}, [])
-
-	/**
-	 * Fetches Google Drive files when a user is signed in.
-	 * It updates the `gapiFiles` state with the fetched files.
-	 */
-	useEffect(() => {
-		if (signedInUser) {
-			if (IS_LOCALHOST) console.log(`[MAIN] signedInUser = "${signedInUser}"`)
-			fetchDriveFiles().then((files) => {
-				setGapiFiles(files)
-				setIsBusyGapiLoad(false)
-			})
-		}
-	}, [signedInUser])
+		if (IS_LOCALHOST) console.log('[AppMainUI] init!')
+		if (allFiles.length > 0) setPagingPage(1)
+	}, [allFiles])
 
 	/**
 	 * Updates the `pagingSize` state based on the selected `optPgeSize`.
@@ -64,21 +42,16 @@ export default function AppMain() {
 	}, [optPgeSize])
 
 	/**
-	 * Sets the initial paging page when Google Drive files are loaded.
-	 */
-	useEffect(() => {
-		if (gapiFiles.length > 0) setPagingPage(1)
-	}, [gapiFiles])
-
-	/**
 	 * Fetches image blobs for files displayed on the current page.
 	 * It triggers when the page, page size, sort, or other related options change.
 	 */
 	useEffect(() => {
-		showFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-	}, [pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord])
+		allFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
+	}, [pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
 
-	const showFiles = useMemo(() => {
+	//const showFiles = useMemo(() => {
+	useEffect(() => {
+		// A: define sorter
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
 				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
@@ -92,60 +65,33 @@ export default function AppMain() {
 			}
 		}
 
-		return gapiFiles
+		// B: sort, filter, page files
+		const gridFiles = allFiles
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-	}, [gapiFiles, pagingPage, pagingSize, optSortBy, optSortDir, dataSvcLoadTime, optSchWord, updated])
 
-	// --------------------------------------------------------------------------------------------
-
-	/**
-	 *  Sign in the user upon button click.
-	 */
-	const handleAuthClick = () => {
-		// NOTE: this triggers callback above (dataSvcLoadTime is set)
-		doAuthSignIn()
-	}
-
-	/**
-	 *  Sign out the user upon button click.
-	 */
-	const handleSignOutClick = () => {
-		gapi.auth2.getAuthInstance().signOut()
-		setSignedInUser('')
-		setGapiFiles([])
-	}
-
-	/**
-	 * load image file blob from google drive api
-	 * @param fileId
-	 */
-	const downloadFile = async (fileId: string) => {
-		const file = gapiFiles.filter(item => item.id === fileId)[0]
-		const response = await fetchFileImgBlob(file)
-		if (response) {
-			const blob = await response.blob()
-			const objectUrl = URL.createObjectURL(blob)
-			const img = document.createElement('img')
-			img.src = objectUrl
-			img.onload = function() {
-				const updFiles = gapiFiles
-				const imgFile = updFiles.filter((file) => file.id === fileId)[0]
-				imgFile.imageBlobUrl = objectUrl
-				imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-				imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-				setGapiFiles(updFiles)
-				setUpdated(new Date().toISOString())
-			}
+		// C: done
+		const noBlobIds = gridFiles.filter((file) => !file.imageBlobUrl).map((item) => item.id)
+		if (noBlobIds.length > 0) {
+			loadPageImages(noBlobIds).then(() => {
+				const gridFiles = allFiles
+					.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+					.sort(sorter)
+					.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
+				setShowFiles([...gridFiles])
+			})
 		}
-	}
+		else {
+			setShowFiles(gridFiles)
+		}
+	}, [allFiles, pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
 
 	// --------------------------------------------------------------------------------------------
 
 	function renderNavbar(): JSX.Element {
 		function renderBtns(): JSX.Element {
-			const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= gapiFiles.length)
+			const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
 			const isSlidePaused = optSlideshowSecs === 999
 
 			return optIsSlideshow ?
@@ -248,7 +194,7 @@ export default function AppMain() {
 										<li><h6 className="dropdown-header">Display</h6></li>
 										<li>
 											<button className="dropdown-item" disabled={true}>
-												<div className='row flex-nowrap'><div className='col'>Total Images</div><div className='col-auto'>{gapiFiles?.length}</div></div>
+												<div className='row flex-nowrap'><div className='col'>Total Images</div><div className='col-auto'>{allFiles?.length}</div></div>
 											</button>
 										</li>
 										<li>
@@ -306,7 +252,7 @@ export default function AppMain() {
 										{signedInUser ?
 											<button className="dropdown-item disabled">{signedInUser}</button>
 											:
-											<button className="dropdown-item" onClick={() => setDataSvcLoadTime(new Date().toISOString())}>(click to refresh)</button>
+											<button className="dropdown-item" onClick={() => handleAuthClick()}>(click to signin)</button>
 										}
 									</li>
 									<li>
@@ -350,15 +296,19 @@ export default function AppMain() {
 					:
 					optIsSlideshow ?
 						<ImageSlideshow
-							images={gapiFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
+							images={allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
 							duration={optSlideshowSecs}
 							downloadFile={downloadFile}
 						/>
 						:
 						debugShowFileNames ?
-							<section>{gapiFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}</section>
+							<section>
+								{allFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}
+							</section>
 							:
-							<section>{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}</section>
+							<section>
+								{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}
+							</section>
 				}
 			</main>
 		</div >

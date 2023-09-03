@@ -4,7 +4,7 @@ import { IGapiFile } from './App.props'
 interface Props {
 	duration: number;
 	images: IGapiFile[];
-	downloadFile: (fileId: string) => Promise<void>;
+	downloadFile: (fileId: string) => Promise<boolean>;
 }
 
 const Slideshow: React.FC<Props> = ({ images, duration, downloadFile }) => {

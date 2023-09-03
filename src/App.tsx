@@ -8,11 +8,11 @@
  * @see https://www.youtube.com/watch?v=TFIt9o6BWqA (HOWTO: process.env)
  */
 import React from 'react'
-import AppMain from './AppMain'
+import AppMainUI from './AppMainUI'
 import './css/style.scss'
 
-function App():JSX.Element {
-	return <AppMain />
+function App(): JSX.Element {
+	return <AppMainUI />
 }
 
 export default App
