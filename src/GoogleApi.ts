@@ -15,6 +15,13 @@
  *
  * NOTE: `GAPI_API_KEY` will always be empty unless the "private initGapiClient = (): void => {}" style of function declaration is used!!
  */
+/**
+ * @see https://developers.google.com/drive/api/guides/about-sdk
+ * @see https://developers.google.com/drive/api/guides/search-files#node.js
+ * @see https://developers.google.com/drive/api/guides/fields-parameter
+ * @see https://developers.google.com/drive/api/v3/reference/files/get
+ * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
+ */
 import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST } from './App.props'
 import { TokenClientConfig, TokenResponse } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
