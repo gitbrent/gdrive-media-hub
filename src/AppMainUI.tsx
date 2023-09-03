@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { useAppMain } from './useAppMain'
 import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
-import { useAppMain } from './useAppMain'
 
 export default function AppMainUI() {
 	const { allFiles, signedInUser, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
-
+	//
 	const DEFAULT_SLIDE_DELAY = 4
 	//
 	const [pagingSize, setPagingSize] = useState(12)
@@ -42,14 +42,8 @@ export default function AppMainUI() {
 	}, [optPgeSize])
 
 	/**
-	 * Fetches image blobs for files displayed on the current page.
-	 * It triggers when the page, page size, sort, or other related options change.
+	 * Sets show files upon source images or option changes
 	 */
-	useEffect(() => {
-		allFiles.filter((file) => !file.imageBlobUrl).forEach((file: IGapiFile) => { downloadFile(file.id) })
-	}, [pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
-
-	//const showFiles = useMemo(() => {
 	useEffect(() => {
 		// A: define sorter
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
@@ -71,7 +65,7 @@ export default function AppMainUI() {
 			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 
-		// C: done
+		// C: set show files
 		const noBlobIds = gridFiles.filter((file) => !file.imageBlobUrl).map((item) => item.id)
 		if (noBlobIds.length > 0) {
 			loadPageImages(noBlobIds).then(() => {
