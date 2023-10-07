@@ -1,5 +1,5 @@
 // APP
-export const APP_BLD = '20230902-1312'
+export const APP_BLD = '20231006-2112'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
@@ -79,18 +79,18 @@ export interface IGapiFile extends gapi.client.drive.File {
 }
 
 export enum OPT_SORTBY {
-	modDate = 'Modified Date',
-	filName = 'File Name'
+	modDate_trim = 'Date', modDate_full = 'Modified Date',
+	filName_trim = 'Name', filName_full = 'File Name'
 }
 
 export enum OPT_SORTDIR {
-	asc = 'Ascending',
-	desc = 'Descinding'
+	asce_trim = 'Asc', asce_full = 'Ascending',
+	desc_trim = 'Des', desc_full = 'Descinding'
 }
 
 export enum OPT_PAGESIZE {
-	ps08 = '8 items',
-	ps12 = '12 items',
-	ps24 = '24 items',
-	ps48 = '48 items',
+	ps08_trim = '8 ', ps08_full = '8 items',
+	ps12_trim = '12', ps12_full = '12 items',
+	ps24_trim = '24', ps24_full = '24 items',
+	ps48_trim = '48', ps48_full = '48 items',
 }

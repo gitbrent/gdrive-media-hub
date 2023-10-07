@@ -3,6 +3,7 @@ import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTD
 import { useAppMain } from './useAppMain'
 import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
+import './css/AppMainUI.css'
 
 export default function AppMainUI() {
 	const { allFiles, signedInUser, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
@@ -11,9 +12,9 @@ export default function AppMainUI() {
 	//
 	const [pagingSize, setPagingSize] = useState(12)
 	const [pagingPage, setPagingPage] = useState(0)
-	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
-	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
-	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12)
+	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate_full)
+	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc_full)
+	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12_trim)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
@@ -35,10 +36,10 @@ export default function AppMainUI() {
 	 * Updates the `pagingSize` state based on the selected `optPgeSize`.
 	 */
 	useEffect(() => {
-		if (optPgeSize === OPT_PAGESIZE.ps08) setPagingSize(8)
-		else if (optPgeSize === OPT_PAGESIZE.ps12) setPagingSize(12)
-		else if (optPgeSize === OPT_PAGESIZE.ps24) setPagingSize(24)
-		else if (optPgeSize === OPT_PAGESIZE.ps48) setPagingSize(48)
+		if (optPgeSize === OPT_PAGESIZE.ps08_full) setPagingSize(8)
+		else if (optPgeSize === OPT_PAGESIZE.ps12_trim) setPagingSize(12)
+		else if (optPgeSize === OPT_PAGESIZE.ps24_full) setPagingSize(24)
+		else if (optPgeSize === OPT_PAGESIZE.ps48_full) setPagingSize(48)
 	}, [optPgeSize])
 
 	/**
@@ -47,11 +48,11 @@ export default function AppMainUI() {
 	useEffect(() => {
 		// A: define sorter
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
-			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+			if (optSortBy === OPT_SORTBY.filName_full) {
+				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asce_full ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce_full ? 1 : -1)
 			}
-			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedByMeTime < b.modifiedByMeTime ? (optSortDir === OPT_SORTDIR.asc ? -1 : 1) : (optSortDir === OPT_SORTDIR.asc ? 1 : -1)
+			else if (optSortBy === OPT_SORTBY.modDate_full) {
+				return a.modifiedByMeTime < b.modifiedByMeTime ? (optSortDir === OPT_SORTDIR.asce_full ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce_full ? 1 : -1)
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -80,6 +81,14 @@ export default function AppMainUI() {
 			setShowFiles(gridFiles)
 		}
 	}, [allFiles, pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
+
+	// WIP: NEW: --------------------------------------------------------------------------------------------
+
+	const [isSidebarOpen, setSidebarOpen] = useState(false)
+
+	const toggleSidebar = () => {
+		setSidebarOpen(!isSidebarOpen)
+	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -164,18 +173,18 @@ export default function AppMainUI() {
 								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Grid Options</a>
 								<ul className="dropdown-menu">
 									<li><h6 className="dropdown-header">Sort By</h6></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate} onClick={() => setOptSortBy(OPT_SORTBY.modDate)}>{OPT_SORTBY.modDate}</button></li>
-									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName} onClick={() => setOptSortBy(OPT_SORTBY.filName)}>{OPT_SORTBY.filName}</button></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.modDate_full} onClick={() => setOptSortBy(OPT_SORTBY.modDate_full)}>{OPT_SORTBY.modDate_full}</button></li>
+									<li><button className="dropdown-item" disabled={optSortBy === OPT_SORTBY.filName_full} onClick={() => setOptSortBy(OPT_SORTBY.filName_full)}>{OPT_SORTBY.filName_full}</button></li>
 									<li><hr className="dropdown-divider" /></li>
 									<li><h6 className="dropdown-header">Sort Direction</h6></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asc} onClick={() => setOptSortDir(OPT_SORTDIR.asc)}>{OPT_SORTDIR.asc}</button></li>
-									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc} onClick={() => setOptSortDir(OPT_SORTDIR.desc)}>{OPT_SORTDIR.desc}</button></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.asce_full} onClick={() => setOptSortDir(OPT_SORTDIR.asce_full)}>{OPT_SORTDIR.asce_full}</button></li>
+									<li><button className="dropdown-item" disabled={optSortDir === OPT_SORTDIR.desc_full} onClick={() => setOptSortDir(OPT_SORTDIR.desc_full)}>{OPT_SORTDIR.desc_full}</button></li>
 									<li><hr className="dropdown-divider" /></li>
 									<li><h6 className="dropdown-header">Page Size</h6></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08)}>{OPT_PAGESIZE.ps08}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12)}>{OPT_PAGESIZE.ps12}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24)}>{OPT_PAGESIZE.ps24}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48)}>{OPT_PAGESIZE.ps48}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08_full)}>{OPT_PAGESIZE.ps08_full}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12_trim} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12_trim)}>{OPT_PAGESIZE.ps12_trim}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24_full)}>{OPT_PAGESIZE.ps24_full}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48_full)}>{OPT_PAGESIZE.ps48_full}</button></li>
 									<li><hr className="dropdown-divider" /></li>
 									<li><h6 className="dropdown-header">Images</h6></li>
 									<li><button className="dropdown-item" onClick={() => setOptIsShowCap(!optIsShowCap)}>{optIsShowCap ? 'Show' : 'No'} Captions</button></li>
@@ -274,37 +283,139 @@ export default function AppMainUI() {
 		</section >)
 	}
 
-	return (
-		<div className="container-fluid">
-			<header>
-				{renderNavbar()}
-			</header>
-			<main>
-				{isBusyGapiLoad ?
-					<section>
-						{renderLogin()}
-						<div className='text-center bg-dark p-3'>
-							<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-						</div>
-					</section>
+	function renderMainContent(): JSX.Element {
+		return (
+			isBusyGapiLoad ?
+				<section>
+					{renderLogin()}
+					< div className='text-center bg-dark p-3' >
+						<div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
+					</div >
+				</section >
+				:
+				optIsSlideshow ?
+					<ImageSlideshow
+						images={allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
+						duration={optSlideshowSecs}
+						downloadFile={downloadFile}
+					/>
 					:
-					optIsSlideshow ?
-						<ImageSlideshow
-							images={allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
-							duration={optSlideshowSecs}
-							downloadFile={downloadFile}
-						/>
+					debugShowFileNames ?
+						<section>
+							{allFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}
+						</section>
 						:
-						debugShowFileNames ?
-							<section>
-								{allFiles?.map(item => item.name).sort().map((item, idx) => (<div key={`badge${idx}`} className='badge bg-info mb-2 me-2'>[{idx}]&nbsp;{item}</div>))}
-							</section>
-							:
-							<section>
-								{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}
-							</section>
-				}
-			</main>
-		</div >
-	)
+						<section>
+							{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}
+						</section>
+		)
+	}
+
+	function renderContainer(): JSX.Element {
+		//const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
+		//const isSlidePaused = optSlideshowSecs === 999
+
+		return (
+			<div className="container-fluid">
+				<div className="row flex-nowrap">
+					<div className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
+						<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+							<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
+								<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
+							</a>
+							<ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+								<li className="nav-item">
+									<a href="#" className="nav-link align-middle px-0">
+										<i className="fs-4 bi-house"></i><span className="ms-2 d-inline">Home</span>
+									</a>
+								</li>
+								<li>
+									<a href="#submenuSortBy" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
+										<i className="fs-4 bi-sort-alpha-down"></i><span className="ms-2 d-inline">Sort By</span>
+									</a>
+									<ul className="collapse nav flex-column" id="submenuSortBy" data-bs-parent="#menu">
+										<li className="w-100">
+											<button className={`dropdown-item ${optSortBy === OPT_SORTBY.modDate_full ? '' : 'text-light'}`} disabled={optSortBy === OPT_SORTBY.modDate_full} onClick={() => setOptSortBy(OPT_SORTBY.modDate_full)}>{isSidebarOpen ? OPT_SORTBY.modDate_full : OPT_SORTBY.modDate_trim}</button>
+											<button className={`dropdown-item ${optSortBy === OPT_SORTBY.filName_full ? '' : 'text-light'}`} disabled={optSortBy === OPT_SORTBY.filName_full} onClick={() => setOptSortBy(OPT_SORTBY.filName_full)}>{isSidebarOpen ? OPT_SORTBY.filName_full : OPT_SORTBY.filName_trim}</button>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<a href="#submenuSortDirection" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
+										<i className="fs-4 bi-arrow-down-up"></i><span className="ms-2 d-inline">Sort Direction</span>
+									</a>
+									<ul className="collapse nav flex-column" id="submenuSortDirection" data-bs-parent="#menu">
+										<li className="w-100">
+											<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.asce_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.asce_full} onClick={() => setOptSortDir(OPT_SORTDIR.asce_full)}>{isSidebarOpen ? OPT_SORTDIR.asce_full : OPT_SORTDIR.asce_trim}</button>
+											<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.desc_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.desc_full} onClick={() => setOptSortDir(OPT_SORTDIR.desc_full)}>{isSidebarOpen ? OPT_SORTDIR.desc_full : OPT_SORTDIR.desc_trim}</button>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<a href="#submenuPageSize" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
+										<i className="fs-4 bi-grid"></i><span className="ms-2 d-inline">Page Size</span>
+									</a>
+									<ul className="collapse nav flex-column" id="submenuPageSize" data-bs-parent="#menu">
+										<li className="w-100">
+											<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps08_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps08_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps08_full : OPT_PAGESIZE.ps08_trim}</button>
+											<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps12_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps12_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps12_full : OPT_PAGESIZE.ps12_trim}</button>
+											<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps24_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps24_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps24_full : OPT_PAGESIZE.ps24_trim}</button>
+											<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps48_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps48_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps48_full : OPT_PAGESIZE.ps48_trim}</button>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<a href="#submenuSlideshow" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
+										<i className="fs-4 bi-play-circle"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slideshow</span>
+									</a>
+									<ul className="collapse nav flex-column ms-1" id="submenuSlideshow" data-bs-parent="#menu">
+										<li className="w-100">
+											{optIsSlideshow ?
+												<>
+													<button className="dropdown-item" onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>
+														<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Resume</span>
+													</button>
+													<button className="dropdown-item" onClick={() => { setOptSlideshowSecs(999) }}>
+														<i className="bi-pause-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Pause</span>
+													</button>
+													<button className="dropdown-item" onClick={() => { setOptIsSlideshow(false) }}>
+														<i className="bi-stop-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Stop</span>
+													</button>
+												</>
+												:
+												<button className="dropdown-item" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>
+													<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Start</span>
+												</button>
+											}
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<hr />
+							<div className="dropdown pb-4">
+								<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+									<img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" className="rounded-circle" />
+									<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>mah boy</span>
+								</a>
+								<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
+									<li><a className="dropdown-item" href="#">New project...</a></li>
+									<li><a className="dropdown-item" href="#">Settings</a></li>
+									<li><a className="dropdown-item" href="#">Profile</a></li>
+									<li>
+										<hr className="dropdown-divider" />
+									</li>
+									<li><a className="dropdown-item" href="#">Sign out</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div className="col py-3">
+						{renderMainContent()}
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	return renderContainer()
 }

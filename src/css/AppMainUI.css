@@ -1,0 +1,24 @@
+.collapsed {
+	width: 74px !important;
+}
+
+/* CAREFUL! a.collapsed are siub menus items, using only `.collapsed` will hose UI */
+div.collapsed .d-inline {
+	display: none !important;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+	color: white;
+	/* Or you can use var(--bs-white) for Bootstrap variable */
+	text-decoration: none;
+	background-color: rgba(255, 255, 255, 0.1);
+	/* This is a semi-transparent white */
+	border-radius: 0.25rem;
+	/* Optional, if you want rounded corners */
+	font-weight: 700 !important;
+}
+
+.drop-item {
+	font-weight: lighter !important;
+}
