@@ -110,12 +110,15 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 }
 
 export const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
+	_isBusyGapiLoad = true
 	try {
 		const downloadPromises = fileIds.map(downloadFile)
 		const results = await Promise.all(downloadPromises)
+		_isBusyGapiLoad = false
 		return results.every(Boolean)
 	} catch (error) {
 		console.error('Failed to load page images:', error)
+		_isBusyGapiLoad = false
 		return false
 	}
 }
