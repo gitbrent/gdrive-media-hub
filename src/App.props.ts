@@ -1,5 +1,5 @@
 // APP
-export const APP_BLD = '20231006-2112'
+export const APP_BLD = '20231007-1240'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
@@ -33,6 +33,7 @@ export enum AuthState {
 export interface IAuthState {
 	status: AuthState
 	userName: string
+	userPict: string
 }
 
 export interface IGapiFile extends gapi.client.drive.File {

@@ -7,12 +7,14 @@ import * as AppMainLogic from './AppMainLogic'
 
 export const useAppMain = () => {
 	const [allFiles, setAllFiles] = useState<IGapiFile[]>([])
-	const [signedInUser, setSignedInUser] = useState<string | null>(null)
+	const [authUserName, setAuthUserName] = useState<string | null>(null)
+	const [authUserPict, setAuthUserPict] = useState<string | null>(null)
 	const [isBusyGapiLoad, setIsBusyGapiLoad] = useState<boolean>(false)
 
 	function callbackInit() {
 		setAllFiles(AppMainLogic.allFiles())
-		setSignedInUser(AppMainLogic.signedInUser())
+		setAuthUserName(AppMainLogic.authUserName())
+		setAuthUserPict(AppMainLogic.authUserPict())
 		setIsBusyGapiLoad(AppMainLogic.isBusyGapiLoad())
 	}
 
@@ -22,7 +24,8 @@ export const useAppMain = () => {
 
 	return {
 		allFiles,
-		signedInUser,
+		authUserName,
+		authUserPict,
 		isBusyGapiLoad,
 		handleAuthClick: AppMainLogic.handleAuthClick,
 		handleSignOutClick: AppMainLogic.handleSignOutClick,

@@ -11,23 +11,27 @@ export interface AppMainLogicInterface {
 // --------------------------------------------------------------------------------------------
 
 let _gapiFiles: IGapiFile[] = []
-let _signedInUser = ''
+let _authUserName = ''
+let _authUserPict = ''
 let _isBusyGapiLoad = false
 
 // --------------------------------------------------------------------------------------------
 
 export const allFiles = () => _gapiFiles
 
-export const signedInUser = () => _signedInUser
+export const authUserName = () => _authUserName
+
+export const authUserPict = () => _authUserPict
 
 export const isBusyGapiLoad = () => _isBusyGapiLoad
 
 export const doInitGoogleApi = (initCallback: () => void) => {
 	_isBusyGapiLoad = true
 	initGoogleApi((authState) => {
-		_signedInUser = authState.userName
-		if (_signedInUser) {
-			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_signedInUser}"`)
+		_authUserName = authState.userName
+		_authUserPict = authState.userPict
+		if (_authUserName) {
+			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_authUserName}"`)
 			fetchDriveFiles().then((files) => {
 				_gapiFiles = files
 				_isBusyGapiLoad = false
@@ -52,7 +56,7 @@ export const handleAuthClick = () => {
  */
 export const handleSignOutClick = () => {
 	gapi.auth2.getAuthInstance().signOut()
-	_signedInUser = ''
+	_authUserName = ''
 	_gapiFiles = []
 }
 

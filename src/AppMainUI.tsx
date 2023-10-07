@@ -6,7 +6,7 @@ import ImageGrid from './ImageGrid'
 import './css/AppMainUI.css'
 
 export default function AppMainUI() {
-	const { allFiles, signedInUser, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
+	const { allFiles, authUserName, authUserPict, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
 	//
 	const DEFAULT_SLIDE_DELAY = 4
 	//
@@ -14,7 +14,7 @@ export default function AppMainUI() {
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate_full)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc_full)
-	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12_trim)
+	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12_full)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
@@ -23,6 +23,11 @@ export default function AppMainUI() {
 	const [debugShowFileNames, setDebugShowFileNames] = useState(false)
 	//
 	const [showFiles, setShowFiles] = useState<IGapiFile[]>([])
+	//
+	const [isSidebarOpen, setSidebarOpen] = useState(false)
+	const toggleSidebar = () => {
+		setSidebarOpen(!isSidebarOpen)
+	}
 
 	/**
 	 * Initializes the Google API when the component mounts.
@@ -81,14 +86,6 @@ export default function AppMainUI() {
 			setShowFiles(gridFiles)
 		}
 	}, [allFiles, pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
-
-	// WIP: NEW: --------------------------------------------------------------------------------------------
-
-	const [isSidebarOpen, setSidebarOpen] = useState(false)
-
-	const toggleSidebar = () => {
-		setSidebarOpen(!isSidebarOpen)
-	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -252,8 +249,8 @@ export default function AppMainUI() {
 										<h6 className="dropdown-header">Logged In As</h6>
 									</li>
 									<li>
-										{signedInUser ?
-											<button className="dropdown-item disabled">{signedInUser}</button>
+										{authUserName ?
+											<button className="dropdown-item disabled">{authUserName}</button>
 											:
 											<button className="dropdown-item" onClick={() => handleAuthClick()}>(click to signin)</button>
 										}
@@ -262,7 +259,7 @@ export default function AppMainUI() {
 										<hr className="dropdown-divider" />
 									</li>
 									<li>
-										<button className="dropdown-item" disabled={!signedInUser} onClick={handleSignOutClick}>Sign Out</button>
+										<button className="dropdown-item" disabled={!authUserName} onClick={handleSignOutClick}>Sign Out</button>
 									</li>
 								</ul>
 							</li>
@@ -306,11 +303,12 @@ export default function AppMainUI() {
 						</section>
 						:
 						<section>
-							{signedInUser ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}
+							{authUserName ? <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} /> : renderLogin()}
 						</section>
 		)
 	}
 
+	// TODO: show actual user
 	function renderContainer(): JSX.Element {
 		//const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
 		//const isSlidePaused = optSlideshowSecs === 999
@@ -394,17 +392,18 @@ export default function AppMainUI() {
 							<hr />
 							<div className="dropdown pb-4">
 								<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-									<img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" className="rounded-circle" />
-									<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>mah boy</span>
+									<img src={authUserPict || undefined} alt="hugenerd" width="30" height="30" className="rounded-circle" />
+									<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
 								</a>
 								<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-									<li><a className="dropdown-item" href="#">New project...</a></li>
 									<li><a className="dropdown-item" href="#">Settings</a></li>
 									<li><a className="dropdown-item" href="#">Profile</a></li>
 									<li>
 										<hr className="dropdown-divider" />
 									</li>
-									<li><a className="dropdown-item" href="#">Sign out</a></li>
+									<li>
+										<button className="dropdown-item" disabled={!authUserName} onClick={handleSignOutClick}>Sign Out</button>
+									</li>
 								</ul>
 							</div>
 						</div>

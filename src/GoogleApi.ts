@@ -50,7 +50,8 @@ const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.file'
 let clientCallback: OnAuthChangeCallback
-let signedInUser = ''
+let authUserName = ''
+let authUserPict = ''
 let isAuthorized = false
 let tokenResponse: TokenResponse
 
@@ -60,7 +61,7 @@ async function doLoadInitGsiGapi() {
 
 	// GSI (2/2)
 	if (typeof window.google === 'undefined' || !window.google) await loadGsiScript()
-	else if (window.google.accounts && !signedInUser) await initGsiClient()
+	else if (window.google.accounts && !authUserName) await initGsiClient()
 
 	// check for current token
 	const tokenData = sessionStorage.getItem('googleTokenData')
@@ -106,7 +107,8 @@ async function doAuthorizeUser() {
 	// FINALLY: callback to notify class/data is loaded
 	clientCallback({
 		status: isAuthorized === true ? AuthState.Authenticated : AuthState.Unauthenticated,
-		userName: signedInUser ? signedInUser : '',
+		userName: authUserName ? authUserName : '',
+		userPict: authUserPict ? authUserPict : '',
 	})
 
 	return
@@ -175,8 +177,10 @@ async function initGsiCallback(response: CredentialResponse) {
 	const responsePayload = decodeJwt(response.credential)
 
 	if (IS_LOCALHOST) console.log('\nGSI-STEP-1: responsePayload ----------')
-	signedInUser = responsePayload?.name?.toString() || ''
-	if (IS_LOCALHOST) console.log('signedInUser', signedInUser)
+	authUserName = responsePayload?.name?.toString() || ''
+	authUserPict = responsePayload?.picture?.toString() || ''
+	if (IS_LOCALHOST) console.log('authUserName', authUserName)
+	if (IS_LOCALHOST) console.log('authUserPict', authUserPict)
 
 	return
 }
