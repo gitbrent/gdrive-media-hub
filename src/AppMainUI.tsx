@@ -40,7 +40,7 @@ export default function AppMainUI() {
 	 */
 	useEffect(() => {
 		if (optPgeSize === OPT_PAGESIZE.ps08_full) setPagingSize(8)
-		else if (optPgeSize === OPT_PAGESIZE.ps12_trim) setPagingSize(12)
+		else if (optPgeSize === OPT_PAGESIZE.ps12_full) setPagingSize(12)
 		else if (optPgeSize === OPT_PAGESIZE.ps24_full) setPagingSize(24)
 		else if (optPgeSize === OPT_PAGESIZE.ps48_full) setPagingSize(48)
 	}, [optPgeSize])
@@ -178,7 +178,7 @@ export default function AppMainUI() {
 									<li><hr className="dropdown-divider" /></li>
 									<li><h6 className="dropdown-header">Page Size</h6></li>
 									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps08_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08_full)}>{OPT_PAGESIZE.ps08_full}</button></li>
-									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12_trim} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12_trim)}>{OPT_PAGESIZE.ps12_trim}</button></li>
+									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps12_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12_full)}>{OPT_PAGESIZE.ps12_full}</button></li>
 									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps24_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24_full)}>{OPT_PAGESIZE.ps24_full}</button></li>
 									<li><button className="dropdown-item" disabled={optPgeSize === OPT_PAGESIZE.ps48_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48_full)}>{OPT_PAGESIZE.ps48_full}</button></li>
 									<li><hr className="dropdown-divider" /></li>
@@ -277,18 +277,43 @@ export default function AppMainUI() {
 		</section>)
 	}
 
+	function renderTopBar(): JSX.Element {
+		const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
+
+		return (<div className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
+			<form className="container-fluid">
+				<div className="row">
+					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
+						<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
+							Prev
+						</button>
+					</div>
+					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
+						<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
+							Next
+						</button>
+					</div>
+					<div className="col-lg-4 col-md-4 col-sm-12">
+						<input className="form-control text-nowrap w-100" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+					</div>
+				</div>
+			</form>
+		</div>
+		)
+	}
+
 	function renderMainContNav(): JSX.Element {
 		//const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
 		//const isSlidePaused = optSlideshowSecs === 999
 
 		return (<div className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
-			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
 				</a>
 				<ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
 					<li className="nav-item">
-						<a href="#" className="nav-link align-middle px-0">
+						<a href="#" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-house"></i><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>
@@ -396,7 +421,12 @@ export default function AppMainUI() {
 				/>
 			}
 			else {
-				returnJsx = <ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
+				returnJsx = <section>
+					{renderTopBar()}
+					<div className='p-2'>
+						<ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
+					</div>
+				</section>
 			}
 		}
 		else {
@@ -404,7 +434,7 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<div className="col py-3">{returnJsx}</div>
+			<div className="col p-0">{returnJsx}</div>
 		)
 	}
 
