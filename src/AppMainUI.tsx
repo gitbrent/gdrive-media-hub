@@ -134,7 +134,7 @@ export default function AppMainUI() {
 								Next
 							</button>
 						</div>
-						<div className="col-lg-4 col-md-4 col-sm-12">
+						<div className="col-lg col-md col-sm-12">
 							<input className="form-control text-nowrap w-100" type="search" placeholder="Search" aria-label="Search" onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 						</div>
 					</div>
