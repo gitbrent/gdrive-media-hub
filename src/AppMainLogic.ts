@@ -1,5 +1,5 @@
 import { IGapiFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob } from './GoogleApi'
+import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -36,6 +36,10 @@ export const doInitGoogleApi = (initCallback: () => void) => {
 				_gapiFiles = files
 				_isBusyGapiLoad = false
 				initCallback()
+			})
+			fetchDriveFolders().then((folders) => {
+				// WIP: NEW:
+				console.log('fetchDriveFolders', folders)
 			})
 		}
 		else {

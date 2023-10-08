@@ -23,7 +23,7 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST } from './App.props'
-import { TokenClientConfig, TokenResponse } from './googlegsi.types'
+import { IGapiFolder, TokenClientConfig, TokenResponse } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
 
@@ -228,6 +228,73 @@ async function updateUserAuthStatus() {
 }
 //#endregion
 
+// WIP:
+const getRootFolderId = async () => {
+	try {
+		const response = await gapi.client.drive.files.get({
+			fileId: 'root',
+			fields: 'id'
+		})
+		return response.result.id
+	} catch (error) {
+		console.error('Couldn\'t fetch root folder ID:', error)
+		return null
+	}
+}
+
+// WIP: NEW: lets build a folder structure
+async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
+	try {
+		const folderMap = new Map<string, IGapiFolder>()
+		const rootFolders: IGapiFolder[] = []
+
+		// A:
+		const rootFolderId = await getRootFolderId()
+		if (!rootFolderId) return [] // Or handle the error as you see fit
+
+		// B:
+		const response = await gapi.client.drive.files.list({
+			q: 'mimeType=\'application/vnd.google-apps.folder\' and trashed = false',
+			fields: 'nextPageToken, files(id, name, parents)',
+		})
+
+		// C: First pass: Populate folderMap with all folders
+		response.result.files?.forEach((folder) => {
+			const id = folder.id || ''
+			const name = folder.name || ''
+			const currentFolder = folderMap.get(id) || { id, name, children: [] }
+
+			folderMap.set(id, currentFolder)
+		})
+
+		// D: Second pass: Populate children and identify root folders
+		response.result.files?.forEach((folder) => {
+			const id = folder.id || ''
+			const currentFolder = folderMap.get(id)
+
+			const parentIds = folder.parents || []
+
+			if (currentFolder && (parentIds.length === 0 || parentIds.includes(rootFolderId))) {
+				rootFolders.push(currentFolder)
+				return
+			}
+
+			parentIds.forEach((parentId) => {
+				const parentFolder = folderMap.get(parentId)
+
+				if (parentFolder && currentFolder && !parentFolder.children?.includes(currentFolder)) {
+					parentFolder.children?.push(currentFolder)
+				}
+			})
+		})
+
+		return rootFolders
+	} catch (error) {
+		console.error('Failed to build folder hierarchy:', error)
+		return []
+	}
+}
+
 // PUBLIC API
 
 export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
@@ -252,6 +319,10 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 	}
 
 	return gapiFiles
+}
+
+export const fetchDriveFolders = async (): Promise<IGapiFolder[]> => {
+	return buildFolderHierarchy()
 }
 
 export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
