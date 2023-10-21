@@ -18,10 +18,16 @@ const Slideshow: React.FC<Props> = ({ images, duration, downloadFile }) => {
 		return () => clearInterval(interval)
 	}, [duration, images.length])
 
+	/**
+	 * Pre-load images
+	 * @description Not all images will have had their blob downloaded yet, so look ahead and fetch the next 3 images
+	 */
 	useEffect(() => {
-		const idxImage = images[currentIndex]
-		if (!idxImage.imageBlobUrl) {
-			downloadFile(idxImage.id)
+		for (let i = 1; i <= 3; i++) {
+			const nextIndex = currentIndex + i
+			if (nextIndex < images.length && !images[nextIndex].imageBlobUrl) {
+				downloadFile(images[nextIndex].id)
+			}
 		}
 	}, [currentIndex])
 
