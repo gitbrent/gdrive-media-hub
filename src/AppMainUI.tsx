@@ -139,9 +139,6 @@ export default function AppMainUI() {
 	}
 
 	function renderMainContNav(): JSX.Element {
-		//const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
-		//const isSlidePaused = optSlideshowSecs === 999
-
 		return (<div id='leftNavBar' className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
