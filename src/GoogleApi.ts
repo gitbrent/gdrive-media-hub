@@ -228,7 +228,7 @@ async function updateUserAuthStatus() {
 }
 //#endregion
 
-// WIP:
+//#region Folders
 const getRootFolderId = async () => {
 	try {
 		const response = await gapi.client.drive.files.get({
@@ -242,7 +242,6 @@ const getRootFolderId = async () => {
 	}
 }
 
-// WIP: NEW: lets build a folder structure
 async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 	try {
 		const folderMap = new Map<string, IGapiFolder>()
@@ -294,6 +293,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 		return []
 	}
 }
+//#endregion
 
 // PUBLIC API
 
