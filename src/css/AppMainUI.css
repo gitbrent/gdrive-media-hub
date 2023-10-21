@@ -1,13 +1,18 @@
-.collapsed {
-	width: 74px !important;
+#leftNavBar {
+	transition: width 0.35s ease;
 }
 
-/* CAREFUL! a.collapsed are siub menus items, using only `.collapsed` will hose UI */
-div.collapsed .d-inline {
+#leftNavBar.collapsed {
+	width: 74px !important;
+	transition: width 0.35s ease;
+}
+
+/* CAREFUL! a.collapsed are sub-menus items, using only `.collapsed` will hose UI */
+#leftNavBar.collapsed .d-inline {
 	display: none !important;
 }
 
-/* followign teo rules are to make the google drive logo (inital, not logged in screen) to be 100% h */
+/* following two rules are to make the google drive logo (initial, not logged in screen) to be 100% h */
 .col.py-3 {
 	display: flex;
 	flex-direction: column;
