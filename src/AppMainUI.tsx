@@ -139,6 +139,8 @@ export default function AppMainUI() {
 	}
 
 	function renderMainContNav(): JSX.Element {
+		const isSlideShowPaused = optSlideshowSecs === 999
+
 		return (<div id='leftNavBar' className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
@@ -150,7 +152,7 @@ export default function AppMainUI() {
 							<i className="fs-4 bi-house"></i><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>
-					<li>
+					<li data-desc="sort-by">
 						<a href="#submenuSortBy" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-sort-alpha-down"></i><span className="ms-2 d-inline">Sort By</span>
 						</a>
@@ -161,7 +163,7 @@ export default function AppMainUI() {
 							</li>
 						</ul>
 					</li>
-					<li>
+					<li data-desc="sort-dir">
 						<a href="#submenuSortDirection" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-arrow-down-up"></i><span className="ms-2 d-inline">Sort Direction</span>
 						</a>
@@ -172,7 +174,7 @@ export default function AppMainUI() {
 							</li>
 						</ul>
 					</li>
-					<li>
+					<li data-desc="page-size">
 						<a href="#submenuPageSize" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-grid"></i><span className="ms-2 d-inline">Page Size</span>
 						</a>
@@ -185,7 +187,7 @@ export default function AppMainUI() {
 							</li>
 						</ul>
 					</li>
-					<li>
+					<li data-desc="slide-show">
 						<a href="#submenuSlideshow" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-play-circle"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slideshow</span>
 						</a>
@@ -193,10 +195,10 @@ export default function AppMainUI() {
 							<li className="w-100">
 								{optIsSlideshow ?
 									<>
-										<button className="dropdown-item" onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>
+										<button className={`dropdown-item ${isSlideShowPaused ? '' : 'text-light'}`} disabled={!isSlideShowPaused} onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>
 											<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Resume</span>
 										</button>
-										<button className="dropdown-item" onClick={() => { setOptSlideshowSecs(999) }}>
+										<button className={`dropdown-item ${!isSlideShowPaused ? '' : 'text-light'}`} disabled={isSlideShowPaused}  onClick={() => { setOptSlideshowSecs(999) }}>
 											<i className="bi-pause-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Pause</span>
 										</button>
 										<button className="dropdown-item" onClick={() => { setOptIsSlideshow(false) }}>

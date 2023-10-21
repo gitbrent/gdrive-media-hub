@@ -57,15 +57,16 @@
 	/*height: calc(100vh - 76px); - not needed, we hide topNavBar during slide show */
 }
 
-.slideShowMain {
+.slideShowContainer .slideShowMain {
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	overflow: hidden;
+	height: 100%;
 }
 
-.slideShowMain img {
+.slideShowContainer .slideShowMain img {
 	max-width: 100%;
 	max-height: 100%;
 	object-fit: contain;
