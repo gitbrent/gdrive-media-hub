@@ -104,17 +104,33 @@ export default function AppMainUI() {
 			<form className="container-fluid">
 				<div className="row">
 					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
-						<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
-							Prev
+						<button className="btn btn-secondary w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
+							<i className="bi-arrow-left me-1"></i>Prev
 						</button>
 					</div>
 					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
-						<button className="btn btn-info w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
-							Next
+						<button className="btn btn-secondary w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
+							Next<i className="bi-arrow-right ms-1"></i>
 						</button>
 					</div>
-					<div className="col-lg-4 col-md-4 col-sm-12">
-						<input className="form-control text-nowrap w-100" type="search" placeholder="Search" aria-label="Search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+					<div className="col-lg col-md-4 col-sm-12 mb-2 mb-md-0">
+						<div className="input-group">
+							<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+							<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+						</div>
+					</div>
+					<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
+						<div className="text-muted">
+							{showFiles.length === 0 ? (
+								'No files to show'
+							) : (
+								<>
+									Showing <b>{(pagingPage - 1) * pagingSize + 1}</b>
+									-
+									<b>{Math.min((pagingPage - 1) * pagingSize + showFiles.length, allFiles.length)}</b> of <b>{allFiles.length}</b> files
+								</>
+							)}
+						</div>
 					</div>
 				</div>
 			</form>
