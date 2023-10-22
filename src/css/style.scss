@@ -9,10 +9,10 @@
 	$pagination-active-bg: $primary;
 	$pagination-hover-bg: $gray-300;
 */
-$pagination-bg: $gray-600;
-$pagination-active-bg: $primary;
 $pagination-hover-bg: $gray-500;
+$pagination-bg: $gray-600;
 $pagination-disabled-bg: $gray-700;
+$pagination-active-bg: $primary;
 
 // Then, import Bootstrap's main SCSS
 @import "~bootstrap/scss/bootstrap";
