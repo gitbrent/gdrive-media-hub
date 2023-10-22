@@ -1,14 +1,15 @@
-nav {
+#leftNav {
 	transition: width 0.35s ease;
+	max-width: 174px !important;
 }
 
-nav.collapsed {
+#leftNav.collapsed {
 	width: 74px !important;
 	transition: width 0.35s ease;
 }
 
 /* CAREFUL! a.collapsed are sub-menus items, using only `.collapsed` will hose UI */
-nav.collapsed .d-inline {
+#leftNav.collapsed .d-inline {
 	display: none !important;
 }
 
