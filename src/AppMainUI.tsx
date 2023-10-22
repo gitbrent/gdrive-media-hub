@@ -19,6 +19,7 @@ export default function AppMainUI() {
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
+	const [isSearching, setIsSearching] = useState(false)
 	//
 	const [showFiles, setShowFiles] = useState<IGapiFile[]>([])
 	//
@@ -26,6 +27,15 @@ export default function AppMainUI() {
 	const toggleSidebar = () => {
 		setSidebarOpen(!isSidebarOpen)
 	}
+
+	// --------------------------------------------------------------------------------------------
+
+	const searchFilterFiles = useMemo(() => {
+		setIsSearching(true)
+		const results = allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		setIsSearching(false)
+		return results
+	}, [allFiles, optSchWord])
 
 	/**
 	 * Initializes the Google API when the component mounts.
@@ -44,10 +54,6 @@ export default function AppMainUI() {
 		else if (optPgeSize === OPT_PAGESIZE.ps24_full) setPagingSize(24)
 		else if (optPgeSize === OPT_PAGESIZE.ps48_full) setPagingSize(48)
 	}, [optPgeSize])
-
-	const searchFilterFiles = useMemo(() => {
-		return allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-	}, [allFiles, optSchWord])
 
 	/**
 	 * Sets show files upon source images or option changes
@@ -99,7 +105,7 @@ export default function AppMainUI() {
 		</section>)
 	}
 
-	function renderTopBar(): JSX.Element {
+	function renderMainContBody_TopBar(): JSX.Element {
 		const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
 
 		return (<div className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
@@ -123,11 +129,11 @@ export default function AppMainUI() {
 					</div>
 					<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
 						<div className="text-muted">
-							{showFiles.length === 0 ? (
-								'No files to show'
-							) : (
-								<span>Showing <b>{searchFilterFiles.length}</b> of <b>{allFiles.length}</b> files</span>
-							)}
+							{isSearching ? <span>searching...</span>
+								: showFiles.length === 0
+									? ('No files to show')
+									: (<span>Showing <b>{searchFilterFiles.length}</b> of <b>{allFiles.length}</b> files</span>)
+							}
 						</div>
 					</div>
 				</div>
@@ -255,7 +261,7 @@ export default function AppMainUI() {
 			}
 			else {
 				returnJsx = <section>
-					{renderTopBar()}
+					{renderMainContBody_TopBar()}
 					<div className='p-2'>
 						<ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
 					</div>
