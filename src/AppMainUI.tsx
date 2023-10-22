@@ -21,7 +21,7 @@ export default function AppMainUI() {
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
 	const [isSearching, setIsSearching] = useState(false)
 	//
-	const [showFiles, setShowFiles] = useState<IGapiFile[]>([])
+	const [gridFiles, setGridFiles] = useState<IGapiFile[]>([])
 	//
 	const [isSidebarOpen, setSidebarOpen] = useState(false)
 	const toggleSidebar = () => {
@@ -30,7 +30,7 @@ export default function AppMainUI() {
 
 	// --------------------------------------------------------------------------------------------
 
-	const searchFilterFiles = useMemo(() => {
+	const filteredFiles = useMemo(() => {
 		setIsSearching(true)
 		const results = allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 		setIsSearching(false)
@@ -74,7 +74,7 @@ export default function AppMainUI() {
 		}
 
 		// B: sort, filter, page files
-		const gridFiles = searchFilterFiles
+		const gridFiles = filteredFiles
 			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 
@@ -82,16 +82,16 @@ export default function AppMainUI() {
 		const noBlobIds = gridFiles.filter((file) => !file.imageBlobUrl).map((item) => item.id)
 		if (noBlobIds.length > 0) {
 			loadPageImages(noBlobIds).then(() => {
-				const gridFiles = searchFilterFiles
+				const gridFiles = filteredFiles
 					.sort(sorter)
 					.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
-				setShowFiles([...gridFiles])
+				setGridFiles([...gridFiles])
 			})
 		}
 		else {
-			setShowFiles(gridFiles)
+			setGridFiles(gridFiles)
 		}
-	}, [searchFilterFiles, pagingPage, pagingSize, optSortBy, optSortDir])
+	}, [filteredFiles, pagingPage, pagingSize, optSortBy, optSortDir])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -103,43 +103,6 @@ export default function AppMainUI() {
 			<h5>Google Drive</h5>
 			<p>view media directly from your google drive</p>
 		</section>)
-	}
-
-	function renderMainContBody_TopBar(): JSX.Element {
-		const isDisabledNext = (showFiles.length < pagingSize) || ((pagingPage - 1) * pagingSize + showFiles.length >= allFiles.length)
-
-		return (<div className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
-			<form className="container-fluid">
-				<div className="row">
-					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
-						<button className="btn btn-secondary w-100" type="button" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }} disabled={pagingPage < 2}>
-							<i className="bi-arrow-left me-1"></i>Prev
-						</button>
-					</div>
-					<div className="col-lg-2 col-md-2 col-6 mb-2 mb-md-0">
-						<button className="btn btn-secondary w-100" type="button" onClick={() => { setPagingPage(pagingPage + 1) }} disabled={isDisabledNext}>
-							Next<i className="bi-arrow-right ms-1"></i>
-						</button>
-					</div>
-					<div className="col-lg col-md-4 col-sm-12 mb-2 mb-md-0">
-						<div className="input-group">
-							<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-							<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-						</div>
-					</div>
-					<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
-						<div className="text-muted">
-							{isSearching ? <span>searching...</span>
-								: showFiles.length === 0
-									? ('No files to show')
-									: (<span>Showing <b>{searchFilterFiles.length}</b> of <b>{allFiles.length}</b> files</span>)
-							}
-						</div>
-					</div>
-				</div>
-			</form>
-		</div>
-		)
 	}
 
 	function renderMainContNav(): JSX.Element {
@@ -240,6 +203,77 @@ export default function AppMainUI() {
 		)
 	}
 
+	function renderMainContBody_TopBar_Paging(): JSX.Element {
+		const maxPage = Math.ceil(filteredFiles.length / pagingSize)
+		const startPage = Math.max(1, pagingPage - 2)
+		const endPage = Math.min(maxPage, pagingPage + 2)
+		const isDisabledNext = (pagingPage * pagingSize >= filteredFiles.length)
+
+		return (
+			<nav aria-label="Page navigation example">
+				<ul className="pagination mb-0">
+					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
+						<button type="button" className="page-link" onClick={() => setPagingPage(1)}>
+							<i className="bi-skip-start me-1"></i>First
+						</button>
+					</li>
+					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
+						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }}>
+							<i className="bi-arrow-left me-1"></i>Prev
+						</button>
+					</li>
+					{Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i)
+						.filter(page => page >= 1 && page <= maxPage)
+						.map(page => (
+							<li key={page} className={`page-item ${page === pagingPage ? 'active' : ''}`}>
+								<button type="button" className="page-link" onClick={() => setPagingPage(page)}>
+									{page}
+								</button>
+							</li>
+						))}
+					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
+						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage + 1) }}>
+							Next<i className="bi-arrow-right ms-1"></i>
+						</button>
+					</li>
+					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
+						<button type="button" className="page-link" onClick={() => { setPagingPage(maxPage) }}>
+							Last<i className="bi-skip-end ms-1"></i>
+						</button>
+					</li>
+				</ul>
+			</nav>
+		)
+	}
+
+	function renderMainContBody_TopBar(): JSX.Element {
+		return (<div className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
+			<form className="container-fluid px-0">
+				<div className="row">
+					<div className="col-lg-auto col-md-4 col-12 mb-2 mb-md-0">
+						{renderMainContBody_TopBar_Paging()}
+					</div>
+					<div className="col-lg col-md-4 col-sm-12 mb-2 mb-md-0">
+						<div className="input-group">
+							<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+							<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+						</div>
+					</div>
+					<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
+						<div className="text-muted">
+							{isSearching ? <span>searching...</span>
+								: gridFiles.length === 0
+									? ('No files to show')
+									: (<span>Showing <b>{filteredFiles.length}</b> of <b>{allFiles.length}</b> files</span>)
+							}
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		)
+	}
+
 	function renderMainContBody(): JSX.Element {
 		let returnJsx = <div>Loading...</div>
 
@@ -263,7 +297,7 @@ export default function AppMainUI() {
 				returnJsx = <section>
 					{renderMainContBody_TopBar()}
 					<div className='p-2'>
-						<ImageGrid gapiFiles={showFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
+						<ImageGrid gapiFiles={gridFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
 					</div>
 				</section>
 			}

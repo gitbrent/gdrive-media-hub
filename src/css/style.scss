@@ -1,8 +1,26 @@
+// First, import variables from Bootswatch
 @import "~bootswatch/dist/darkly/variables";
+
+// Override the pagination variables here
+/* @see: https://getbootstrap.com/docs/5.3/customize/color/#using-the-new-colors */
+/* FYI: WORKS
+	$pagination-color: var(--bs-light);
+	$pagination-hover-bg: var(--bs-secondary);
+	$pagination-active-bg: $primary;
+	$pagination-hover-bg: $gray-300;
+*/
+$pagination-bg: $gray-600;
+$pagination-active-bg: $primary;
+$pagination-hover-bg: $gray-500;
+$pagination-disabled-bg: $gray-700;
+
+// Then, import Bootstrap's main SCSS
 @import "~bootstrap/scss/bootstrap";
+
+// Finally, import Bootswatch theme
 @import "~bootswatch/dist/darkly/bootswatch";
 
-// override `#eee` hard-coded background in react-grid-gallery
+// Your other styles
 .ReactGridGallery_tile {
 	background: transparent !important;
 }
