@@ -1,15 +1,22 @@
-#leftNavBar {
+nav {
 	transition: width 0.35s ease;
 }
 
-#leftNavBar.collapsed {
+nav.collapsed {
 	width: 74px !important;
 	transition: width 0.35s ease;
 }
 
 /* CAREFUL! a.collapsed are sub-menus items, using only `.collapsed` will hose UI */
-#leftNavBar.collapsed .d-inline {
+nav.collapsed .d-inline {
 	display: none !important;
+}
+
+main.login {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
 }
 
 /* following two rules are to make the google drive logo (initial, not logged in screen) to be 100% h */
@@ -36,4 +43,8 @@
 
 .drop-item {
 	font-weight: lighter !important;
+}
+
+.cursor-link {
+	cursor: pointer;
 }

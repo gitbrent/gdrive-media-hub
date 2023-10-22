@@ -1,5 +1,5 @@
 // APP
-export const APP_BLD = '20231007-1240'
+export const APP_BLD = '20231021-1801'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 

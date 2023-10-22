@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './useAppMain'
 import ImageSlideshow from './ImageSlideshow'
@@ -45,6 +45,10 @@ export default function AppMainUI() {
 		else if (optPgeSize === OPT_PAGESIZE.ps48_full) setPagingSize(48)
 	}, [optPgeSize])
 
+	const searchFilterFiles = useMemo(() => {
+		return allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+	}, [allFiles, optSchWord])
+
 	/**
 	 * Sets show files upon source images or option changes
 	 */
@@ -64,8 +68,7 @@ export default function AppMainUI() {
 		}
 
 		// B: sort, filter, page files
-		const gridFiles = allFiles
-			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		const gridFiles = searchFilterFiles
 			.sort(sorter)
 			.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 
@@ -73,8 +76,7 @@ export default function AppMainUI() {
 		const noBlobIds = gridFiles.filter((file) => !file.imageBlobUrl).map((item) => item.id)
 		if (noBlobIds.length > 0) {
 			loadPageImages(noBlobIds).then(() => {
-				const gridFiles = allFiles
-					.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+				const gridFiles = searchFilterFiles
 					.sort(sorter)
 					.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 				setShowFiles([...gridFiles])
@@ -83,12 +85,12 @@ export default function AppMainUI() {
 		else {
 			setShowFiles(gridFiles)
 		}
-	}, [allFiles, pagingPage, pagingSize, optSortBy, optSortDir, optSchWord])
+	}, [searchFilterFiles, pagingPage, pagingSize, optSortBy, optSortDir])
 
 	// --------------------------------------------------------------------------------------------
 
 	function renderLogin(): JSX.Element {
-		return (<section onClick={() => handleAuthClick()} className="text-center">
+		return (<section className="text-center cursor-link" onClick={() => handleAuthClick()}>
 			<div className="p-4">
 				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveLogo" />
 			</div>
@@ -124,11 +126,7 @@ export default function AppMainUI() {
 							{showFiles.length === 0 ? (
 								'No files to show'
 							) : (
-								<>
-									Showing <b>{(pagingPage - 1) * pagingSize + 1}</b>
-									-
-									<b>{Math.min((pagingPage - 1) * pagingSize + showFiles.length, allFiles.length)}</b> of <b>{allFiles.length}</b> files
-								</>
+								<span>Showing <b>{searchFilterFiles.length}</b> of <b>{allFiles.length}</b> files</span>
 							)}
 						</div>
 					</div>
@@ -141,7 +139,7 @@ export default function AppMainUI() {
 	function renderMainContNav(): JSX.Element {
 		const isSlideShowPaused = optSlideshowSecs === 999
 
-		return (<div id='leftNavBar' className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
+		return (<nav className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
@@ -198,7 +196,7 @@ export default function AppMainUI() {
 										<button className={`dropdown-item ${isSlideShowPaused ? '' : 'text-light'}`} disabled={!isSlideShowPaused} onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>
 											<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Resume</span>
 										</button>
-										<button className={`dropdown-item ${!isSlideShowPaused ? '' : 'text-light'}`} disabled={isSlideShowPaused}  onClick={() => { setOptSlideshowSecs(999) }}>
+										<button className={`dropdown-item ${!isSlideShowPaused ? '' : 'text-light'}`} disabled={isSlideShowPaused} onClick={() => { setOptSlideshowSecs(999) }}>
 											<i className="bi-pause-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Pause</span>
 										</button>
 										<button className="dropdown-item" onClick={() => { setOptIsSlideshow(false) }}>
@@ -232,7 +230,7 @@ export default function AppMainUI() {
 					</ul>
 				</div>
 			</div>
-		</div>
+		</nav>
 		)
 	}
 
@@ -269,7 +267,7 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<div className="col p-0">{returnJsx}</div>
+			<main className={`col p-0 ${authUserName ? '' : 'login'}`}>{returnJsx}</main>
 		)
 	}
 
