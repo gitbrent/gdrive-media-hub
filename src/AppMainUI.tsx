@@ -135,6 +135,18 @@ export default function AppMainUI() {
 		return () => window.removeEventListener('resize', calculatePageSize)
 	}, [])
 
+	/**
+	 * This useEffect watches the length of `showFiles`, the number of items per page (`pagingSize`),
+	 * and the current page number (`pagingPage`). If the number of items in `showFiles` changes,
+	 * such that the current page number is out of range, it resets the current page to 1.
+	 */
+	useEffect(() => {
+		const maxPage = Math.ceil(filteredFiles.length / pagingSize)
+		if (pagingPage > maxPage || pagingPage < 1) {
+			setPagingPage(1)
+		}
+	}, [gridFiles.length, pagingSize, pagingPage])
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderLogin(): JSX.Element {
