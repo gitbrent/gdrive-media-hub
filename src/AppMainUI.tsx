@@ -10,7 +10,7 @@ export default function AppMainUI() {
 	//
 	const DEFAULT_SLIDE_DELAY = 4
 	//
-	const [pagingSize, setPagingSize] = useState(12)
+	const [pagingSize, setPagingSize] = useState(8)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate_full)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc_full)
@@ -90,33 +90,20 @@ export default function AppMainUI() {
 		const calculatePageSize = () => {
 			// Get the height of a single figure element inside #gallery-container
 			const galleryContainer = document.getElementById('main-container')
+			const galleryTopBar = document.getElementById('topGridBar')
 			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
 			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
 			const marginTop = figureStyles ? parseFloat(figureStyles.marginTop) : 0
 			const marginBottom = figureStyles ? parseFloat(figureStyles.marginBottom) : 0
 			const rowHeight = figureElement ? figureElement.offsetHeight + marginTop + marginBottom : 199 + 8  // fallback to 198 if not found
-			const galleryTopBar = document.getElementById('topGridBar')
 
-			// Get the available height for the gallery.
+			// Calculate the available height and width for the gallery.
 			const availableHeight = galleryContainer ? galleryContainer.clientHeight - (galleryTopBar ? galleryTopBar.clientHeight : 0) : window.innerHeight
+			const availableWidth = galleryContainer ? galleryContainer.clientWidth : window.innerWidth
 
-			// Calculate the number of rows that can fit.
+			// Calculate the number of rows and columns that can fit.
 			const numRows = Math.floor(availableHeight / rowHeight)
-
-			// Dynamically determine the number of columns based on window width.
-			const windowWidth = galleryContainer ? galleryContainer.clientWidth : window.innerWidth
-			let numColumns
-			if (windowWidth >= 1400) {
-				numColumns = 10
-			} else if (windowWidth >= 1200) {
-				numColumns = 8
-			} else if (windowWidth >= 992) {
-				numColumns = 6
-			} else if (windowWidth >= 768) {
-				numColumns = 4
-			} else {
-				numColumns = 2 // Default to 2 columns for smaller screens
-			}
+			const numColumns = Math.floor(availableWidth / rowHeight)
 
 			// Calculate pageSize.
 			const pageSize = numRows * numColumns
@@ -169,7 +156,7 @@ export default function AppMainUI() {
 				</a>
 				<ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
 					<li className="nav-item">
-						<a href="#" className="nav-link px-0 align-middle text-nowrap">
+						<a href="/" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-house"></i><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>

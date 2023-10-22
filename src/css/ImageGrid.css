@@ -6,10 +6,27 @@
 }
 
 .gallery figure {
-	flex: 1 0 calc(100% / var(--num-columns) - 0.5rem);
-	max-width: calc(100% / var(--num-columns) - 0.5rem);
 	margin: 0.25rem;
-	position: relative;
+	flex: 1 0 auto;
+	height: 200px;
+	/* Set an explicit height */
+	width: 200px;
+	/* Set an explicit width */
+	overflow: hidden;
+	/* Hide overflow content */
+}
+
+.gallery figure img,
+.gallery figure .folder-icon {
+	display: block;
+	height: 100%;
+	/* Take up full height of figure */
+	width: 100%;
+	/* Take up full width of figure */
+	object-fit: cover;
+	/* Cover the whole area without squishing */
+	object-position: center;
+	/* Center the image in the area */
 }
 
 /* by default, captions are shown in the grid and shadowbox, this hides the grid caption! */
@@ -17,13 +34,24 @@
 	display: none;
 }
 
-.gallery figure img,
-.gallery figure .folder-icon {
-	display: block;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+/* make bootstrap spinner animated! */
+.bi-arrow-repeat {
+	animation: spin 2s linear infinite;
 }
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/* ----------------------------------------------------- */
+/* columns */
+/* ----------------------------------------------------- */
 
 @media (min-width: 768px) {
 	.gallery {
@@ -48,6 +76,10 @@
 		--num-columns: 10;
 	}
 }
+
+/* ----------------------------------------------------- */
+/* slide-show */
+/* ----------------------------------------------------- */
 
 .slideShowContainer {
 	display: flex;
