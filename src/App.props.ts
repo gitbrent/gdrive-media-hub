@@ -1,5 +1,5 @@
 // APP
-export const APP_BLD = '20231021-1801'
+export const APP_BLD = '20231022-1501'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
 
@@ -87,11 +87,4 @@ export enum OPT_SORTBY {
 export enum OPT_SORTDIR {
 	asce_trim = 'Asc', asce_full = 'Ascending',
 	desc_trim = 'Des', desc_full = 'Descinding'
-}
-
-export enum OPT_PAGESIZE {
-	ps08_trim = '8 ', ps08_full = '8 items',
-	ps12_trim = '12', ps12_full = '12 items',
-	ps24_trim = '24', ps24_full = '24 items',
-	ps48_trim = '48', ps48_full = '48 items',
 }

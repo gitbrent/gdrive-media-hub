@@ -1,23 +1,28 @@
 .gallery {
 	display: flex;
 	flex-wrap: wrap;
-	margin: 0 -0.25rem;
+	justify-content: flex-start;
+	margin: 0.25rem;
 }
 
 .gallery figure {
+	flex: 1 0 calc(100% / var(--num-columns) - 0.5rem);
+	max-width: calc(100% / var(--num-columns) - 0.5rem);
 	margin: 0.25rem;
-	flex: 1 0 auto;
+	position: relative;
 }
 
-/* by default, captions are shown in the gird and shaodwbox, this hides the grid caption! */
+/* by default, captions are shown in the grid and shadowbox, this hides the grid caption! */
 .gallery figure figcaption {
 	display: none;
 }
 
-.gallery figure img {
+.gallery figure img,
+.gallery figure .folder-icon {
 	display: block;
-	height: 200px;
-	max-width: 100%;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 @media (min-width: 768px) {
@@ -42,10 +47,6 @@
 	.gallery {
 		--num-columns: 10;
 	}
-}
-
-.gallery img {
-	flex-basis: calc(100% / var(--num-columns) - 0.25rem);
 }
 
 .slideShowContainer {

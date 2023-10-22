@@ -30,9 +30,9 @@ export default function ImageGrid(props: IProps) {
 	}, [props.gapiFiles])
 
 	return galleryItems && galleryItems.length > 0 ? (
-		<Gallery id="galleryItems" withCaption={props.isShowCap}>
+		<Gallery withCaption={props.isShowCap}>
 			{/*<div className="gallery" style={{ '--num-columns': 6 } as React.CSSProperties}>*/}
-			<div className="gallery">
+			<div id="gallery-container" className="gallery">
 				{galleryItems.map((item) => (
 					<Item {...item} key={item.id}>
 						{({ ref, open }) => (

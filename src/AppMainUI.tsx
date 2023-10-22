@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_PAGESIZE, OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './useAppMain'
 import ImageSlideshow from './ImageSlideshow'
 import ImageGrid from './ImageGrid'
@@ -14,7 +14,6 @@ export default function AppMainUI() {
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate_full)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc_full)
-	const [optPgeSize, setOptPgeSize] = useState(OPT_PAGESIZE.ps12_full)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
@@ -44,16 +43,6 @@ export default function AppMainUI() {
 		if (IS_LOCALHOST) console.log('[AppMainUI] init!')
 		if (allFiles.length > 0) setPagingPage(1)
 	}, [allFiles])
-
-	/**
-	 * Updates the `pagingSize` state based on the selected `optPgeSize`.
-	 */
-	useEffect(() => {
-		if (optPgeSize === OPT_PAGESIZE.ps08_full) setPagingSize(8)
-		else if (optPgeSize === OPT_PAGESIZE.ps12_full) setPagingSize(12)
-		else if (optPgeSize === OPT_PAGESIZE.ps24_full) setPagingSize(24)
-		else if (optPgeSize === OPT_PAGESIZE.ps48_full) setPagingSize(48)
-	}, [optPgeSize])
 
 	/**
 	 * Sets show files upon source images or option changes
@@ -93,6 +82,59 @@ export default function AppMainUI() {
 		}
 	}, [filteredFiles, pagingPage, pagingSize, optSortBy, optSortDir])
 
+	/**
+	 * Set `pageSize` based upon current container size
+	 * - also creates up a window.resize event listener!
+	 */
+	useEffect(() => {
+		const calculatePageSize = () => {
+			// Get the height of a single figure element inside #gallery-container
+			const galleryContainer = document.getElementById('main-container')
+			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
+			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
+			const marginTop = figureStyles ? parseFloat(figureStyles.marginTop) : 0
+			const marginBottom = figureStyles ? parseFloat(figureStyles.marginBottom) : 0
+			const rowHeight = figureElement ? figureElement.offsetHeight + marginTop + marginBottom : 199 + 8  // fallback to 198 if not found
+			const galleryTopBar = document.getElementById('topGridBar')
+
+			// Get the available height for the gallery.
+			const availableHeight = galleryContainer ? galleryContainer.clientHeight - (galleryTopBar ? galleryTopBar.clientHeight : 0) : window.innerHeight
+
+			// Calculate the number of rows that can fit.
+			const numRows = Math.floor(availableHeight / rowHeight)
+
+			// Dynamically determine the number of columns based on window width.
+			const windowWidth = galleryContainer ? galleryContainer.clientWidth : window.innerWidth
+			let numColumns
+			if (windowWidth >= 1400) {
+				numColumns = 10
+			} else if (windowWidth >= 1200) {
+				numColumns = 8
+			} else if (windowWidth >= 992) {
+				numColumns = 6
+			} else if (windowWidth >= 768) {
+				numColumns = 4
+			} else {
+				numColumns = 2 // Default to 2 columns for smaller screens
+			}
+
+			// Calculate pageSize.
+			const pageSize = numRows * numColumns
+
+			// Set pageSize
+			setPagingSize(pageSize)
+		}
+
+		// Initial calculation
+		calculatePageSize()
+
+		// Add resize event listener
+		window.addEventListener('resize', calculatePageSize)
+
+		// Cleanup: remove event listener
+		return () => window.removeEventListener('resize', calculatePageSize)
+	}, [])
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderLogin(): JSX.Element {
@@ -108,7 +150,7 @@ export default function AppMainUI() {
 	function renderMainContNav(): JSX.Element {
 		const isSlideShowPaused = optSlideshowSecs === 999
 
-		return (<nav className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
+		return (<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
@@ -138,19 +180,6 @@ export default function AppMainUI() {
 							<li className="w-100">
 								<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.asce_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.asce_full} onClick={() => setOptSortDir(OPT_SORTDIR.asce_full)}>{isSidebarOpen ? OPT_SORTDIR.asce_full : OPT_SORTDIR.asce_trim}</button>
 								<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.desc_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.desc_full} onClick={() => setOptSortDir(OPT_SORTDIR.desc_full)}>{isSidebarOpen ? OPT_SORTDIR.desc_full : OPT_SORTDIR.desc_trim}</button>
-							</li>
-						</ul>
-					</li>
-					<li data-desc="page-size">
-						<a href="#submenuPageSize" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
-							<i className="fs-4 bi-grid"></i><span className="ms-2 d-inline">Page Size</span>
-						</a>
-						<ul className="collapse nav flex-column" id="submenuPageSize" data-bs-parent="#menu">
-							<li className="w-100">
-								<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps08_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps08_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps08_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps08_full : OPT_PAGESIZE.ps08_trim}</button>
-								<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps12_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps12_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps12_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps12_full : OPT_PAGESIZE.ps12_trim}</button>
-								<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps24_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps24_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps24_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps24_full : OPT_PAGESIZE.ps24_trim}</button>
-								<button className={`dropdown-item ${optPgeSize === OPT_PAGESIZE.ps48_full ? '' : 'text-light'}`} disabled={optPgeSize === OPT_PAGESIZE.ps48_full} onClick={() => setOptPgeSize(OPT_PAGESIZE.ps48_full)}>{isSidebarOpen ? OPT_PAGESIZE.ps48_full : OPT_PAGESIZE.ps48_trim}</button>
 							</li>
 						</ul>
 					</li>
@@ -247,7 +276,7 @@ export default function AppMainUI() {
 	}
 
 	function renderMainContBody_TopBar(): JSX.Element {
-		return (<div className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
+		return (<div id="topGridBar" className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
 			<form className="container-fluid px-0">
 				<div className="row">
 					<div className="col-lg-auto col-md-4 col-12 mb-2 mb-md-0">
@@ -296,9 +325,7 @@ export default function AppMainUI() {
 			else {
 				returnJsx = <section>
 					{renderMainContBody_TopBar()}
-					<div className='p-2'>
-						<ImageGrid gapiFiles={gridFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
-					</div>
+					<ImageGrid gapiFiles={gridFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
 				</section>
 			}
 		}
@@ -307,7 +334,7 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<main className={`col p-0 ${authUserName ? '' : 'login'}`}>{returnJsx}</main>
+			<main id="main-container" className={`col p-0 ${authUserName ? '' : 'login'}`}>{returnJsx}</main>
 		)
 	}
 
