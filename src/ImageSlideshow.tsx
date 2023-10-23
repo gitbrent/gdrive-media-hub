@@ -36,7 +36,7 @@ const Slideshow: React.FC<Props> = ({ images, duration, downloadFile }) => {
 	return (
 		<div className='slideShowContainer'>
 			<div className='slideShowMain'>
-				<img src={currentImage.imageBlobUrl} />
+				{currentImage.imageBlobUrl ? <img src={currentImage.imageBlobUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />}
 			</div>
 		</div>
 	)
