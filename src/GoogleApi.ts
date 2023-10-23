@@ -331,11 +331,10 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 
 	if (IS_LOCALHOST) {
 		console.log(`[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
-		//if (allFiles.length > 0) console.log(allFiles[0])
+		if (allFiles.length > 0) console.log('allFiles[0]', allFiles[0])
 	}
 
-	const badges = document.querySelectorAll('#file-load-badge')
-	badges.forEach(badge => badge.remove())
+	document.getElementById('file-load-badge')?.remove()
 
 	return allFiles
 }
