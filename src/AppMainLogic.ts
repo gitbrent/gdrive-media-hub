@@ -109,6 +109,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 				}
 			})
 		} else {
+			console.warn('fetchFileImgBlob() failed')
 			return false
 		}
 	} catch (error) {
