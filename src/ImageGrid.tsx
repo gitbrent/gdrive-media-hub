@@ -41,7 +41,7 @@ export default function ImageGrid(props: IProps) {
 									{props.isShowCap && <figcaption>{item.caption}</figcaption>}
 								</figure>)
 								:
-								(<figure className="text-muted" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+								(<figure className="text-muted" title={item.caption} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 									<i className="h1 mb-0 bi-arrow-repeat" />
 								</figure>)
 						)}
