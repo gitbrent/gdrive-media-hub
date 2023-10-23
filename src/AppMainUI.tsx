@@ -137,7 +137,7 @@ export default function AppMainUI() {
 	// --------------------------------------------------------------------------------------------
 
 	function renderLogin(): JSX.Element {
-		return (<section className="text-center cursor-link" onClick={() => handleAuthClick()}>
+		return (<section id="loginCont" className="text-center cursor-link" onClick={() => handleAuthClick()}>
 			<div className="p-4">
 				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveLogo" />
 			</div>
@@ -315,11 +315,7 @@ export default function AppMainUI() {
 		}
 		else if (authUserName) {
 			if (optIsSlideshow) {
-				returnJsx = <ImageSlideshow
-					images={allFiles.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })}
-					duration={optSlideshowSecs}
-					downloadFile={downloadFile}
-				/>
+				returnJsx = <ImageSlideshow images={filteredFiles} duration={optSlideshowSecs} downloadFile={downloadFile} />
 			}
 			else {
 				returnJsx = <section>

@@ -303,23 +303,43 @@ export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 }
 
 export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]> => {
-	const response = await gapi.client.drive.files.list({
-		//q: 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
-		q: searchText ? `trashed=false and name contains "${searchText}"` : 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
-		fields: 'files(id,mimeType,modifiedByMeTime,name,size)',
-		orderBy: 'modifiedByMeTime desc',
-		pageSize: 1000,
-	})
+	let allFiles: IGapiFile[] = []
+	let pageToken: string | undefined
 
-	const gapiFiles: IGapiFile[] = (response.result.files || []) as IGapiFile[]
+	do {
+		const response = await gapi.client.drive.files.list({
+			q: searchText ? `trashed=false and name contains "${searchText}"` : 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
+			fields: 'nextPageToken, files(id,mimeType,modifiedByMeTime,name,size)',
+			orderBy: 'modifiedByMeTime desc',
+			pageSize: 1000,
+			pageToken: pageToken,
+		})
+
+		allFiles = allFiles.concat(response.result.files as IGapiFile[]) || []
+		pageToken = response.result.nextPageToken
+		//
+		const loginCont = document.getElementById('loginCont')
+		let badgeElement = document.getElementById('file-load-badge')
+		if (!badgeElement) {
+			badgeElement = document.createElement('div')
+			badgeElement.className = 'alert alert-primary'
+			badgeElement.id = 'file-load-badge'
+			loginCont?.appendChild(badgeElement)
+		}
+		badgeElement.textContent = `Loaded ${allFiles?.length} files...`
+	} while (pageToken && allFiles.length < 10000)
 
 	if (IS_LOCALHOST) {
-		console.log(`- gapiFiles.length = ${gapiFiles.length}`)
-		if (gapiFiles.length > 0) console.log(gapiFiles[0])
+		console.log(`[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
+		//if (allFiles.length > 0) console.log(allFiles[0])
 	}
 
-	return gapiFiles
+	const badges = document.querySelectorAll('#file-load-badge')
+	badges.forEach(badge => badge.remove())
+
+	return allFiles
 }
+
 
 export const fetchDriveFolders = async (): Promise<IGapiFolder[]> => {
 	return buildFolderHierarchy()
