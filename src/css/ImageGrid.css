@@ -109,10 +109,10 @@
 */
 /* slide-show: stretch (esp for gifs) */
 .slideShowContainer .slideShowMain img {
-	object-fit: cover;
 	/* Scale the image while preserving aspect ratio */
-	height: 100%;
-	/* Stretch the height to fill container */
-	width: 100%;
-	/* Stretch the width to fill container */
+	object-fit: cover;
+	/* Set max height to fill container */
+	max-height: 100%;
+	/* Set max width to fill container */
+	max-width: 100%;
 }
