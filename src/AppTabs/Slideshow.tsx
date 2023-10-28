@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { IGapiFile } from './App.props'
+import { IGapiFile } from '../App.props'
+import '../css/Slideshow.css'
 
 interface Props {
 	duration: number;

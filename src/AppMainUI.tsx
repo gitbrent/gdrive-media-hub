@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { GridSizes, IGapiFile, IS_LOCALHOST, OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './useAppMain'
-import ImageSlideshow from './ImageSlideshow'
-import ImageGrid from './ImageGrid'
+import ImageGrid from './AppTabs/ImageGrid'
+import ImageSlideshow from './AppTabs/Slideshow'
 import './css/AppMainUI.css'
 
 export default function AppMainUI() {

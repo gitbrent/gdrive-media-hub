@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
-import { IGapiFile, IGridSize } from './App.props'
+import { IGapiFile, IGridSize } from '../App.props'
 import { FixedItemProps } from './ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
-import './css/ImageGrid.css'
+import '../css/ImageGrid.css'
 
 interface IProps {
 	gridImages: IGapiFile[]
