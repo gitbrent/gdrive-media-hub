@@ -37,7 +37,7 @@ export default function ImageGrid(props: IProps) {
 						{({ ref, open }) => (
 							item?.thumbnail?.indexOf('spinner') === -1 ?
 								(<figure>
-									<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} alt={item.alt} />
+									<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} title={item.caption} alt={item.alt} />
 									{props.isShowCap && <figcaption>{item.caption}</figcaption>}
 								</figure>)
 								:
