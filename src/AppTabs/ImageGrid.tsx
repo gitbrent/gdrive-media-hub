@@ -130,9 +130,17 @@ export default function ImageGrid(props: IProps) {
 
 	function renderMainContBody_TopBar_Paging(): JSX.Element {
 		const maxPage = Math.ceil(filtdSortdFiles.length / pagingSize)
-		const startPage = Math.max(1, pagingPage - 2)
-		const endPage = Math.min(maxPage, pagingPage + 2)
 		const isDisabledNext = (pagingPage * pagingSize >= filtdSortdFiles.length)
+		// Determine start and end pages to show a max of 3 numbers
+		let startPage = pagingPage - 1
+		let endPage = pagingPage + 1
+		if (startPage < 1) {
+			startPage = 1
+			endPage = Math.min(3, maxPage)
+		} else if (endPage > maxPage) {
+			endPage = maxPage
+			startPage = Math.max(1, maxPage - 2)
+		}
 
 		return (
 			<nav aria-label="Page navigation example">
