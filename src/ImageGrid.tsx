@@ -6,16 +6,21 @@ import 'photoswipe/dist/photoswipe.css'
 import './css/ImageGrid.css'
 
 interface IProps {
-	gapiFiles: IGapiFile[]
+	gridImages: IGapiFile[]
 	isShowCap: boolean
 	selGridSize: IGridSize
 }
 
 export default function ImageGrid(props: IProps) {
+	/**
+	 * @description Memoized array of gallery items to be displayed in the grid.
+	 *
+	 * @returns {FixedItemProps[]} Returns an array of gallery items with properties appropriately set for display.
+	 */
 	const galleryItems: FixedItemProps[] = useMemo(() => {
 		const showImages: FixedItemProps[] = []
 
-		props.gapiFiles.forEach((item) => {
+		props.gridImages.forEach((item) => {
 			showImages.push({
 				id: item.id,
 				caption: item.name || '(loading)',
@@ -27,7 +32,7 @@ export default function ImageGrid(props: IProps) {
 		})
 
 		return showImages
-	}, [props.gapiFiles])
+	}, [props.gridImages])
 
 	return galleryItems && galleryItems.length > 0 ? (
 		<Gallery withCaption={props.isShowCap}>
@@ -52,7 +57,19 @@ export default function ImageGrid(props: IProps) {
 	) : (
 		<section className="text-center my-5">
 			<div className="alert alert-warning d-inline-flex align-items-center" role="alert">
-				<span className="h1 fw-light mb-0 me-3">⚠️</span>no images to display
+				<div className="row align-items-center no-gutters gx-2">
+					<div className="col-auto">
+						<i className="bi-exclamation-triangle-fill display-3"></i>
+					</div>
+					<div className="col">
+						<div>
+							<h3 className="mb-0">say less bro</h3>
+						</div>
+						<div>
+							<p className="mb-0">(no imgaes to display)</p>
+						</div>
+					</div>
+				</div>
 			</div>
 		</section>
 	)
