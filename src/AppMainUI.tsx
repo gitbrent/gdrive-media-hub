@@ -142,7 +142,7 @@ export default function AppMainUI() {
 				<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveLogo" />
 			</div>
 			<h5>Google Drive</h5>
-			<p>view media directly from your google drive</p>
+			<p className='text-muted'>superior media viewer</p>
 		</section>)
 	}
 
@@ -210,7 +210,7 @@ export default function AppMainUI() {
 					</li>
 				</ul>
 				<hr />
-				<div id="leftNavBtmBtn" className="dropdown px-3 pb-4">
+				<div id="leftNavBtmBtn" className="dropdown px-2 pb-4">
 					<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
 						{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill"></i>}
 						<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
@@ -242,12 +242,14 @@ export default function AppMainUI() {
 				<ul className="pagination mb-0">
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
 						<button type="button" className="page-link" onClick={() => setPagingPage(1)}>
-							<i className="bi-skip-start me-1"></i>First
+							<i className="bi-chevron-bar-left me-1"></i>
+							<span className="d-none d-sm-inline-block">First</span>
 						</button>
 					</li>
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
 						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }}>
-							<i className="bi-arrow-left me-1"></i>Prev
+							<i className="bi-chevron-left me-1"></i>
+							<span className="d-none d-sm-inline-block">Prev</span>
 						</button>
 					</li>
 					{Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i)
@@ -261,12 +263,14 @@ export default function AppMainUI() {
 						))}
 					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
 						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage + 1) }}>
-							Next<i className="bi-arrow-right ms-1"></i>
+							<span className="d-none d-sm-inline-block">Next</span>
+							<i className="bi-chevron-right ms-1"></i>
 						</button>
 					</li>
 					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
 						<button type="button" className="page-link" onClick={() => { setPagingPage(maxPage) }}>
-							Last<i className="bi-skip-end ms-1"></i>
+							<span className="d-none d-sm-inline-block">Last</span>
+							<i className="bi-chevron-bar-right ms-1"></i>
 						</button>
 					</li>
 				</ul>
