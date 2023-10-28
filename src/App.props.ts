@@ -1,4 +1,5 @@
 // APP
+// @see [SampleImages](https://unsample.net/)
 export const APP_BLD = '20231022-1501'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost?show=gapi') > -1

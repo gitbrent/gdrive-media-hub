@@ -210,7 +210,7 @@ export default function AppMainUI() {
 					</li>
 				</ul>
 				<hr />
-				<div className="dropdown pb-4">
+				<div id="leftNavBtmBtn" className="dropdown px-3 pb-4">
 					<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
 						{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill"></i>}
 						<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
@@ -320,7 +320,7 @@ export default function AppMainUI() {
 			else {
 				returnJsx = <section>
 					{renderMainContBody_TopBar()}
-					<ImageGrid gapiFiles={gridFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
+					<ImageGrid gridImages={gridFiles} isShowCap={optIsShowCap} selGridSize={GridSizes[1]} />
 				</section>
 			}
 		}

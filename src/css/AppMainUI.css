@@ -20,6 +20,24 @@ main.login {
 	height: 100vh;
 }
 
+/* General CSS for all screens */
+#leftNav #leftNavBtmBtn {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+
+/* Media query for iPhone and smaller screens */
+@media (max-width: 767px) {
+	#leftNavBtmBtn {
+		bottom: 20px;
+	}
+}
+
+/* -------------------------------------------------------------------------------- */
+/* -- bootstrap-5 mods and adds                                                  -- */
+/* -------------------------------------------------------------------------------- */
+
 /* following two rules are to make the google drive logo (initial, not logged in screen) to be 100% h */
 .col.py-3 {
 	display: flex;
