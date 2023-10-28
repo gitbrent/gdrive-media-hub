@@ -3,21 +3,23 @@ import { IGapiFile } from '../App.props'
 import '../css/Slideshow.css'
 
 interface Props {
-	duration: number;
-	images: IGapiFile[];
+	allFiles: IGapiFile[];
 	downloadFile: (fileId: string) => Promise<boolean>;
+	duration: number; // TODO: change to slideshowOptions object, add to upcoming OPTIOMNS tab
 }
 
-const ImageSlideshow: React.FC<Props> = ({ images, duration, downloadFile }) => {
+const ImageSlideshow: React.FC<Props> = ({ allFiles, duration, downloadFile }) => {
 	const [shuffledImages, setShuffledImages] = useState<IGapiFile[]>([])
 	const [currentIndex, setCurrentIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
+	//
+	const currentImage = shuffledImages[currentIndex]
 
 	// Shuffle images once at the beginning
 	useEffect(() => {
-		const shuffled = [...images].sort(() => Math.random() - 0.5)
+		const shuffled = [...allFiles].sort(() => Math.random() - 0.5)
 		setShuffledImages(shuffled)
-	}, [images])
+	}, [allFiles])
 
 	// Slide-show logic
 	useEffect(() => {
@@ -41,7 +43,7 @@ const ImageSlideshow: React.FC<Props> = ({ images, duration, downloadFile }) => 
 		}
 	}, [currentIndex, shuffledImages, downloadFile])
 
-	const currentImage = shuffledImages[currentIndex]
+	// --------------------------------------------------------------------------------------------
 
 	return (
 		<div className='slideShowContainer'>
