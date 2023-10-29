@@ -20,6 +20,8 @@ export default function ImageGrid(props: IProps) {
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
 
+	const [lastLoadDate, setLastLoadDate] = useState('')
+
 	// --------------------------------------------------------------------------------------------
 
 	const filtdSortdFiles = useMemo(() => {
@@ -56,19 +58,21 @@ export default function ImageGrid(props: IProps) {
 				})
 			})
 
-		// C: Load first batch of missing images
-		const noBlobIds = showImages.filter((file, idx) => { idx < 20 && !file.original }).map((file) => file.id as string)
-		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds)
-
 		setIsSearching(false)
 		return showImages
-	}, [props.allFiles, optSchWord])
+	}, [props.allFiles, optSchWord, lastLoadDate])
 
 	const gridShowFiles = useMemo(() => {
 		return filtdSortdFiles.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [filtdSortdFiles, pagingPage, pagingSize, props.optSortBy, props.optSortDir])
 
 	// --------------------------------------------------------------------------------------------
+
+	// Fix issue with initial images all showing loading images
+	useEffect(() => {
+		const noBlobIds = gridShowFiles.filter((file) => !file.original).map((file) => file.id as string)
+		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds).then(() => setLastLoadDate((new Date).toISOString()))
+	}, [gridShowFiles])
 
 	/**
 	 * Set `pageSize` based upon current container size
