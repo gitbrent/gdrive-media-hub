@@ -7,8 +7,8 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	height: 100vh;
-	/* height: calc(100vh - 76px); - not needed, we hide topNavBar during slide show */
+	/* height: 100vh; */
+	height: calc(100vh - 76px);
 }
 
 .slideShowContainer .slideShowMain {
