@@ -18,6 +18,7 @@ main.login {
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
+	height: -webkit-fill-available;
 }
 
 /* General CSS for all screens */
@@ -32,6 +33,14 @@ main.login {
 	#leftNavBtmBtn {
 		bottom: 20px;
 	}
+}
+
+#contHome {
+	display: flex;
+	height: 100vh;
+	height: -webkit-fill-available;
+	justify-content: center;
+	align-items: center;
 }
 
 /* -------------------------------------------------------------------------------- */
@@ -66,4 +75,9 @@ main.login {
 
 .cursor-link {
 	cursor: pointer;
+}
+
+/* remove little drop-down chevron after profile pic, lower-left, leftNav */
+#dropdownUser1::after {
+	content: none;
 }
