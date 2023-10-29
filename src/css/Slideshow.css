@@ -31,8 +31,6 @@
 .slideShowContainer .slideShowMain img {
 	/* Scale the image while preserving aspect ratio */
 	object-fit: cover;
-	/* Set max height to fill container */
-	max-height: 100%;
-	/* Set max width to fill container */
-	max-width: 100%;
+	height: 100%;
+	width: 100%;
 }
