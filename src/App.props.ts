@@ -1,7 +1,8 @@
 // APP
-export const APP_BLD = '20230902-1312'
+// @see [SampleImages](https://unsample.net/)
+export const APP_BLD = '20231028-2101'
 export const APP_VER = '1.3.0-WIP'
-export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost') > -1
+export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost?show=gapi') > -1
 
 // ============================================================================
 
@@ -33,6 +34,7 @@ export enum AuthState {
 export interface IAuthState {
 	status: AuthState
 	userName: string
+	userPict: string
 }
 
 export interface IGapiFile extends gapi.client.drive.File {
@@ -84,13 +86,6 @@ export enum OPT_SORTBY {
 }
 
 export enum OPT_SORTDIR {
-	asc = 'Ascending',
+	asce = 'Ascending',
 	desc = 'Descinding'
-}
-
-export enum OPT_PAGESIZE {
-	ps08 = '8 items',
-	ps12 = '12 items',
-	ps24 = '24 items',
-	ps48 = '48 items',
 }

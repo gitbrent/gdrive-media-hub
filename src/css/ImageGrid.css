@@ -1,24 +1,58 @@
 .gallery {
 	display: flex;
 	flex-wrap: wrap;
-	margin: 0 -0.25rem;
+	justify-content: flex-start;
+	margin: 0.25rem;
 }
 
 .gallery figure {
 	margin: 0.25rem;
 	flex: 1 0 auto;
+	/* Set an explicit height */
+	height: 200px;
+	/* Set an explicit width */
+	width: 200px;
+	/* Hide overflow content */
+	overflow: hidden;
+	cursor: pointer;
 }
 
-/* by default, captions are shown in the gird and shaodwbox, this hides the grid caption! */
+.gallery figure img,
+.gallery figure .folder-icon {
+	display: block;
+	height: 100%;
+	/* Take up full height of figure */
+	width: 100%;
+	/* Take up full width of figure */
+	object-fit: cover;
+	/* Cover the whole area without squishing */
+	object-position: center;
+	/* Center the image in the area */
+}
+
+/* by default, captions are shown in the grid and shadowbox, this hides the grid caption! */
 .gallery figure figcaption {
 	display: none;
 }
 
-.gallery figure img {
-	display: block;
-	height: 200px;
-	max-width: 100%;
+/* make bootstrap spinner animated! */
+.bi-arrow-repeat {
+	animation: spin 2s linear infinite;
 }
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/* ----------------------------------------------------- */
+/* columns */
+/* ----------------------------------------------------- */
 
 @media (min-width: 768px) {
 	.gallery {
@@ -42,33 +76,4 @@
 	.gallery {
 		--num-columns: 10;
 	}
-}
-
-.gallery img {
-	flex-basis: calc(100% / var(--num-columns) - 0.25rem);
-}
-
-.slideShowContainer {
-	display: flex;
-	flex-direction: column;
-	height: calc(100vh - 76px);
-	/* Take full viewport height - <header> */
-}
-
-.slideShowMain {
-	flex-grow: 1;
-	/* Take up remaining space */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	overflow: hidden;
-	/* Hide any overflow content */
-}
-
-.slideShowMain img {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
-	display: block;
-	margin: auto;
 }

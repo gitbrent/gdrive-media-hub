@@ -41,6 +41,12 @@ export interface TokenResponse {
 	token_type: string,
 }
 
+export interface IGapiFolder {
+	id: string
+	name: string
+	children?: IGapiFolder[]
+}
+
 // ==========
 
 export interface IGapiCurrUser {

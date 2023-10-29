@@ -8,7 +8,7 @@ export interface IProps {
 
 // TODO: use this component for VIDEO files
 
-export default function AppImgGrid(props: IProps) {
+export default function VideoGrid(props: IProps) {
 	return (<section>
 		<div id='imgGrid' className='p-4 bg-dark'>
 			<div className='row row-cols-1 row-cols-md-2 row-cols-lg-4 justify-content-between align-items-center g-4' data-desc={props.updTimestamp}>
