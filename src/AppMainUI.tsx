@@ -52,12 +52,12 @@ export default function AppMainUI() {
 						</a>
 					</li>
 					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#submenuSlideshow" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}>
+						<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}>
 							<i className="fs-4 bi-grid" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Image Grid</span>
 						</a>
 					</li>
 					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#submenuSlideshow" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
+						<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
 							<i className="fs-4 bi-play-circle" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
 						</a>
 					</li>
