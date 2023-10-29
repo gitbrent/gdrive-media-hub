@@ -73,34 +73,37 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 		setCurrentIndex(prevIndex)
 	}
 
+	// TODO: 20231029: use `downloadFile` on first init, then use UpdateDate like gird so we GUARANTEE the image shows/is loaded
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderTopBar(): JSX.Element {
-		console.log(Object.entries(SlideShowDelay))
-
 		return (
 			<nav className="navbar position-sticky bg-dark py-3" style={{ top: 0, zIndex: 100 }}>
-				<div className="container-fluid">
+				<div className="container-fluid px-0">
 					<div className="row w-100 align-items-center">
 						<div className='col-auto d-none d-lg-block'>
 							<a className="navbar-brand text-white me-0">Slide Show</a>
 						</div>
-						<div className="col-3 col-md">
-							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }}>
-								{isPaused ? <span><i className='bi-play me-2'></i>Play</span> : <span><i className='bi-pause me-2'></i>Pause</span>}
+						<div className="col col-md">
+							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause">
+								{isPaused
+									? <span><i className='bi-play  me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Play</span></span>
+									: <span><i className='bi-pause me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Pause</span></span>
+								}
 							</button>
 						</div>
 						<div className="col-3 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPreviousSlide}>
-								<i className="bi-skip-backward me-2"></i><span className="d-none d-lg-inline-block">Prev</span>
+							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPreviousSlide} title="Prev">
+								<i className="bi-skip-backward me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
 							</button>
 						</div>
 						<div className="col-3 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={shuffledImages.length === 0} onClick={goToNextSlide}>
-								<span className="d-none d-lg-inline-block">Next</span><i className="bi-skip-forward ms-2"></i>
+							<button className='btn btn-secondary w-100' disabled={shuffledImages.length === 0} onClick={goToNextSlide} title="Next">
+								<span className="d-none d-lg-inline-block">Next</span><i className="bi-skip-forward ms-0 ms-md-2"></i>
 							</button>
 						</div>
-						<div className='col-3 col-md-auto'>
+						<div className='col-auto'>
 							<div className="dropdown">
 								<button className="btn btn-secondary dropdown-toggle" type="button" id="delayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
 									<span className="d-none d-lg-inline-block">Delay: </span>{optSlideshowSecs}<span className="d-none d-lg-inline-block"> sec</span>
@@ -119,17 +122,20 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								</ul>
 							</div>
 						</div>
-						<div className="col-12 col-md mt-3 mt-md-0">
+						<div className="col col-md mt-3 mt-md-0">
 							<form className="d-flex" role="search">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</form>
 						</div>
-						<div className="col-12 col-md-auto mt-3 mt-md-0">
+						<div className="col-auto col-md-auto mt-3 mt-md-0">
 							<div className="text-muted">
 								{shuffledImages.length === 0
 									? ('No files to show')
-									: (<span><span className="d-none d-lg-inline-block">Showing </span><b>{shuffledImages.length}</b> of <b>{allFiles.length}</b> files</span>)
+									: (<span>
+										<span className="d-none d-lg-inline-block">Showing </span><b>{shuffledImages.length}</b>&nbsp;of&nbsp;
+										<b>{allFiles.length}</b><span className="d-none d-lg-inline-block"> files</span>
+									</span>)
 								}
 							</div>
 						</div>
