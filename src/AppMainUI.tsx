@@ -47,22 +47,26 @@ export default function AppMainUI() {
 				</a>
 				<ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
 					<li className="nav-item" data-desc="home">
-						<a href="/" className="nav-link px-0 align-middle text-nowrap">
+						<a href="/" role="button" className="nav-link px-0 align-middle text-nowrap" title="home" aria-label="home">
 							<i className="fs-4 bi-house" /><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>
 					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}>
+						<a href="#" role="button"
+							onClick={() => setCurrentTab(AppTabs.ImageGrid)}
+							className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}
+							title="image grid" aria-label="image grid"
+						>
 							<i className="fs-4 bi-grid" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Image Grid</span>
 						</a>
 					</li>
 					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
+						<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
 							<i className="fs-4 bi-play-circle" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
 						</a>
 					</li>
 					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#submenuSettings" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link px-0 ${currentTab === AppTabs.Settings ? 'active' : ''}`}>
+						<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link px-0 ${currentTab === AppTabs.Settings ? 'active' : ''}`}>
 							<i className="fs-4 bi-sliders" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Settings</span>
 						</a>
 					</li>

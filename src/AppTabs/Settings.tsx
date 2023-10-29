@@ -86,7 +86,7 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 
 	return (
 		<>
-			<nav className="navbar sticky-top bg-dark py-3">
+			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<a className="navbar-brand text-white"><i className="bi-sliders me-2" />Settings</a>
 				</div>

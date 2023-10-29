@@ -74,16 +74,29 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	}
 
 	// TODO: 20231029: use `downloadFile` on first init, then use UpdateDate like gird so we GUARANTEE the image shows/is loaded
+	/* 20231029 - not working, seems like a closure issue in `AppMainLogic.ts`
+	useEffect(() => {
+		if (currentImage && currentImage.id && !currentImage.imageBlobUrl) {
+			downloadFile(currentImage.id)
+				.then(() => {
+					//setLastLoadDate(new Date().toISOString())
+				})
+				.catch((error) => {
+					console.error(`Error downloading item: ${currentImage.id}`, error)
+				})
+		}
+	}, [currentImage])
+	*/
 
 	// --------------------------------------------------------------------------------------------
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar position-sticky bg-dark py-3" style={{ top: 0, zIndex: 100 }}>
-				<div className="container-fluid px-0">
+			<nav className="navbar sticky-top bg-dark">
+				<div className="container-fluid">
 					<div className="row w-100 align-items-center">
 						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand text-white me-0">Slide Show</a>
+							<a className="navbar-brand text-white"><i className="bi-play-circle me-2" />Slide Show</a>
 						</div>
 						<div className="col col-md">
 							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause">
@@ -103,10 +116,10 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								<span className="d-none d-lg-inline-block">Next</span><i className="bi-skip-forward ms-0 ms-md-2"></i>
 							</button>
 						</div>
-						<div className='col-auto'>
+						<div className="col-3 col-md-auto">
 							<div className="dropdown">
 								<button className="btn btn-secondary dropdown-toggle" type="button" id="delayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-									<span className="d-none d-lg-inline-block">Delay: </span>{optSlideshowSecs}<span className="d-none d-lg-inline-block"> sec</span>
+									<span className="d-none d-lg-inline-block">Delay:&nbsp;</span>{optSlideshowSecs}<span className="d-none d-lg-inline-block">&nbsp;sec</span>
 								</button>
 								<ul className="dropdown-menu" aria-labelledby="delayDropdown">
 									{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
@@ -133,8 +146,8 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								{shuffledImages.length === 0
 									? ('No files to show')
 									: (<span>
-										<span className="d-none d-lg-inline-block">Showing </span><b>{shuffledImages.length}</b>&nbsp;of&nbsp;
-										<b>{allFiles.length}</b><span className="d-none d-lg-inline-block"> files</span>
+										<span className="d-none d-lg-inline-block">Showing&nbsp;</span><b>{shuffledImages.length}</b>&nbsp;of&nbsp;
+										<b>{allFiles.length}</b><span className="d-none d-lg-inline-block">&nbsp;files</span>
 									</span>)
 								}
 							</div>

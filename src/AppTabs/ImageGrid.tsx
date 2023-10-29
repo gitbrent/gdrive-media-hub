@@ -150,18 +150,18 @@ export default function ImageGrid(props: IProps) {
 		}
 
 		return (
-			<nav aria-label="page navigation">
+			<nav className='text-center' aria-label="page navigation">
 				<ul className="pagination mb-0">
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
-						<button type="button" className="page-link" onClick={() => setPagingPage(1)}>
+						<button type="button" className="page-link text-nowrap" onClick={() => setPagingPage(1)}>
 							<i className="bi-chevron-bar-left me-1"></i>
-							<span className="d-none d-sm-inline-block">First</span>
+							<span className="d-none d-lg-inline-block">First</span>
 						</button>
 					</li>
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
-						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }}>
+						<button type="button" className="page-link text-nowrap" onClick={() => { setPagingPage(pagingPage > 1 ? pagingPage - 1 : 1) }}>
 							<i className="bi-chevron-left me-1"></i>
-							<span className="d-none d-sm-inline-block">Prev</span>
+							<span className="d-none d-lg-inline-block">Prev</span>
 						</button>
 					</li>
 					{Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i)
@@ -174,14 +174,14 @@ export default function ImageGrid(props: IProps) {
 							</li>
 						))}
 					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
-						<button type="button" className="page-link" onClick={() => { setPagingPage(pagingPage + 1) }}>
-							<span className="d-none d-sm-inline-block">Next</span>
+						<button type="button" className="page-link text-nowrap" onClick={() => { setPagingPage(pagingPage + 1) }}>
+							<span className="d-none d-lg-inline-block">Next</span>
 							<i className="bi-chevron-right ms-1"></i>
 						</button>
 					</li>
 					<li className={`page-item ${isDisabledNext ? 'disabled' : ''}`}>
-						<button type="button" className="page-link" onClick={() => { setPagingPage(maxPage) }}>
-							<span className="d-none d-sm-inline-block">Last</span>
+						<button type="button" className="page-link text-nowrap" onClick={() => { setPagingPage(maxPage) }}>
+							<span className="d-none d-lg-inline-block">Last</span>
 							<i className="bi-chevron-bar-right ms-1"></i>
 						</button>
 					</li>
@@ -191,30 +191,37 @@ export default function ImageGrid(props: IProps) {
 	}
 
 	function renderMainContBody_TopBar(): JSX.Element {
-		return (<div id="topGridBar" className="position-sticky bg-dark p-3" style={{ top: 0, zIndex: 100 }}>
-			<form className="container-fluid px-0">
-				<div className="row">
-					<div className="col-lg-auto col-md-4 col-12 mb-2 mb-md-0">
-						{renderMainContBody_TopBar_Paging()}
-					</div>
-					<div className="col-lg col-md-4 col-sm-12 mb-2 mb-md-0">
-						<div className="input-group">
-							<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-							<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+		return (
+			<nav className="navbar sticky-top bg-dark" id="topGridBar">
+				<form className="container-fluid">
+					<div className="row justify-content-around align-items-center">
+						<div className='col-auto d-none d-lg-block'>
+							<a className="navbar-brand text-white"><i className="bi-grid me-2" />Image Grid</a>
+						</div>
+						<div className="col-12 col-md mb-2 mb-md-0">
+							{renderMainContBody_TopBar_Paging()}
+						</div>
+						<div className="col col-md mt-2 mt-md-0">
+							<div className="input-group">
+								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+							</div>
+						</div>
+						<div className="col-auto col-md-auto mt-2 mt-md-0">
+							<div className="text-muted">
+								{isSearching ? <span>searching...</span>
+									: gridShowFiles.length === 0
+										? ('No files to show')
+										: (<span>
+											<span className="d-none d-lg-inline-block">Showing&nbsp;</span><b>{gridShowFiles.length}</b>&nbsp;of&nbsp;
+											<b>{filtdSortdFiles.length}</b><span className="d-none d-lg-inline-block">&nbsp;files</span>
+										</span>)
+								}
+							</div>
 						</div>
 					</div>
-					<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
-						<div className="text-muted">
-							{isSearching ? <span>searching...</span>
-								: gridShowFiles.length === 0
-									? ('No files to show')
-									: (<span>Showing <b>{gridShowFiles.length}</b> of <b>{filtdSortdFiles.length}</b> files</span>)
-							}
-						</div>
-					</div>
-				</div>
-			</form>
-		</div>
+				</form>
+			</nav>
 		)
 	}
 
