@@ -306,6 +306,16 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 	let allFiles: IGapiFile[] = []
 	let pageToken: string | undefined
 
+	const loginCont = document.getElementById('loginCont')
+	let badgeElement = document.getElementById('file-load-badge')
+	if (!badgeElement) {
+		badgeElement = document.createElement('div')
+		badgeElement.className = 'alert alert-primary'
+		badgeElement.id = 'file-load-badge'
+		loginCont?.appendChild(badgeElement)
+	}
+	badgeElement.textContent = 'Loading files...'
+
 	do {
 		const response = await gapi.client.drive.files.list({
 			q: searchText ? `trashed=false and name contains "${searchText}"` : 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
@@ -318,14 +328,6 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 		allFiles = allFiles.concat(response.result.files as IGapiFile[]) || []
 		pageToken = response.result.nextPageToken
 		//
-		const loginCont = document.getElementById('loginCont')
-		let badgeElement = document.getElementById('file-load-badge')
-		if (!badgeElement) {
-			badgeElement = document.createElement('div')
-			badgeElement.className = 'alert alert-primary'
-			badgeElement.id = 'file-load-badge'
-			loginCont?.appendChild(badgeElement)
-		}
 		badgeElement.textContent = `Loaded ${allFiles?.length} files...`
 	} while (pageToken && allFiles.length < 10000)
 
