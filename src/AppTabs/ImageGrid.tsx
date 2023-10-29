@@ -41,9 +41,7 @@ export default function ImageGrid(props: IProps) {
 
 		setIsSearching(true)
 
-		const noBlobIds = props.allFiles.filter((file) => !file.imageBlobUrl).map((item) => item.id)
-		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds)
-
+		// B: filter, sort, populate image array
 		props.allFiles
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
@@ -51,12 +49,16 @@ export default function ImageGrid(props: IProps) {
 				showImages.push({
 					id: item.id,
 					caption: item.name || '(loading)',
-					original: item.imageBlobUrl || '/spinner750.png',
-					thumbnail: item.imageBlobUrl || '/spinner750.png',
+					original: item.imageBlobUrl || '',
+					thumbnail: item.imageBlobUrl || '',
 					width: item.imageW || 0,
 					height: item.imageH || 0,
 				})
 			})
+
+		// C: Load first batch of missing images
+		const noBlobIds = showImages.filter((file, idx) => { idx < 20 && !file.original }).map((file) => file.id as string)
+		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds)
 
 		setIsSearching(false)
 		return showImages
@@ -224,7 +226,7 @@ export default function ImageGrid(props: IProps) {
 							{gridShowFiles.map((item) => (
 								<Item {...item} key={item.id}>
 									{({ ref, open }) => (
-										item?.thumbnail?.indexOf('spinner') === -1 ?
+										item?.thumbnail ?
 											(<figure>
 												<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} title={item.caption} alt={item.alt} />
 												{props.isShowCap && <figcaption>{item.caption}</figcaption>}
