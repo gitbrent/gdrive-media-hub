@@ -2,19 +2,23 @@ import React, { useState } from 'react'
 import { OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './useAppMain'
 import ImageGrid from './AppTabs/ImageGrid'
-import ImageSlideshow from './AppTabs/Slideshow'
+import Slideshow from './AppTabs/Slideshow'
 import './css/AppMainUI.css'
+
+export enum AppTabs {
+	ImageGrid = 'ImageGrid',
+	SlideShow = 'SlideShow',
+	Settings = 'Settings',
+	//Profile = 'Profile',
+}
 
 export default function AppMainUI() {
 	const { allFiles, authUserName, authUserPict, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
 	//
-	const DEFAULT_SLIDE_DELAY = 4
-	//
+	const [currentTab, setCurrentTab] = useState(AppTabs.ImageGrid)
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate_full)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc_full)
-	const [optIsSlideshow, setOptIsSlideshow] = useState(false)
 	const [optIsShowCap, setOptIsShowCap] = useState(true)
-	const [optSlideshowSecs, setOptSlideshowSecs] = useState(DEFAULT_SLIDE_DELAY)
 	//
 	const [isSidebarOpen, setSidebarOpen] = useState(false)
 	const toggleSidebar = () => {
@@ -33,20 +37,34 @@ export default function AppMainUI() {
 		</section>)
 	}
 
-	function renderMainContNav(): JSX.Element {
-		const isSlideShowPaused = optSlideshowSecs === 999
-
+	function renderLNav(): JSX.Element {
 		return (<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
 				</a>
 				<ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-					<li className="nav-item">
+					<li className="nav-item" data-desc="home">
 						<a href="/" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-house"></i><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>
+					<li className="nav-item px-0 align-middle text-nowrap">
+						<a href="#submenuSlideshow" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}>
+							<i className="fs-4 bi-grid"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Image Grid</span>
+						</a>
+					</li>
+					<li className="nav-item px-0 align-middle text-nowrap">
+						<a href="#submenuSlideshow" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
+							<i className="fs-4 bi-play-circle"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
+						</a>
+					</li>
+					<li className="nav-item px-0 align-middle text-nowrap">
+						<a href="#submenuSettings" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link px-0 ${currentTab === AppTabs.Settings ? 'active' : ''}`}>
+							<i className="fs-4 bi-sliders"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Settings</span>
+						</a>
+					</li>
+					{/* TODO: move below to SETTINGS */}
 					<li data-desc="sort-by">
 						<a href="#submenuSortBy" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
 							<i className="fs-4 bi-sort-alpha-down"></i><span className="ms-2 d-inline">Sort By</span>
@@ -66,32 +84,6 @@ export default function AppMainUI() {
 							<li className="w-100">
 								<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.asce_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.asce_full} onClick={() => setOptSortDir(OPT_SORTDIR.asce_full)}>{isSidebarOpen ? OPT_SORTDIR.asce_full : OPT_SORTDIR.asce_trim}</button>
 								<button className={`dropdown-item ${optSortDir === OPT_SORTDIR.desc_full ? '' : 'text-light'}`} disabled={optSortDir === OPT_SORTDIR.desc_full} onClick={() => setOptSortDir(OPT_SORTDIR.desc_full)}>{isSidebarOpen ? OPT_SORTDIR.desc_full : OPT_SORTDIR.desc_trim}</button>
-							</li>
-						</ul>
-					</li>
-					<li data-desc="slide-show">
-						<a href="#submenuSlideshow" data-bs-toggle="collapse" className="nav-link px-0 align-middle text-nowrap">
-							<i className="fs-4 bi-play-circle"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slideshow</span>
-						</a>
-						<ul className="collapse nav flex-column ms-1" id="submenuSlideshow" data-bs-parent="#menu">
-							<li className="w-100">
-								{optIsSlideshow ?
-									<>
-										<button className={`dropdown-item ${isSlideShowPaused ? '' : 'text-light'}`} disabled={!isSlideShowPaused} onClick={() => { setOptSlideshowSecs(DEFAULT_SLIDE_DELAY) }}>
-											<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Resume</span>
-										</button>
-										<button className={`dropdown-item ${!isSlideShowPaused ? '' : 'text-light'}`} disabled={isSlideShowPaused} onClick={() => { setOptSlideshowSecs(999) }}>
-											<i className="bi-pause-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Pause</span>
-										</button>
-										<button className="dropdown-item" onClick={() => { setOptIsSlideshow(false) }}>
-											<i className="bi-stop-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Stop</span>
-										</button>
-									</>
-									:
-									<button className="dropdown-item" onClick={() => { setOptIsSlideshow(true); setOptSlideshowSecs(4) }}>
-										<i className="bi-play-fill"></i><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Start</span>
-									</button>
-								}
 							</li>
 						</ul>
 					</li>
@@ -118,7 +110,7 @@ export default function AppMainUI() {
 		)
 	}
 
-	function renderMainContBody(): JSX.Element {
+	function renderBody(): JSX.Element {
 		let returnJsx = <div>Loading...</div>
 
 		if (isBusyGapiLoad) {
@@ -130,14 +122,18 @@ export default function AppMainUI() {
 			</section>
 		}
 		else if (authUserName) {
-			if (optIsSlideshow) {
-				returnJsx = <ImageSlideshow allFiles={allFiles} duration={optSlideshowSecs} downloadFile={downloadFile} />
-			}
-			else {
-				// TODO:
-				returnJsx = <section>
-					<ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} optSortBy={optSortBy} optSortDir={optSortDir} />
-				</section>
+			switch (currentTab) {
+				case AppTabs.ImageGrid:
+					returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} optSortBy={optSortBy} optSortDir={optSortDir} />
+					break
+				case AppTabs.SlideShow:
+					returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />
+					break
+				case AppTabs.Settings:
+					returnJsx = <div className='p-4'><h1>TODO:SETTINGS</h1></div>
+					break
+				default:
+					returnJsx = <div />
 			}
 		}
 		else {
@@ -152,8 +148,8 @@ export default function AppMainUI() {
 	return (
 		<div className="container-fluid">
 			<div className="row flex-nowrap">
-				{renderMainContNav()}
-				{renderMainContBody()}
+				{renderLNav()}
+				{renderBody()}
 			</div>
 		</div>
 	)
