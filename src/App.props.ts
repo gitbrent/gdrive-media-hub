@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231022-1501'
+export const APP_BLD = '20231028-2101'
 export const APP_VER = '1.3.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost?show=gapi') > -1
 
@@ -81,11 +81,11 @@ export interface IGapiFile extends gapi.client.drive.File {
 }
 
 export enum OPT_SORTBY {
-	modDate_trim = 'Date', modDate_full = 'Modified Date',
-	filName_trim = 'Name', filName_full = 'File Name'
+	modDate = 'Modified Date',
+	filName = 'File Name'
 }
 
 export enum OPT_SORTDIR {
-	asce_trim = 'Asc', asce_full = 'Ascending',
-	desc_trim = 'Des', desc_full = 'Descinding'
+	asce = 'Ascending',
+	desc = 'Descinding'
 }
