@@ -14,6 +14,17 @@ $pagination-bg: $gray-600;
 $pagination-disabled-bg: $gray-700;
 $pagination-active-bg: $primary;
 
+/*
+orig:
+--bs-nav-pills-li nk-active-color: #fff;
+--bs-nav-pills-link-active-bg: #375a7f;
+*/
+/* no affect - had to override in style below
+$nav-tabs-link-active-color: #990011;
+$nav-pills-link-active-color: #333;
+*/
+$nav-pills-link-active-bg: $gray-800;
+
 // Then, import Bootstrap's main SCSS
 @import "~bootstrap/scss/bootstrap";
 
@@ -23,4 +34,8 @@ $pagination-active-bg: $primary;
 // Your other styles
 .ReactGridGallery_tile {
 	background: transparent !important;
+}
+
+#leftNav .nav-pills .nav-link.active {
+	color: var(--bs-gray) !important;
 }
