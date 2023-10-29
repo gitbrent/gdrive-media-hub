@@ -4,6 +4,7 @@ import { FixedItemProps } from './ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
+import NoImagesAlert from '../components/NoImagesAlert'
 
 interface IProps {
 	allFiles: IGapiFile[]
@@ -26,11 +27,11 @@ export default function ImageGrid(props: IProps) {
 
 		// A: define sorter
 		const sorter = (a: IGapiFile, b: IGapiFile) => {
-			if (props.optSortBy === OPT_SORTBY.filName_full) {
-				return a.name < b.name ? (props.optSortDir === OPT_SORTDIR.asce_full ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce_full ? 1 : -1)
+			if (props.optSortBy === OPT_SORTBY.filName) {
+				return a.name < b.name ? (props.optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
-			else if (props.optSortBy === OPT_SORTBY.modDate_full) {
-				return a.modifiedByMeTime < b.modifiedByMeTime ? (props.optSortDir === OPT_SORTDIR.asce_full ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce_full ? 1 : -1)
+			else if (props.optSortBy === OPT_SORTBY.modDate) {
+				return a.modifiedByMeTime < b.modifiedByMeTime ? (props.optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -238,23 +239,7 @@ export default function ImageGrid(props: IProps) {
 						</div>
 					</Gallery>
 				) : (
-					<section className="text-center my-5">
-						<div className="alert alert-warning d-inline-flex align-items-center" role="alert">
-							<div className="row align-items-center no-gutters gx-2">
-								<div className="col-auto">
-									<i className="bi-exclamation-triangle-fill display-3"></i>
-								</div>
-								<div className="col">
-									<div>
-										<h3 className="mb-0">say less bro</h3>
-									</div>
-									<div>
-										<p className="mb-0">(no imgaes to display)</p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
+					<NoImagesAlert />
 				)
 			}
 		</section>

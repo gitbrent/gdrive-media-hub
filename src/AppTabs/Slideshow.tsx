@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile } from '../App.props'
+import NoImagesAlert from '../components/NoImagesAlert'
 import '../css/Slideshow.css'
 
 enum SlideShowDelay {
@@ -26,9 +27,11 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 
 	// Shuffle images once at the beginning
 	useEffect(() => {
-		const shuffled = [...allFiles].sort(() => Math.random() - 0.5)
+		const shuffled = [...allFiles]
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.sort(() => Math.random() - 0.5)
 		setShuffledImages(shuffled)
-	}, [allFiles])
+	}, [allFiles, optSchWord])
 
 	// Pre-fetching logic
 	useEffect(() => {
@@ -78,22 +81,22 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 		return (
 			<nav className="navbar position-sticky bg-dark py-3" style={{ top: 0, zIndex: 100 }}>
 				<div className="container-fluid">
-					<div className="row w-100">
+					<div className="row w-100 align-items-center">
 						<div className='col-auto d-none d-md-block'>
 							<a className="navbar-brand text-white me-0">Slide Show</a>
 						</div>
 						<div className="col-3 col-md">
-							<button className="btn btn-light w-100" onClick={() => { setIsPaused(!isPaused) }}>
+							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }}>
 								{isPaused ? <span><i className='bi-play me-2'></i>Play</span> : <span><i className='bi-pause me-2'></i>Pause</span>}
 							</button>
 						</div>
 						<div className="col-3 col-md">
-							<button className='btn btn-light w-100' disabled={usedIndices.length <= 1} onClick={goToPreviousSlide}>
+							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPreviousSlide}>
 								<i className="bi-skip-backward me-2"></i>Prev
 							</button>
 						</div>
 						<div className="col-3 col-md">
-							<button className='btn btn-light w-100' disabled={shuffledImages.length === 0} onClick={goToNextSlide}>
+							<button className='btn btn-secondary w-100' disabled={shuffledImages.length === 0} onClick={goToNextSlide}>
 								Next<i className="bi-skip-forward ms-2"></i>
 							</button>
 						</div>
@@ -122,6 +125,14 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</form>
 						</div>
+						<div className="col-lg-auto col-md-4 col-sm-12 my-auto">
+							<div className="text-muted">
+								{shuffledImages.length === 0
+									? ('No files to show')
+									: (<span>Showing <b>{shuffledImages.length}</b> of <b>{allFiles.length}</b> files</span>)
+								}
+							</div>
+						</div>
 					</div>
 				</div>
 			</nav>
@@ -133,7 +144,10 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			{renderTopBar()}
 			<div className='slideShowContainer'>
 				<div className='slideShowMain'>
-					{currentImage?.imageBlobUrl ? <img src={currentImage.imageBlobUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />}
+					{shuffledImages.length === 0
+						? <NoImagesAlert />
+						: currentImage?.imageBlobUrl ? <img src={currentImage.imageBlobUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />
+					}
 				</div>
 			</div>
 		</section>
