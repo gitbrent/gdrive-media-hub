@@ -51,7 +51,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, isBusyGapiLoad, handleA
 	}
 
 	return (
-		<section>
+		<section className="w-100">
 			{renderTopBar()}
 			{authUserName ? renderHome() : renderLogin()}
 		</section>
