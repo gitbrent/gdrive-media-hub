@@ -88,7 +88,11 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 		<>
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
-					<a className="navbar-brand text-white"><i className="bi-sliders me-2" />Settings</a>
+					<div className="row align-items-center">
+						<div className='col-auto d-none d-lg-block'>
+							<a className="navbar-brand text-white"><i className="bi-sliders me-2" />Settings</a>
+						</div>
+					</div>
 				</div>
 			</nav>
 			<section className='p-4'>

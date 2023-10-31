@@ -31,7 +31,6 @@ export default function AppMainUI() {
 
 	// --------------------------------------------------------------------------------------------
 
-
 	function renderLNav(): JSX.Element {
 		return (<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
@@ -119,7 +118,7 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<main id="main-container" className={`col p-0 ${authUserName ? '' : 'login'}`}>{returnJsx}</main>
+			<main className="col p-0">{returnJsx}</main>
 		)
 	}
 

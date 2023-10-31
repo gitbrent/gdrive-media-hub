@@ -1,6 +1,6 @@
 #leftNav {
 	transition: width 0.35s ease;
-	max-width: 174px !important;
+	max-width: 150px !important;
 }
 
 #leftNav.collapsed {
@@ -11,14 +11,6 @@
 /* CAREFUL! a.collapsed are sub-menus items, using only `.collapsed` will hose UI */
 #leftNav.collapsed .d-inline {
 	display: none !important;
-}
-
-main.login {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100vh;
-	height: -webkit-fill-available;
 }
 
 /* General CSS for all screens */
@@ -35,17 +27,14 @@ main.login {
 	}
 }
 
-#contHome {
-	display: flex;
-	height: 100vh;
-	height: -webkit-fill-available;
-	justify-content: center;
-	align-items: center;
-}
-
 /* -------------------------------------------------------------------------------- */
 /* -- bootstrap-5 mods and adds                                                  -- */
 /* -------------------------------------------------------------------------------- */
+
+.navbar {
+	/* some topnav bars have buttons, some dont, so just use larger, button size for all */
+	min-height: 70px !important;
+}
 
 /* following two rules are to make the google drive logo (initial, not logged in screen) to be 100% h */
 .col.py-3 {

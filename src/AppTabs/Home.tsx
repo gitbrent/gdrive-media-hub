@@ -1,5 +1,6 @@
 import React from 'react'
 import { IGapiFile } from '../App.props'
+import '../css/Home.css'
 
 interface Props {
 	authUserName: string | null
@@ -13,7 +14,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, isBusyGapiLoad, handleA
 		return (
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
-					<div className="row w-100 align-items-center">
+					<div className="row align-items-center">
 						<div className='col-auto d-none d-lg-block'>
 							<a className="navbar-brand text-white"><i className="bi-house me-2" />Home</a>
 						</div>
@@ -24,16 +25,21 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, isBusyGapiLoad, handleA
 	}
 
 	function renderLogin(): JSX.Element {
-		return (<div id="contHome">
-			<div id="loginCont" className="text-center cursor-link" onClick={handleAuthClick}>
-				<div className="p-4">
-					<img height="150" width="150" src="/google-drive.png" alt="GoogleDriveLogo" />
+		return (
+			<div id="contHome">
+				<div id="loginCont" className="text-center cursor-link bg-secondary p-4 rounded" onClick={handleAuthClick}>
+					<img src="/google-drive.png" alt="GoogleDriveLogo" className='w-25' />
+					<div className='my-3'>
+						<div className="display-6">Google Drive</div>
+						<div className="display-6">Media Viewer</div>
+					</div>
+					{isBusyGapiLoad
+						? <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
+						: <div className="text-muted mt-3">click to connect</div>
+					}
 				</div>
-				<h5>Google Drive</h5>
-				<p className="text-muted">superior media viewer</p>
-				{isBusyGapiLoad && <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>}
 			</div>
-		</div>)
+		)
 	}
 
 	function renderHome(): JSX.Element {
@@ -51,7 +57,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, isBusyGapiLoad, handleA
 	}
 
 	return (
-		<section className="w-100">
+		<section>
 			{renderTopBar()}
 			{authUserName ? renderHome() : renderLogin()}
 		</section>

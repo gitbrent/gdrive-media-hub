@@ -81,7 +81,7 @@ export default function ImageGrid(props: IProps) {
 	useEffect(() => {
 		const calculatePageSize = () => {
 			// Get the height of a single figure element inside #gallery-container
-			const galleryContainer = document.getElementById('main-container')
+			const galleryContainer = document.getElementById('contImageGrid')
 			const galleryTopBar = document.getElementById('topGridBar')
 			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
 			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
@@ -232,7 +232,7 @@ export default function ImageGrid(props: IProps) {
 			{renderMainContBody_TopBar()}
 			{
 				pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0 ? (
-					<Gallery withCaption={props.isShowCap}>
+					<Gallery id="contImageGrid" withCaption={props.isShowCap}>
 						<div id="gallery-container" className="gallery">
 							{gridShowFiles.map((item) => (
 								<Item {...item} key={item.id}>
