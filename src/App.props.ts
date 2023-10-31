@@ -6,6 +6,16 @@ export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhos
 
 // ============================================================================
 
+export enum OPT_SORTBY {
+	modDate = 'Modified Date',
+	filName = 'File Name'
+}
+
+export enum OPT_SORTDIR {
+	asce = 'Ascending',
+	desc = 'Descinding'
+}
+
 // ----------------------------------------------------------------------------
 
 export interface IPageSize { title: string, size: number }
@@ -80,12 +90,9 @@ export interface IGapiFile extends gapi.client.drive.File {
 	// parents: string[]
 }
 
-export enum OPT_SORTBY {
-	modDate = 'Modified Date',
-	filName = 'File Name'
-}
-
-export enum OPT_SORTDIR {
-	asce = 'Ascending',
-	desc = 'Descinding'
+export interface IFileAnalysis {
+	total_files: number;
+	total_size: number;
+	file_types: Record<string, number>;
+	common_names: Record<string, number>;
 }

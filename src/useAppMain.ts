@@ -31,5 +31,6 @@ export const useAppMain = () => {
 		handleSignOutClick: AppMainLogic.handleSignOutClick,
 		downloadFile: AppMainLogic.downloadFile,
 		loadPageImages: AppMainLogic.loadPageImages,
+		getFileAnalysis: AppMainLogic.getFileAnalysis
 	}
 }

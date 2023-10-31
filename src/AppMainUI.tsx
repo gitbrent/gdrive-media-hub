@@ -16,7 +16,9 @@ export enum AppTabs {
 }
 
 export default function AppMainUI() {
-	const { allFiles, authUserName, authUserPict, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages } = useAppMain()
+	const {
+		allFiles, authUserName, authUserPict, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages, getFileAnalysis
+	} = useAppMain()
 	//
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 	const [isSidebarOpen, setSidebarOpen] = useState(false)
@@ -33,7 +35,7 @@ export default function AppMainUI() {
 
 	function renderLNav(): JSX.Element {
 		return (<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
-			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
+			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-3 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
 				</a>
@@ -47,25 +49,27 @@ export default function AppMainUI() {
 							<i className="fs-4 bi-house" /><span className="ms-2 d-inline">Home</span>
 						</a>
 					</li>
-					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#" role="button"
-							onClick={() => setCurrentTab(AppTabs.ImageGrid)}
-							className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`}
-							title="image grid" aria-label="image grid"
-						>
-							<i className="fs-4 bi-grid" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Image Grid</span>
-						</a>
-					</li>
-					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`}>
-							<i className="fs-4 bi-play-circle" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
-						</a>
-					</li>
-					<li className="nav-item px-0 align-middle text-nowrap">
-						<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link px-0 ${currentTab === AppTabs.Settings ? 'active' : ''}`}>
-							<i className="fs-4 bi-sliders" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Settings</span>
-						</a>
-					</li>
+					{authUserName &&
+						<li className="nav-item px-0 align-middle text-nowrap">
+							<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
+								<i className="fs-4 bi-grid" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Image Grid</span>
+							</a>
+						</li>
+					}
+					{authUserName &&
+						<li className="nav-item px-0 align-middle text-nowrap">
+							<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
+								<i className="fs-4 bi-play-circle" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
+							</a>
+						</li>
+					}
+					{authUserName &&
+						<li className="nav-item px-0 align-middle text-nowrap">
+							<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link px-0 ${currentTab === AppTabs.Settings ? 'active' : ''}`} title="settings" aria-label="settings">
+								<i className="fs-4 bi-sliders" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Settings</span>
+							</a>
+						</li>
+					}
 				</ul>
 				<hr />
 				<div id="leftNavBtmBtn" className="dropdown px-3 pb-4">
@@ -93,10 +97,20 @@ export default function AppMainUI() {
 
 		switch (currentTab) {
 			case AppTabs.Home:
-				returnJsx = <Home authUserName={authUserName} allFiles={allFiles} isBusyGapiLoad={isBusyGapiLoad} handleAuthClick={handleAuthClick} />
+				returnJsx = <Home
+					authUserName={authUserName}
+					allFiles={allFiles}
+					getFileAnalysis={getFileAnalysis}
+					isBusyGapiLoad={isBusyGapiLoad}
+					handleAuthClick={handleAuthClick} />
 				break
 			case AppTabs.ImageGrid:
-				returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} optSortBy={optSortBy} optSortDir={optSortDir} />
+				returnJsx = <ImageGrid
+					allFiles={allFiles}
+					isShowCap={optIsShowCap}
+					loadPageImages={loadPageImages}
+					optSortBy={optSortBy}
+					optSortDir={optSortDir} />
 				break
 			case AppTabs.SlideShow:
 				returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />

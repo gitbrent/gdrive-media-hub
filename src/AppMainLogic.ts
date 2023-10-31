@@ -1,5 +1,5 @@
-import { IGapiFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, doAuthSignIn, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
+import { IFileAnalysis, IGapiFile, IS_LOCALHOST } from './App.props'
+import { initGoogleApi, doAuthSignIn, doAuthSignOut, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -59,9 +59,7 @@ export const handleAuthClick = () => {
  *  Sign out the user upon button click.
  */
 export const handleSignOutClick = () => {
-	gapi.auth2.getAuthInstance().signOut()
-	_authUserName = ''
-	_gapiFiles = []
+	doAuthSignOut()
 }
 
 /**
@@ -130,4 +128,54 @@ export const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 		_isBusyGapiLoad = false
 		return false
 	}
+}
+
+export const getFileAnalysis = (): IFileAnalysis => {
+	const analysis = {
+		total_files: 0,
+		total_size: 0,
+		file_types: {} as Record<string, number>,
+		common_names: {} as Record<string, number>
+	}
+
+	_gapiFiles.forEach((file) => {
+		// Increment the total file count
+		analysis.total_files += 1
+
+		// Increment the total size
+		if (file.size) {
+			analysis.total_size += parseInt(file.size)
+		}
+
+		// Count the MIME types
+		const mimeType = file.mimeType.split('/').pop()
+		if (mimeType) {
+			analysis.file_types[mimeType] = (analysis.file_types[mimeType] || 0) + 1
+		}
+
+		// Count common names
+		const commonNameMatch = file.name.match(/^([a-zA-Z]+)(?:-|_|[0-9])/)
+		const commonName = commonNameMatch ? commonNameMatch[1] : 'Unknown'
+		analysis.common_names[commonName] = (analysis.common_names[commonName] || 0) + 1
+	})
+
+	// Filter common names to keep only those in the top 10%
+	const sortedCommonNames = Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a)
+	const totalCommonNames = sortedCommonNames.reduce((acc, [, value]) => acc + value, 0)
+	const topPercentile = totalCommonNames * 0.05
+	let accumulated = 0
+	const filteredCommonNames: Record<string, number> = {}
+
+	console.log('Sorted Common Names:', sortedCommonNames) // DEBUG: why is top-5% only hsowing 1 result
+
+	for (const [name, count] of sortedCommonNames) {
+		accumulated += count
+		filteredCommonNames[name] = count
+		if (accumulated >= topPercentile) {
+			break
+		}
+	}
+	analysis.common_names = filteredCommonNames
+
+	return analysis
 }
