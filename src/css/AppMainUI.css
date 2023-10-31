@@ -1,6 +1,6 @@
 #leftNav {
 	transition: width 0.35s ease;
-	max-width: 150px !important;
+	max-width: 175px !important;
 }
 
 #leftNav.collapsed {

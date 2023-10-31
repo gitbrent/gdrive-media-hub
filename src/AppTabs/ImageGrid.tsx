@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { IGapiFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import { FixedItemProps } from './ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
+import NoImagesAlert from '../components/NoImagesAlert'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
-import NoImagesAlert from '../components/NoImagesAlert'
 
 interface IProps {
 	allFiles: IGapiFile[]
@@ -230,31 +230,29 @@ export default function ImageGrid(props: IProps) {
 	return (
 		<section>
 			{renderMainContBody_TopBar()}
-			{
-				pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0 ? (
-					<Gallery id="contImageGrid" withCaption={props.isShowCap}>
-						<div id="gallery-container" className="gallery">
-							{gridShowFiles.map((item) => (
-								<Item {...item} key={item.id}>
-									{({ ref, open }) => (
-										item?.thumbnail ?
-											(<figure>
-												<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} title={item.caption} alt={item.alt} />
-												{props.isShowCap && <figcaption>{item.caption}</figcaption>}
-											</figure>)
-											:
-											(<figure className="text-muted" title={item.caption} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-												<i className="h1 mb-0 bi-arrow-repeat" />
-											</figure>)
-									)}
-								</Item>
-							))}
-						</div>
-					</Gallery>
-				) : (
-					<NoImagesAlert />
-				)
-			}
+			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0 ? (
+				<Gallery id="contImageGrid" withCaption={props.isShowCap}>
+					<div id="gallery-container" className="gallery">
+						{gridShowFiles.map((item) => (
+							<Item {...item} key={item.id}>
+								{({ ref, open }) => (
+									item?.thumbnail ?
+										(<figure>
+											<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} title={item.caption} alt={item.alt} />
+											{props.isShowCap && <figcaption>{item.caption}</figcaption>}
+										</figure>)
+										:
+										(<figure className="text-muted" title={item.caption} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+											<i className="h1 mb-0 bi-arrow-repeat" />
+										</figure>)
+								)}
+							</Item>
+						))}
+					</div>
+				</Gallery>
+			) : (
+				<NoImagesAlert />
+			)}
 		</section>
 	)
 }

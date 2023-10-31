@@ -114,6 +114,13 @@ async function doAuthorizeUser() {
 	return
 }
 
+async function doAuthorizeSignOut() {
+	// FIXME:
+	gapi.auth2.getAuthInstance().signOut()
+	//_authUserName = ''
+	//_gapiFiles = []
+}
+
 //#region GAPI
 async function loadGapiScript() {
 	return new Promise((resolve) => {
@@ -341,7 +348,6 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 	return allFiles
 }
 
-
 export const fetchDriveFolders = async (): Promise<IGapiFolder[]> => {
 	return buildFolderHierarchy()
 }
@@ -358,4 +364,8 @@ export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
 
 export const doAuthSignIn = async () => {
 	return doAuthorizeUser()
+}
+
+export const doAuthSignOut = async () => {
+	return doAuthorizeSignOut()
 }
