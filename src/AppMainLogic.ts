@@ -160,7 +160,7 @@ export const getFileAnalysis = (): IFileAnalysis => {
 	})
 
 	// Filter common names to keep only the top 10
-	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).slice(0, 10))
+	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a).slice(0, 10))
 
 	// done
 	return analysis
