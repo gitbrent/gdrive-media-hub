@@ -95,7 +95,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center">
-						<div className='col-auto d-none d-lg-block'>
+						<div className='col-auto d-none d-xl-block'>
 							<a className="navbar-brand text-white"><i className="bi-play-circle me-2" />Slide Show</a>
 						</div>
 						<div className="col col-md">
@@ -146,8 +146,8 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								{shuffledImages.length === 0
 									? ('No files to show')
 									: (<span>
-										<span className="d-none d-lg-inline-block">Showing&nbsp;</span><b>{shuffledImages.length}</b>&nbsp;of&nbsp;
-										<b>{allFiles.length}</b><span className="d-none d-lg-inline-block">&nbsp;files</span>
+										<b>{shuffledImages.length}</b>&nbsp;of&nbsp;
+										<b>{allFiles.length}</b><span className="d-none d-lg-inline-block"></span>
 									</span>)
 								}
 							</div>

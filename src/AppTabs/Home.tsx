@@ -153,8 +153,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 			<h5>Welcome {authUserName}!</h5>
 			<div className='row'>
 				{/*<div className='col'>{renderTotalFiles()}</div>*/}
-				<div className='col-12 col-md-3'>{renderImageTypes()}</div>
-				<div className='col-12 col-md-9'>{renderTopFileNames()}</div>
+				<div className='col-12 col-md-4'>{renderImageTypes()}</div>
+				<div className='col-12 col-md-8'>{renderTopFileNames()}</div>
 			</div>
 		</section>)
 	}
