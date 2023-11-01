@@ -115,6 +115,8 @@ async function doAuthorizeUser() {
 }
 
 async function doAuthorizeSignOut() {
+	sessionStorage.setItem('googleTokenData', '')
+
 	// FIXME:
 	gapi.auth2.getAuthInstance().signOut()
 	//_authUserName = ''
