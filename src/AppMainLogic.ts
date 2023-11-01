@@ -155,12 +155,12 @@ export const getFileAnalysis = (): IFileAnalysis => {
 
 		// Count common names
 		const commonNameMatch = file.name.match(/^([a-zA-Z]+)(?:-|_|[0-9])/)
-		const commonName = commonNameMatch ? commonNameMatch[0] : file.name.length >= 5 ? file.name.substring(0, 4) : '(misc)'
+		const commonName = commonNameMatch ? commonNameMatch[0] : file.name.length >= 5 ? file.name.substring(0, 5) : '(misc)'
 		analysis.common_names[commonName] = (analysis.common_names[commonName] || 0) + 1
 	})
 
-	// Filter common names to keep only the top 10
-	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a).slice(0, 10))
+	// Filter common names to keep only the top NN
+	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a).slice(0, 24))
 
 	// done
 	return analysis

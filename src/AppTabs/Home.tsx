@@ -45,55 +45,71 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		)
 	}
 
+	function renderTotalFiles(): JSX.Element {
+		return (
+			<div className="bg-secondary p-4 my-4">
+				<h3>File Overview</h3>
+				<div className="card mt-4">
+					<div className="card-body">
+						<div className='row align-items-center mb-2'>
+							<div className='col'><h5 className="mb-0">Total Images</h5></div>
+							<div className='col-auto'><span className="badge bg-primary">{allFiles.length}</span></div>
+						</div>
+						<div className="progress">
+							<div className="progress-bar" role="progressbar" style={{ width: '100%' }} aria-valuenow={100} aria-valuemin={0} aria-valuemax={100} />
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
 	function renderImageTypes(): JSX.Element {
 		const totalFiles = fileAnalysis.total_files
 		const calculatePercent = (count: number, total: number) => {
 			return (count / total) * 100
 		}
 
-		return (<div className="bg-secondary p-4 my-4">
-			<h3>Image Types</h3>
-			{Object.keys(fileAnalysis.file_types).map((type, index) => {
-				const count = fileAnalysis.file_types[type]
-				const percent = calculatePercent(count, totalFiles)
-
-				return (
-					<div key={index} className="card mt-3">
-						<div className="card-body">
-							<div className='row align-items-center mb-2'>
-								<div className='col'><h5 className="mb-0">{type}</h5></div>
-								<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
-							</div>
-							<div className="progress">
-								<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
-							</div>
-						</div>
+		return (
+			<div className="bg-secondary p-4 my-4">
+				<div className='row align-items-center'>
+					<div className='col'><h3 className='mb-0'>File Types</h3></div>
+					<div className='col-auto'>
+						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '24px' }}>{fileAnalysis.total_files}</span>
 					</div>
-				)
-			})}
-		</div>)
+				</div>
+				{Object.entries(fileAnalysis.file_types)
+					.sort(([, a], [, b]) => b - a)
+					.map(([type, count], index) => {
+						const percent = calculatePercent(count, totalFiles)
+						return (
+							<div key={index} className="card mt-4">
+								<div className="card-body">
+									<div className='row align-items-center mb-2'>
+										<div className='col'><h5 className="mb-0">{type}</h5></div>
+										<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+									</div>
+									<div className="progress">
+										<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+									</div>
+								</div>
+							</div>
+						)
+					})
+				}
+			</div>
+		)
 	}
 
-	function renderHome(): JSX.Element {
-		console.log('getFileAnalysis', fileAnalysis)
-		console.log('fileAnalysis.common_names', fileAnalysis.common_names)
-
-		return (<section className='p-4'>
-			<h5>Connected!</h5>
-			<div className='row'>
-				<div className="col" data-desc="total-images">
-					<div className="bg-secondary p-4 my-4">
-						<h3>Total Images</h3>
-						<div>{allFiles.length}</div>
-					</div>
-				</div>
-				<div className='col' data-desc="image-types">
-					{renderImageTypes()}
-				</div>
-				<div className='col' data-desc="common-names">
-					<div className="bg-secondary p-4 my-4">
-						<h3>Common Names</h3>
-						{Object.entries(fileAnalysis.common_names).sort(([, a], [, b]) => b - a).map(([type, count], index) => (
+	function renderTopFileNames(): JSX.Element {
+		return (<div className="bg-secondary p-4 my-4">
+			<h3>Top File Names</h3>
+			<div className="row mt-4">
+				<div className="col">
+					{Object.entries(fileAnalysis.common_names)
+						.sort(([, a], [, b]) => b - a)
+						.slice(0, 8)
+						.map(([type, count], index) => (
 							<ul key={`${type}${index}`} className="list-group">
 								<li className="list-group-item d-flex justify-content-between align-items-center">
 									<strong>{type}</strong>
@@ -101,8 +117,44 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 								</li>
 							</ul>
 						))}
-					</div>
 				</div>
+				<div className="col">
+					{Object.entries(fileAnalysis.common_names)
+						.sort(([, a], [, b]) => b - a)
+						.slice(8, 16)
+						.map(([type, count], index) => (
+							<ul key={`${type}${index}`} className="list-group">
+								<li className="list-group-item d-flex justify-content-between align-items-center">
+									<strong>{type}</strong>
+									<span className="badge bg-primary rounded-pill">{count}</span>
+								</li>
+							</ul>
+						))}
+				</div>
+				<div className="col">
+					{Object.entries(fileAnalysis.common_names)
+						.sort(([, a], [, b]) => b - a)
+						.slice(16, 24)
+						.map(([type, count], index) => (
+							<ul key={`${type}${index}`} className="list-group">
+								<li className="list-group-item d-flex justify-content-between align-items-center">
+									<strong>{type}</strong>
+									<span className="badge bg-primary rounded-pill">{count}</span>
+								</li>
+							</ul>
+						))}
+				</div>
+			</div>
+		</div>)
+	}
+
+	function renderHome(): JSX.Element {
+		return (<section className='p-4'>
+			<h5>Welcome {authUserName}!</h5>
+			<div className='row'>
+				{/*<div className='col'>{renderTotalFiles()}</div>*/}
+				<div className='col-12 col-md-3'>{renderImageTypes()}</div>
+				<div className='col-12 col-md-9'>{renderTopFileNames()}</div>
 			</div>
 		</section>)
 	}
