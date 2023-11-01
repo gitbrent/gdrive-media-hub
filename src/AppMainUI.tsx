@@ -35,7 +35,7 @@ export default function AppMainUI() {
 
 	function renderLNav(): JSX.Element {
 		return (<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
-			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-3 text-white min-vh-100 position-sticky" style={{ top: 0, zIndex: 100 }}>
+			<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-3 text-white min-vh-100-fixed position-sticky" style={{ top: 0, zIndex: 100 }}>
 				<a href="#" onClick={toggleSidebar} className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none" title="collapse/expand">
 					<i className="fs-4 bi-list" /><span className={`ms-2 ${isSidebarOpen ? 'd-inline' : 'd-none'}`}>Menu</span>
 				</a>

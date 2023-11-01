@@ -70,3 +70,8 @@
 #dropdownUser1::after {
 	content: none;
 }
+
+/* fixes vh issue on iOS */
+.min-vh-100-fixed {
+	min-height: 100svh !important;
+}
