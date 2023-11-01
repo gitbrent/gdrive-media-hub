@@ -11,9 +11,7 @@ interface Props {
 }
 
 const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusyGapiLoad, handleAuthClick }) => {
-	const fileAnalysis = useMemo(() => {
-		return getFileAnalysis()
-	}, [allFiles])
+	const fileAnalysis = useMemo(() => { return getFileAnalysis() }, [allFiles])
 
 	function renderTopBar(): JSX.Element {
 		return (
@@ -47,43 +45,59 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		)
 	}
 
+	function renderImageTypes(): JSX.Element {
+		const totalFiles = fileAnalysis.total_files
+		const calculatePercent = (count: number, total: number) => {
+			return (count / total) * 100
+		}
+
+		return (<div className="bg-secondary p-4 my-4">
+			<h3>Image Types</h3>
+			{Object.keys(fileAnalysis.file_types).map((type, index) => {
+				const count = fileAnalysis.file_types[type]
+				const percent = calculatePercent(count, totalFiles)
+
+				return (
+					<div key={index} className="card mt-3">
+						<div className="card-body">
+							<div className='row align-items-center mb-2'>
+								<div className='col'><h5 className="mb-0">{type}</h5></div>
+								<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+							</div>
+							<div className="progress">
+								<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+							</div>
+						</div>
+					</div>
+				)
+			})}
+		</div>)
+	}
+
 	function renderHome(): JSX.Element {
 		console.log('getFileAnalysis', fileAnalysis)
+		console.log('fileAnalysis.common_names', fileAnalysis.common_names)
 
 		return (<section className='p-4'>
 			<h5>Connected!</h5>
 			<div className='row'>
-				<div className='col' data-desc="total-images">
+				<div className="col" data-desc="total-images">
 					<div className="bg-secondary p-4 my-4">
 						<h3>Total Images</h3>
 						<div>{allFiles.length}</div>
 					</div>
 				</div>
 				<div className='col' data-desc="image-types">
-					<div className="bg-secondary p-4 my-4">
-						<h3>Image Types</h3>
-						{Object.keys(fileAnalysis.file_types).map((type, index) => (
-							<ul key={index} className="list-group list-group-horizontal">
-								<li className="list-group-item">
-									<strong>{type}</strong>
-								</li>
-								<li className="list-group-item">
-									{fileAnalysis.file_types[type]}
-								</li>
-							</ul>
-						))}
-					</div>
+					{renderImageTypes()}
 				</div>
 				<div className='col' data-desc="common-names">
 					<div className="bg-secondary p-4 my-4">
 						<h3>Common Names</h3>
-						{Object.keys(fileAnalysis.common_names).map((type, index) => (
-							<ul key={`${type}${index}`} className="list-group list-group-horizontal">
-								<li className="list-group-item">
+						{Object.entries(fileAnalysis.common_names).sort(([, a], [, b]) => b - a).map(([type, count], index) => (
+							<ul key={`${type}${index}`} className="list-group">
+								<li className="list-group-item d-flex justify-content-between align-items-center">
 									<strong>{type}</strong>
-								</li>
-								<li className="list-group-item">
-									{fileAnalysis.common_names[type]}
+									<span className="badge bg-primary rounded-pill">{count}</span>
 								</li>
 							</ul>
 						))}

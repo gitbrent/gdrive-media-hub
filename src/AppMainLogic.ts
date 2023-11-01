@@ -155,27 +155,13 @@ export const getFileAnalysis = (): IFileAnalysis => {
 
 		// Count common names
 		const commonNameMatch = file.name.match(/^([a-zA-Z]+)(?:-|_|[0-9])/)
-		const commonName = commonNameMatch ? commonNameMatch[1] : 'Unknown'
+		const commonName = commonNameMatch ? commonNameMatch[0] : file.name.length >= 5 ? file.name.substring(0, 4) : '(misc)'
 		analysis.common_names[commonName] = (analysis.common_names[commonName] || 0) + 1
 	})
 
-	// Filter common names to keep only those in the top 10%
-	const sortedCommonNames = Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a)
-	const totalCommonNames = sortedCommonNames.reduce((acc, [, value]) => acc + value, 0)
-	const topPercentile = totalCommonNames * 0.05
-	let accumulated = 0
-	const filteredCommonNames: Record<string, number> = {}
+	// Filter common names to keep only the top 10
+	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).slice(0, 10))
 
-	console.log('Sorted Common Names:', sortedCommonNames) // DEBUG: why is top-5% only hsowing 1 result
-
-	for (const [name, count] of sortedCommonNames) {
-		accumulated += count
-		filteredCommonNames[name] = count
-		if (accumulated >= topPercentile) {
-			break
-		}
-	}
-	analysis.common_names = filteredCommonNames
-
+	// done
 	return analysis
 }
