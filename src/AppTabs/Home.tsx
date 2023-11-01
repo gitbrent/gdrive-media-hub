@@ -29,7 +29,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	function renderLogin(): JSX.Element {
 		return (
-			<div id="contHome">
+			<section id="contHome" className='m-5'>
 				<div id="loginCont" className="text-center cursor-link bg-secondary p-4 rounded" onClick={handleAuthClick}>
 					<img src="/google-drive.png" alt="GoogleDriveLogo" className='w-25' />
 					<div className='my-3'>
@@ -41,7 +41,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 						: <div className="text-muted mt-3">click to connect</div>
 					}
 				</div>
-			</div>
+			</section>
 		)
 	}
 

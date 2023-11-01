@@ -26,6 +26,9 @@ $pagination-active-bg: $primary;
 */
 $nav-pills-link-active-bg: $gray-800;
 
+// This way we dont have to add `mb-0` to every <h5> in .card-title
+$card-title-spacer-y: 0;
+
 // Then, import Bootstrap's main SCSS
 @import "~bootstrap/scss/bootstrap";
 
@@ -37,9 +40,11 @@ $nav-pills-link-active-bg: $gray-800;
 	background: transparent !important;
 }
 
+// Custom leftNav button colors
 #leftNav .nav-pills .nav-link {
 	color: $gray-600 !important;
 }
+
 #leftNav .nav-pills .nav-link.active {
 	color: $gray-100 !important;
 }
