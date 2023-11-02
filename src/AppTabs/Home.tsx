@@ -48,7 +48,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 	function renderTotalFiles(): JSX.Element {
 		return (
 			<div className="bg-secondary p-4 my-4">
-				<h3>File Overview</h3>
+				<h4>File Overview</h4>
 				<div className="card mt-4">
 					<div className="card-body">
 						<div className='row align-items-center mb-2'>
@@ -73,9 +73,9 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		return (
 			<div className="bg-secondary p-4 my-4">
 				<div className='row align-items-center'>
-					<div className='col'><h3 className='mb-0'>File Types</h3></div>
+					<div className='col'><h4 className='mb-0'>File Types</h4></div>
 					<div className='col-auto'>
-						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '24px' }}>{fileAnalysis.total_files}</span>
+						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '18px' }}>{fileAnalysis.total_files}</span>
 					</div>
 				</div>
 				{Object.entries(fileAnalysis.file_types)
@@ -103,7 +103,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	function renderTopFileNames(): JSX.Element {
 		return (<div className="bg-secondary p-4 my-4">
-			<h3>Top File Names</h3>
+			<h4>Top File Names</h4>
 			<div className="row mt-4">
 				<div className="col">
 					{Object.entries(fileAnalysis.common_names)
@@ -131,19 +131,21 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 							</ul>
 						))}
 				</div>
-				<div className="col">
-					{Object.entries(fileAnalysis.common_names)
-						.sort(([, a], [, b]) => b - a)
-						.slice(16, 24)
-						.map(([type, count], index) => (
-							<ul key={`${type}${index}`} className="list-group">
-								<li className="list-group-item d-flex justify-content-between align-items-center">
-									<strong>{type}</strong>
-									<span className="badge bg-primary rounded-pill">{count}</span>
-								</li>
-							</ul>
-						))}
-				</div>
+				{Object.entries(fileAnalysis.common_names)?.length > 16 &&
+					<div className="col">
+						{Object.entries(fileAnalysis.common_names)
+							.sort(([, a], [, b]) => b - a)
+							.slice(16, 24)
+							.map(([type, count], index) => (
+								<ul key={`${type}${index}`} className="list-group">
+									<li className="list-group-item d-flex justify-content-between align-items-center">
+										<strong>{type}</strong>
+										<span className="badge bg-primary rounded-pill">{count}</span>
+									</li>
+								</ul>
+							))}
+					</div>
+				}
 			</div>
 		</div>)
 	}
