@@ -23,7 +23,18 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
 	//
 	const [isPaused, setIsPaused] = useState(true)
-	const currentImage = shuffledImages[currentIndex]
+	const [currentImageUrl, setCurrentImageUrl] = useState('')
+
+	useEffect(() => {
+		if (shuffledImages[currentIndex]?.id && !shuffledImages[currentIndex]?.imageBlobUrl) {
+			downloadFile(shuffledImages[currentIndex].id).then(() => {
+				setCurrentImageUrl(shuffledImages[currentIndex].imageBlobUrl || '')
+			})
+		}
+		else {
+			setCurrentImageUrl(shuffledImages[currentIndex]?.imageBlobUrl || '')
+		}
+	}, [currentIndex, shuffledImages])
 
 	// Shuffle images once at the beginning
 	useEffect(() => {
@@ -37,11 +48,11 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	useEffect(() => {
 		for (let i = 1; i <= 3; i++) {
 			const nextIndex = (currentIndex + i) % shuffledImages.length
-			if (!shuffledImages[nextIndex]?.imageBlobUrl) {
-				downloadFile(shuffledImages[nextIndex]?.id)
+			if (shuffledImages[nextIndex] && !shuffledImages[nextIndex].imageBlobUrl) {
+				downloadFile(shuffledImages[nextIndex].id)
 			}
 		}
-	}, [currentIndex, shuffledImages, downloadFile])
+	}, [currentIndex, shuffledImages])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -165,7 +176,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 				<div className='slideShowMain'>
 					{shuffledImages.length === 0
 						? <NoImagesAlert />
-						: currentImage?.imageBlobUrl ? <img src={currentImage.imageBlobUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />
+						: currentImageUrl ? <img src={currentImageUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />
 					}
 				</div>
 			</div>
