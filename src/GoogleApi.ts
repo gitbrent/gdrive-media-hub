@@ -355,13 +355,19 @@ export const fetchDriveFolders = async (): Promise<IGapiFolder[]> => {
 }
 
 export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
-	return chgFile?.id ?
-		await fetch(`https://www.googleapis.com/drive/v3/files/${chgFile.id}?alt=media`, {
-			method: 'GET',
-			headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-		})
-		:
-		false
+	try {
+		return chgFile?.id ?
+			await fetch(`https://www.googleapis.com/drive/v3/files/${chgFile.id}?alt=media`, {
+				method: 'GET',
+				headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+			})
+			:
+			false
+	}
+	catch (ex) {
+		console.error(ex)
+		return false
+	}
 }
 
 export const doAuthSignIn = async () => {
