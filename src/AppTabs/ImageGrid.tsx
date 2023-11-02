@@ -19,7 +19,6 @@ export default function ImageGrid(props: IProps) {
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
-
 	const [lastLoadDate, setLastLoadDate] = useState('')
 
 	// --------------------------------------------------------------------------------------------
