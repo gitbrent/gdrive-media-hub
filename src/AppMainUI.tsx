@@ -70,23 +70,24 @@ export default function AppMainUI() {
 							</a>
 						</li>
 					}
+					<li className="nav-item px-0 align-middle text-nowrap" id="leftNavBtmBtn">
+						<div id="leftNavBtmBtn" className="dropdown px-3 pb-4">
+							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+								{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill" />}
+								<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
+							</a>
+							<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
+								<li><a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.Profile)}>Profile</a></li>
+								<li>
+									<hr className="dropdown-divider" />
+								</li>
+								<li>
+									<button className="dropdown-item" onClick={handleSignOutClick}>Sign Out</button>
+								</li>
+							</ul>
+						</div>
+					</li>
 				</ul>
-				<hr />
-				<div id="leftNavBtmBtn" className="dropdown px-3 pb-4">
-					<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-						{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill" />}
-						<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
-					</a>
-					<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-						<li><a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.Profile)}>Profile</a></li>
-						<li>
-							<hr className="dropdown-divider" />
-						</li>
-						<li>
-							<button className="dropdown-item" disabled={!authUserName} onClick={handleSignOutClick}>Sign Out</button>
-						</li>
-					</ul>
-				</div>
 			</div>
 		</nav>
 		)
