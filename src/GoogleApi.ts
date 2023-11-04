@@ -48,7 +48,7 @@ type OnAuthChangeCallback = (authState: IAuthState) => void;
 const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
 const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.file'
+const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 let clientCallback: OnAuthChangeCallback
 let authUserName = ''
 let authUserPict = ''
@@ -246,8 +246,9 @@ const getRootFolderId = async () => {
 		})
 		return response.result.id
 	} catch (error) {
-		console.error('Couldn\'t fetch root folder ID:', error)
-		return null
+		// NOTE: This occurs when Google App/Drive Permissions are not correct (e.g.: "Can read only its own files")
+		console.error('[getRootFolderId] Could not fetch root folder ID!', error)
+		return ''
 	}
 }
 
@@ -258,7 +259,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 
 		// A:
 		const rootFolderId = await getRootFolderId()
-		if (!rootFolderId) return [] // Or handle the error as you see fit
+		if (!rootFolderId) throw new Error('unable to fetch root folder id')
 
 		// B:
 		const response = await gapi.client.drive.files.list({
@@ -298,7 +299,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 
 		return rootFolders
 	} catch (error) {
-		console.error('Failed to build folder hierarchy:', error)
+		console.error('[buildFolderHierarchy]', error)
 		return []
 	}
 }
