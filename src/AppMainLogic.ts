@@ -1,4 +1,4 @@
-import { IFileAnalysis, IGapiFile, IS_LOCALHOST } from './App.props'
+import { FileSizeThresholds, IFileAnalysis, IGapiFile, IS_LOCALHOST } from './App.props'
 import { initGoogleApi, doAuthSignIn, doAuthSignOut, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
 
 export interface AppMainLogicInterface {
@@ -135,16 +135,37 @@ export const getFileAnalysis = (): IFileAnalysis => {
 		total_files: 0,
 		total_size: 0,
 		file_types: {} as Record<string, number>,
-		common_names: {} as Record<string, number>
+		common_names: {} as Record<string, number>,
+		size_categories: {
+			Tiny: 0,
+			Small: 0,
+			Medium: 0,
+			Large: 0,
+			Huge: 0
+		} as Record<string, number>
 	}
 
 	_gapiFiles.forEach((file) => {
 		// Increment the total file count
 		analysis.total_files += 1
 
-		// Increment the total size
+		// Increment the total size and categorize by size
 		if (file.size) {
-			analysis.total_size += parseInt(file.size)
+			const fileSize = parseInt(file.size)
+			analysis.total_size += fileSize
+
+			// Categorize the file size
+			if (fileSize <= FileSizeThresholds.Tiny) {
+				analysis.size_categories.Tiny += 1
+			} else if (fileSize <= FileSizeThresholds.Small) {
+				analysis.size_categories.Small += 1
+			} else if (fileSize <= FileSizeThresholds.Medium) {
+				analysis.size_categories.Medium += 1
+			} else if (fileSize <= FileSizeThresholds.Large) {
+				analysis.size_categories.Large += 1
+			} else {
+				analysis.size_categories.Huge += 1
+			}
 		}
 
 		// Count the MIME types

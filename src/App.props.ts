@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231031-1930'
+export const APP_BLD = '20231104-1400'
 export const APP_VER = '2.0.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost?show=gapi') > -1
 
@@ -33,6 +33,14 @@ export const GridSizes: IGridSize[] = [
 	{ title: '12 (lg)', css: '12rem' },
 	{ title: '16 (xl)', css: '16rem' },
 ]
+
+export const FileSizeThresholds = {
+	Tiny: 100 * 1024,        // files up to 100KB
+	Small: 1 * 1024 * 1024,  // files up to 1MB
+	Medium: 5 * 1024 * 1024, // files up to 5MB
+	Large: 10 * 1024 * 1024, // files up to 10MB
+	Huge: 25 * 1024 * 1024,  // files up to 25MB
+}
 
 // ----------------------------------------------------------------------------
 
@@ -91,8 +99,9 @@ export interface IGapiFile extends gapi.client.drive.File {
 }
 
 export interface IFileAnalysis {
-	total_files: number;
-	total_size: number;
-	file_types: Record<string, number>;
-	common_names: Record<string, number>;
+	total_files: number
+	total_size: number
+	file_types: Record<string, number>
+	common_names: Record<string, number>
+	size_categories: Record<string, number>
 }
