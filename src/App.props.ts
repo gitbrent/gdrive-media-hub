@@ -102,6 +102,7 @@ export interface IFileAnalysis {
 	total_files: number
 	total_size: number
 	file_types: Record<string, number>
+	file_years: Record<string, number>
 	common_names: Record<string, number>
 	size_categories: Record<string, number>
 }

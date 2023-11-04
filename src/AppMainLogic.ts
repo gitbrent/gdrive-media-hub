@@ -131,10 +131,12 @@ export const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 }
 
 export const getFileAnalysis = (): IFileAnalysis => {
+	const topNames = 50
 	const analysis = {
 		total_files: 0,
 		total_size: 0,
 		file_types: {} as Record<string, number>,
+		file_years: {} as Record<string, number>,
 		common_names: {} as Record<string, number>,
 		size_categories: {
 			Tiny: 0,
@@ -149,7 +151,7 @@ export const getFileAnalysis = (): IFileAnalysis => {
 		// Increment the total file count
 		analysis.total_files += 1
 
-		// Increment the total size and categorize by size
+		// A: Bucket FILES by SIZE-CATEGORY
 		if (file.size) {
 			const fileSize = parseInt(file.size)
 			analysis.total_size += fileSize
@@ -168,20 +170,24 @@ export const getFileAnalysis = (): IFileAnalysis => {
 			}
 		}
 
-		// Count the MIME types
+		// B: Bucket FILES by YEAR
+		const year = file.modifiedByMeTime ? new Date(file.modifiedByMeTime).getFullYear().toString() : 'Unknown'
+		analysis.file_years[year] = (analysis.file_years[year] || 0) + 1
+
+		// C: Bucket FILES by MIME-TYPE
 		const mimeType = file.mimeType.split('/').pop()
 		if (mimeType) {
 			analysis.file_types[mimeType] = (analysis.file_types[mimeType] || 0) + 1
 		}
 
-		// Count common names
+		// D: Bucket FILES by COMMON-NAME
 		const commonNameMatch = file.name.match(/^([a-zA-Z]+)(?:-|_|[0-9])/)
 		const commonName = commonNameMatch ? commonNameMatch[0] : file.name.length >= 5 ? file.name.substring(0, 5) : '(misc)'
 		analysis.common_names[commonName] = (analysis.common_names[commonName] || 0) + 1
 	})
 
 	// Filter common names to keep only the top NN
-	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a).slice(0, 24))
+	analysis.common_names = Object.fromEntries(Object.entries(analysis.common_names).sort(([, a], [, b]) => b - a).slice(0, topNames))
 
 	// done
 	return analysis
