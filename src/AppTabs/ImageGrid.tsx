@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { IGapiFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import { FixedItemProps } from './ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
-import NoImagesAlert from '../components/NoImagesAlert'
+import AlertNoImages from '../components/AlertNoImages'
+import AlertLoading from '../components/AlertLoading'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
@@ -229,7 +230,8 @@ export default function ImageGrid(props: IProps) {
 	return (
 		<section>
 			{renderMainContBody_TopBar()}
-			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0 ? (
+			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0
+				?
 				<Gallery id="contImageGrid" withCaption={props.isShowCap}>
 					<div id="gallery-container" className="gallery">
 						{gridShowFiles.map((item) => (
@@ -249,9 +251,13 @@ export default function ImageGrid(props: IProps) {
 						))}
 					</div>
 				</Gallery>
-			) : (
-				<NoImagesAlert />
-			)}
+				:
+				props.allFiles?.length > 0 ? (
+					<AlertLoading />
+				) : (
+					<AlertNoImages />
+				)
+			}
 		</section>
 	)
 }
