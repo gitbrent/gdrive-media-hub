@@ -305,8 +305,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 }
 //#endregion
 
-// PUBLIC API
-
+//#region PUBLIC-API
 export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 	clientCallback = onAuthChange
 	doLoadInitGsiGapi()
@@ -378,3 +377,4 @@ export const doAuthSignIn = async () => {
 export const doAuthSignOut = async () => {
 	return doAuthorizeSignOut()
 }
+//#endregion
