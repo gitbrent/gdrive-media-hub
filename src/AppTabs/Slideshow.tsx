@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile } from '../App.props'
-import NoImagesAlert from '../components/NoImagesAlert'
+import AlertNoImages from '../components/AlertNoImages'
 import '../css/Slideshow.css'
 
 enum SlideShowDelay {
@@ -175,7 +175,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			<div className='slideShowContainer'>
 				<div className='slideShowMain'>
 					{shuffledImages.length === 0
-						? <NoImagesAlert />
+						? <AlertNoImages />
 						: currentImageUrl ? <img src={currentImageUrl} /> : <i className="h1 mb-0 bi-arrow-repeat" />
 					}
 				</div>

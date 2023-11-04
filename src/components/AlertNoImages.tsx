@@ -1,11 +1,11 @@
 import React from 'react'
 
-interface NoImagesAlertProps {
+interface AlertNoImagesProps {
 	title?: string;
 	subtitle?: string;
 }
 
-const NoImagesAlert: React.FC<NoImagesAlertProps> = ({ title = 'say less bro', subtitle = '(no images to display)' }) => {
+const AlertNoImages: React.FC<AlertNoImagesProps> = ({ title = 'say less bro', subtitle = '(no images to display)' }) => {
 	return (
 		<section className="text-center my-5">
 			<div className="alert alert-warning d-inline-flex align-items-center" role="alert">
@@ -27,4 +27,4 @@ const NoImagesAlert: React.FC<NoImagesAlertProps> = ({ title = 'say less bro', s
 	)
 }
 
-export default NoImagesAlert
+export default AlertNoImages
