@@ -52,11 +52,13 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4 my-4">
+			<div className="bg-secondary p-4">
 				<div className='row align-items-center'>
 					<div className='col'><h4 className='mb-0'>Files by Type</h4></div>
 					<div className='col-auto'>
-						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '18px' }}>{fileAnalysis.total_files}</span>
+						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
+							{fileAnalysis.total_files}
+						</span>
 					</div>
 				</div>
 				{Object.entries(fileAnalysis.file_types)
@@ -96,18 +98,16 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4 my-4">
-				<div className='row align-items-center'>
+			<div className="bg-secondary p-4">
+				<div className='row align-items-center flex-nowrap'>
 					<div className='col'><h4 className='mb-0'>Files by Size</h4></div>
 					<div className='col-auto'>
-						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '18px' }}>
+						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
 							{formatBytes(fileAnalysis.total_size)}
 						</span>
 					</div>
 				</div>
 				{Object.entries(FileSizeThresholds)
-					// eslint-disable-next-line @typescript-eslint/no-unused-vars
-					.filter(([_, size]) => size !== FileSizeThresholds.Huge)
 					.map(([category, size], index) => {
 						const catTotal = fileAnalysis.size_categories[category]
 						const percent = calculatePercent(catTotal, fileAnalysis.total_files)
@@ -133,30 +133,32 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		)
 	}
 
-	function renderFilesByYear(): JSX.Element {
+	function renderFilesByYear2(): JSX.Element {
 		const totalFiles = fileAnalysis.total_files
 		const calculatePercent = (count: number, total: number) => {
 			return (count / total) * 100
 		}
 
 		return (
-			<div className="bg-secondary p-4 my-4">
+			<div className="bg-secondary p-4">
 				<div className='row align-items-center'>
 					<div className='col'><h4 className='mb-0'>Files By Year</h4></div>
 					<div className='col-auto'>
-						<span className="badge bg-primary rounded-pill mb-0" style={{ fontSize: '18px' }}>{fileAnalysis.total_files}</span>
+						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
+							{fileAnalysis.total_files}
+						</span>
 					</div>
 				</div>
-				<div className='row row-cols-1 row-cols-md-2'>
+				<div className='row'>
 					{Object.entries(fileAnalysis.file_years)
-						.sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+						.sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
 						.map(([year, count], index) => {
 							const percent = calculatePercent(count, totalFiles)
 							return (
 								<div key={`${year}${index}`} className="col">
 									<div className="card mt-4">
 										<div className="card-body">
-											<div className='row align-items-center mb-2'>
+											<div className='row align-items-center flex-nowrap mb-2'>
 												<div className='col'><h5 className="mb-0">{year}</h5></div>
 												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
 											</div>
@@ -168,6 +170,76 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 								</div>
 							)
 						})}
+				</div>
+			</div>
+		)
+	}
+
+	function renderFilesByYear(): JSX.Element {
+		const totalFiles = fileAnalysis.total_files
+		const currentYear = new Date().getFullYear()
+		const calculatePercent = (count: number, total: number) => {
+			return Math.round((count / total) * 100)
+		}
+		let overTenYearsCount = 0
+
+		const sortedFileYears = Object.entries(fileAnalysis.file_years)
+			.sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+
+		// Sum counts for years more than 10 years ago
+		sortedFileYears.forEach(([year, count]) => {
+			if (currentYear - parseInt(year) > 10) {
+				overTenYearsCount += count
+			}
+		})
+
+		return (
+			<div className="bg-secondary p-4">
+				<div className='row align-items-center'>
+					<div className='col'><h4 className='mb-0'>Files By Year</h4></div>
+					<div className='col-auto'>
+						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
+							{fileAnalysis.total_files}
+						</span>
+					</div>
+				</div>
+				<div className='row row-cols row-cols-md-4 row-cols-xl-6'>
+					{sortedFileYears
+						.filter(([year]) => currentYear - parseInt(year) <= 10)
+						.map(([year, count], index) => {
+							const percent = calculatePercent(count, totalFiles)
+							return (
+								<div key={`${year}${index}`} className="col">
+									<div className="card mt-4">
+										<div className="card-body">
+											<div className='row align-items-center gx-0 flex-nowrap mb-2'>
+												<div className='col'><h5 className="mb-0">{year}</h5></div>
+												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+											</div>
+											<div className="progress">
+												<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+											</div>
+										</div>
+									</div>
+								</div>
+							)
+						})
+					}
+					{overTenYearsCount > 0 && (
+						<div key="over10" className="col order-first">
+							<div className="card mt-4">
+								<div className="card-body">
+									<div className='row align-items-center flex-nowrap mb-2'>
+										<div className='col'><h5 className="mb-0">Older</h5></div>
+										<div className='col-auto'><span className="badge bg-primary">{overTenYearsCount}</span></div>
+									</div>
+									<div className="progress">
+										<div className="progress-bar" role="progressbar" title={`${calculatePercent(overTenYearsCount, totalFiles)}%`} style={{ width: `${calculatePercent(overTenYearsCount, totalFiles)}%` }} aria-valuenow={calculatePercent(overTenYearsCount, totalFiles)} aria-valuemin={0} aria-valuemax={100} />
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		)
@@ -204,23 +276,32 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4 my-4">
-				<h4>Top {entriesLength} File Names</h4>
-				<div className="row mt-4">{columns}</div>
+			<div className="bg-secondary p-4">
+				<div className="row align-items-center mb-4">
+					<div className='col'><h4 className='mb-0'>Top Filenames</h4></div>
+					<div className='col-auto'>
+						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
+							{entriesLength}
+						</span>
+					</div>
+				</div>
+				<div className="row g-4">{columns}</div>
 			</div>
 		)
 	}
 
 	function renderHome(): JSX.Element {
-		return (<section className='p-4'>
-			<h5>Welcome {authUserName}!</h5>
-			<div className='row'>
-				<div className='col-12 col-md'>{renderFilesBySize()}</div>
-				<div className='col-12 col-md'>{renderFilesByYear()}</div>
-				<div className='col-12 col-md'>{renderFilesByType()}</div>
-				<div className='col-12 col-md-12'>{renderTopFileNames()}</div>
-			</div>
-		</section>)
+		return (
+			<section className='p-4'>
+				<h5 className='mb-4'>Welcome {authUserName}!</h5>
+				<div className='row g-4'>
+					<div className='col-12 col-md'>{renderFilesBySize()}</div>
+					<div className='col-12 col-md'>{renderFilesByType()}</div>
+					<div className='col-12 col-md-12'>{renderFilesByYear()}</div>
+					<div className='col-12 col-md-12'>{renderTopFileNames()}</div>
+				</div>
+			</section>
+		)
 	}
 
 	return (
