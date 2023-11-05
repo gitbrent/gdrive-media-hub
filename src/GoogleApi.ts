@@ -55,6 +55,13 @@ let authUserPict = ''
 let isAuthorized = false
 let tokenResponse: TokenResponse
 
+const CACHE_KEY_PREFIX = 'fileListCache_' // Prefix to create unique key per user
+const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+
+function getCacheKey(userId: string) {
+	return `${CACHE_KEY_PREFIX}${userId}`
+}
+
 async function doLoadInitGsiGapi() {
 	// GAPI (1/2)
 	if (typeof gapi === 'undefined' || !gapi.client) await loadGapiScript()
@@ -311,10 +318,52 @@ export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 	doLoadInitGsiGapi()
 }
 
-export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]> => {
+export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
+	const cacheKey = getCacheKey(authUserName)
+	const cachedData = localStorage.getItem(cacheKey)
+	let mergedFiles: IGapiFile[] = []
+	let cachedFiles: IGapiFile[] = []
+	let isFullRefresh = true
+
+	if (cachedData) {
+		const { timestamp, files } = JSON.parse(cachedData)
+		if (Date.now() - timestamp < CACHE_EXPIRY_TIME) {
+			if (IS_LOCALHOST) console.log('[fetchDriveFiles] FYI: using cachedData')
+			cachedFiles = files as IGapiFile[]
+		}
+	}
+	isFullRefresh = !cachedFiles || cachedFiles.length === 0
+
+	// Cache is stale or not present, so fetch new data using fetchDriveFilesAll
+	const newFiles = await fetchDriveFilesAll(isFullRefresh)
+
+	if (!isFullRefresh) {
+		const cachedFilesMap = new Map(cachedFiles.map(file => [file.id, file]))
+
+		// Iterate over new files and update or add to the map
+		newFiles.forEach(file => {
+			cachedFilesMap.set(file.id, file)
+		})
+
+		mergedFiles = Array.from(cachedFilesMap.values())
+	}
+	else {
+		mergedFiles = newFiles
+	}
+
+	// Store the new list in the cache with a timestamp
+	localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), files: mergedFiles }))
+
+	// Done
+	return mergedFiles
+}
+
+export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile[]> => {
+	const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000)).toISOString()
 	let allFiles: IGapiFile[] = []
 	let pageToken: string | undefined
 
+	// A: update UI loading status
 	const loginCont = document.getElementById('loginCont')
 	let badgeElement = document.getElementById('file-load-badge')
 	if (!badgeElement) {
@@ -325,11 +374,15 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 	}
 	badgeElement.textContent = 'Loading files...'
 
+	// B: read files
 	do {
+		// eslint-disable-next-line quotes
+		let query = "trashed=false and (mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif')"
+		if (!isFullSync) query = `modifiedTime > '${oneDayAgo}' and ${query}`
 		const response = await gapi.client.drive.files.list({
-			q: searchText ? `trashed=false and name contains "${searchText}"` : 'trashed=false and (mimeType = \'image/png\' or mimeType = \'image/jpeg\' or mimeType = \'image/gif\')',
-			fields: 'nextPageToken, files(id,mimeType,modifiedByMeTime,name,size)',
-			orderBy: 'modifiedByMeTime desc',
+			q: query,
+			fields: 'nextPageToken, files(id, name, mimeType, size, modifiedByMeTime)',
+			//orderBy: 'modifiedByMeTime desc',
 			pageSize: 1000,
 			pageToken: pageToken,
 		})
@@ -337,16 +390,18 @@ export const fetchDriveFiles = async (searchText?: string): Promise<IGapiFile[]>
 		allFiles = allFiles.concat(response.result.files as IGapiFile[]) || []
 		pageToken = response.result.nextPageToken
 		//
-		badgeElement.textContent = `Loaded ${allFiles?.length} files...`
-	} while (pageToken && allFiles.length < 10000)
+		badgeElement.textContent = `Loading files... (${allFiles?.length})`
+	} while (pageToken)
 
 	if (IS_LOCALHOST) {
 		console.log(`[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
 		if (allFiles.length > 0) console.log('allFiles[0]', allFiles[0])
 	}
 
+	// C: update UI loading status
 	document.getElementById('file-load-badge')?.remove()
 
+	// D: done
 	return allFiles
 }
 
@@ -376,5 +431,9 @@ export const doAuthSignIn = async () => {
 
 export const doAuthSignOut = async () => {
 	return doAuthorizeSignOut()
+}
+
+export const doClearFileCache = () => {
+	localStorage.removeItem(getCacheKey(authUserName))
 }
 //#endregion

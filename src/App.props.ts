@@ -1,8 +1,8 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231104-1400'
+export const APP_BLD = '20231104-1800'
 export const APP_VER = '2.0.0-WIP'
-export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('localhost?show=gapi') > -1
+export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
 
 // ============================================================================
 
