@@ -1,5 +1,5 @@
 import { FileSizeThresholds, IFileAnalysis, IGapiFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, doAuthSignIn, doAuthSignOut, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
+import { initGoogleApi, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -60,6 +60,11 @@ export const handleAuthClick = () => {
  */
 export const handleSignOutClick = () => {
 	doAuthSignOut()
+}
+
+// TODO: Add to "Profile" page
+export const handleClearFileCache = () => {
+	doClearFileCache()
 }
 
 /**
