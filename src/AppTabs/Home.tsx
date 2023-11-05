@@ -133,48 +133,6 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		)
 	}
 
-	function renderFilesByYear2(): JSX.Element {
-		const totalFiles = fileAnalysis.total_files
-		const calculatePercent = (count: number, total: number) => {
-			return (count / total) * 100
-		}
-
-		return (
-			<div className="bg-secondary p-4">
-				<div className='row align-items-center'>
-					<div className='col'><h4 className='mb-0'>Files By Year</h4></div>
-					<div className='col-auto'>
-						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
-							{fileAnalysis.total_files}
-						</span>
-					</div>
-				</div>
-				<div className='row'>
-					{Object.entries(fileAnalysis.file_years)
-						.sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
-						.map(([year, count], index) => {
-							const percent = calculatePercent(count, totalFiles)
-							return (
-								<div key={`${year}${index}`} className="col">
-									<div className="card mt-4">
-										<div className="card-body">
-											<div className='row align-items-center flex-nowrap mb-2'>
-												<div className='col'><h5 className="mb-0">{year}</h5></div>
-												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
-											</div>
-											<div className="progress">
-												<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
-											</div>
-										</div>
-									</div>
-								</div>
-							)
-						})}
-				</div>
-			</div>
-		)
-	}
-
 	function renderFilesByYear(): JSX.Element {
 		const totalFiles = fileAnalysis.total_files
 		const currentYear = new Date().getFullYear()
