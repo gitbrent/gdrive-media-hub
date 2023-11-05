@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231104-1800'
+export const APP_BLD = '20231104-2000'
 export const APP_VER = '2.0.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
 
@@ -105,4 +105,9 @@ export interface IFileAnalysis {
 	file_years: Record<string, number>
 	common_names: Record<string, number>
 	size_categories: Record<string, number>
+}
+
+export interface IFileListCache {
+	timeStamp: number
+	gapiFiles: IGapiFile[]
 }

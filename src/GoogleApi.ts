@@ -22,7 +22,7 @@
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
-import { AuthState, IAuthState, IGapiFile, IS_LOCALHOST } from './App.props'
+import { AuthState, IAuthState, IFileListCache, IGapiFile, IS_LOCALHOST } from './App.props'
 import { IGapiFolder, TokenClientConfig, TokenResponse } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
@@ -57,6 +57,10 @@ let tokenResponse: TokenResponse
 
 const CACHE_KEY_PREFIX = 'fileListCache_' // Prefix to create unique key per user
 const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+
+function getDatabaseName() {
+	return `${authUserName} Database`
+}
 
 function getCacheKey(userId: string) {
 	return `${CACHE_KEY_PREFIX}${userId}`
@@ -312,6 +316,91 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 }
 //#endregion
 
+//#region INDEXDB-CACHING
+const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> => {
+	return new Promise((resolve, reject) => {
+		const open = indexedDB.open(getDatabaseName(), 2)
+
+		open.onsuccess = () => {
+			const db = open.result
+			const tx = db.transaction('GapiFileCache', 'readwrite')
+			const store = tx.objectStore('GapiFileCache')
+
+			// Save the files and timestamp separately
+			store.put({ id: 'gapiFiles', gapiFiles: fileListCache.gapiFiles })
+			store.put({ id: 'timeStamp', timeStamp: fileListCache.timeStamp })
+
+			tx.oncomplete = () => {
+				db.close()
+				resolve(true)
+			}
+
+			tx.onerror = (event) => {
+				console.error(event)
+				reject(false)
+			}
+		}
+	})
+}
+
+const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
+	return new Promise((resolve, reject) => {
+		const open = indexedDB.open(getDatabaseName(), 2)
+
+		open.onupgradeneeded = () => {
+			// If the schema is outdated, we create or update it
+			const db = open.result
+			// Create an object store or update its version
+			if (!db.objectStoreNames.contains('GapiFileCache')) {
+				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			}
+		}
+
+		open.onsuccess = () => {
+			const db = open.result
+			const tx = db.transaction('GapiFileCache', 'readonly')
+			const store = tx.objectStore('GapiFileCache')
+
+			const filesRequest = store.get('gapiFiles')
+			const stampRequest = store.get('timeStamp')
+
+			filesRequest.onsuccess = () => {
+				stampRequest.onsuccess = () => {
+					// Now we have both the files and the timestamp
+					const gapiFiles = filesRequest.result // This is now the actual files array
+					const timeStamp = stampRequest.result // This is now the actual timestamp
+					if (gapiFiles && timeStamp) {
+						const cache: IFileListCache = {
+							timeStamp: timeStamp.timeStamp, // Assuming the timestamp here is a number
+							gapiFiles: gapiFiles.gapiFiles, // Assuming gapiFiles here is an array of IGapiFile
+						}
+						resolve(cache)
+					} else {
+						reject(null)
+					}
+				}
+				stampRequest.onerror = () => {
+					reject(stampRequest.error)
+				}
+			}
+			filesRequest.onerror = () => {
+				console.error(filesRequest.error)
+				reject(null)
+			}
+
+			tx.oncomplete = () => {
+				db.close()
+			}
+		}
+
+		open.onerror = (event) => {
+			console.error(event)
+			reject('Error opening IndexedDB')
+		}
+	})
+}
+//#endregion
+
 //#region PUBLIC-API
 export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 	clientCallback = onAuthChange
@@ -319,20 +408,22 @@ export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 }
 
 export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
-	const cacheKey = getCacheKey(authUserName)
-	const cachedData = localStorage.getItem(cacheKey)
-	let mergedFiles: IGapiFile[] = []
 	let cachedFiles: IGapiFile[] = []
+	let mergedFiles: IGapiFile[] = []
 	let isFullRefresh = true
 
-	if (cachedData) {
-		const { timestamp, files } = JSON.parse(cachedData)
-		if (Date.now() - timestamp < CACHE_EXPIRY_TIME) {
+	const objCache = await loadCacheFromIndexedDB().catch(() => {
+		if (IS_LOCALHOST) console.log('FYI: loadCacheFromIndexedDB failed')
+	})
+
+	if (objCache?.timeStamp && objCache?.gapiFiles?.length > 0) {
+		if (Date.now() - objCache.timeStamp < CACHE_EXPIRY_TIME) {
 			if (IS_LOCALHOST) console.log('[fetchDriveFiles] FYI: using cachedData')
-			cachedFiles = files as IGapiFile[]
+			cachedFiles = objCache.gapiFiles
 		}
 	}
 	isFullRefresh = !cachedFiles || cachedFiles.length === 0
+	if (IS_LOCALHOST) console.log('isFullRefresh', isFullRefresh)
 
 	// Cache is stale or not present, so fetch new data using fetchDriveFilesAll
 	const newFiles = await fetchDriveFilesAll(isFullRefresh)
@@ -352,7 +443,7 @@ export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
 	}
 
 	// Store the new list in the cache with a timestamp
-	localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), files: mergedFiles }))
+	saveCacheToIndexedDB({ timeStamp: Date.now(), gapiFiles: mergedFiles } as IFileListCache)
 
 	// Done
 	return mergedFiles
