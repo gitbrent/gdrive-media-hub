@@ -399,6 +399,25 @@ const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 		}
 	})
 }
+
+async function doDeleteDatabase() {
+	const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
+
+	deleteRequest.onsuccess = () => {
+		alert('Database deleted successfully')
+		return
+	}
+
+	deleteRequest.onerror = (event) => {
+		console.error('Database deletion failed', event)
+		return
+	}
+
+	deleteRequest.onblocked = () => {
+		console.warn('Database deletion blocked')
+		return
+	}
+}
 //#endregion
 
 //#region PUBLIC-API
@@ -525,6 +544,6 @@ export const doAuthSignOut = async () => {
 }
 
 export const doClearFileCache = () => {
-	localStorage.removeItem(getCacheKey(authUserName))
+	return doDeleteDatabase()
 }
 //#endregion

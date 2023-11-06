@@ -19,7 +19,16 @@ export enum AppTabs {
 
 export default function AppMainUI() {
 	const {
-		allFiles, authUserName, authUserPict, isBusyGapiLoad, handleAuthClick, handleSignOutClick, downloadFile, loadPageImages, getFileAnalysis
+		allFiles,
+		authUserName,
+		authUserPict,
+		downloadFile,
+		getFileAnalysis,
+		handleAuthClick,
+		handleSignOutClick,
+		handleClearFileCache,
+		isBusyGapiLoad,
+		loadPageImages,
 	} = useAppMain()
 	//
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
@@ -86,7 +95,12 @@ export default function AppMainUI() {
 								<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
 							</a>
 							<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-								<li><a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.Profile)}>Profile</a></li>
+								<li>
+									<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.Profile)}>Profile</a>
+								</li>
+								<li>
+									<a className="dropdown-item" href="#" onClick={handleClearFileCache}>Clear Cache</a>
+								</li>
 								<li>
 									<hr className="dropdown-divider" />
 								</li>

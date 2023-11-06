@@ -29,6 +29,7 @@ export const useAppMain = () => {
 		isBusyGapiLoad,
 		handleAuthClick: AppMainLogic.handleAuthClick,
 		handleSignOutClick: AppMainLogic.handleSignOutClick,
+		handleClearFileCache: AppMainLogic.handleClearFileCache,
 		downloadFile: AppMainLogic.downloadFile,
 		loadPageImages: AppMainLogic.loadPageImages,
 		getFileAnalysis: AppMainLogic.getFileAnalysis
