@@ -4,6 +4,7 @@ import { useAppMain } from './useAppMain'
 import Home from './AppTabs/Home'
 import ImageGrid from './AppTabs/ImageGrid'
 import Slideshow from './AppTabs/Slideshow'
+import VideoPlayer from './AppTabs/VideoPlayer'
 import Settings from './AppTabs/Settings'
 import './css/AppMainUI.css'
 
@@ -11,6 +12,7 @@ export enum AppTabs {
 	Home = 'Home',
 	ImageGrid = 'ImageGrid',
 	SlideShow = 'SlideShow',
+	VideoPlayer = 'VideoPlayer',
 	Settings = 'Settings',
 	Profile = 'Profile',
 }
@@ -60,6 +62,13 @@ export default function AppMainUI() {
 						<li className="nav-item px-0 align-middle text-nowrap">
 							<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link px-0 ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
 								<i className="fs-4 bi-play-circle" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Slide Show</span>
+							</a>
+						</li>
+					}
+					{authUserName &&
+						<li className="nav-item px-0 align-middle text-nowrap">
+							<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.VideoPlayer)} className={`nav-link px-0 ${currentTab === AppTabs.VideoPlayer ? 'active' : ''}`} title="video grid" aria-label="video grid">
+								<i className="fs-4 bi-camera-video" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>Video Grid</span>
 							</a>
 						</li>
 					}
@@ -115,6 +124,9 @@ export default function AppMainUI() {
 				break
 			case AppTabs.SlideShow:
 				returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />
+				break
+			case AppTabs.VideoPlayer:
+				returnJsx = <VideoPlayer allFiles={allFiles} downloadFile={downloadFile} />
 				break
 			case AppTabs.Settings:
 				returnJsx = <Settings

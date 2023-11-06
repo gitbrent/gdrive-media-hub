@@ -71,48 +71,56 @@ export const handleClearFileCache = () => {
  * load image file blob from google drive api
  * @param fileId
  */
-/*
-export const downloadFile = async (fileId: string) => {
-	const file = _gapiFiles.filter(item => item.id === fileId)[0]
-	const response = await fetchFileImgBlob(file)
-	if (response) {
-		const blob = await response.blob()
-		const objectUrl = URL.createObjectURL(blob)
-		const img = document.createElement('img')
-		img.src = objectUrl
-		img.onload = () => {
-			const updFiles = [..._gapiFiles]
-			const imgFile = updFiles.filter((file) => file.id === fileId)[0]
-			imgFile.imageBlobUrl = objectUrl
-			imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-			imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-			_gapiFiles = updFiles
-		}
-	}
-}
-*/
 export const downloadFile = async (fileId: string): Promise<boolean> => {
 	try {
-		const file = _gapiFiles.filter(item => item.id === fileId)[0]
+		const file = _gapiFiles.find(item => item.id === fileId)
+		if (!file) {
+			console.warn('File not found')
+			return false
+		}
+
 		const response = await fetchFileImgBlob(file)
 		if (response) {
 			const blob = await response.blob()
 			const objectUrl = URL.createObjectURL(blob)
-			return new Promise((resolve) => {
-				const img = new Image()
-				img.src = objectUrl
-				img.onload = () => {
-					const updFiles = [..._gapiFiles]
-					const imgFile = updFiles.filter((file) => file.id === fileId)[0]
-					imgFile.imageBlobUrl = objectUrl
-					imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-					imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-					_gapiFiles = updFiles
-					resolve(true)
+
+			if (blob.type.startsWith('image/')) {
+				return new Promise((resolve) => {
+					const img = new Image()
+					img.src = objectUrl
+					img.onload = () => {
+						const updFiles = [..._gapiFiles]
+						const imgFile = updFiles.find((file) => file.id === fileId)
+						if (imgFile) {
+							imgFile.imageBlobUrl = objectUrl
+							imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
+							imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
+						}
+						_gapiFiles = updFiles
+						resolve(true)
+					}
+					img.onerror = () => {
+						console.error('Error loading image')
+						resolve(false)
+					}
+				})
+			} else if (blob.type.startsWith('video/')) {
+				const updFiles = [..._gapiFiles]
+				const videoFile = updFiles.find((file) => file.id === fileId)
+				if (videoFile) {
+					videoFile.videoBlobUrl = objectUrl // Store the URL for the video
+					// For video, you might not need width and height beforehand,
+					// but you could set some default values or try to read the metadata
+					// using a hidden video element (more complex and usually not necessary).
 				}
-			})
+				_gapiFiles = updFiles
+				return true
+			} else {
+				console.warn('Unknown file type')
+				return false
+			}
 		} else {
-			console.warn('fetchFileImgBlob() failed')
+			console.warn('fetchFileContent() failed')
 			return false
 		}
 	} catch (error) {
@@ -120,6 +128,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 		return false
 	}
 }
+
 
 export const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 	_isBusyGapiLoad = true

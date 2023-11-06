@@ -468,7 +468,7 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 	// B: read files
 	do {
 		// eslint-disable-next-line quotes
-		let query = "trashed=false and (mimeType = 'image/png' or mimeType = 'image/jpeg' or mimeType = 'image/gif')"
+		let query = "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')"
 		if (!isFullSync) query = `modifiedTime > '${oneDayAgo}' and ${query}`
 		const response = await gapi.client.drive.files.list({
 			q: query,
