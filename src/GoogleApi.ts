@@ -49,14 +49,14 @@ const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
 const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
+const CACHE_KEY_PREFIX = 'fileListCache_' // Prefix to create unique key per user
+const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+const CACHE_DBASE_VER = 3
 let clientCallback: OnAuthChangeCallback
 let authUserName = ''
 let authUserPict = ''
 let isAuthorized = false
 let tokenResponse: TokenResponse
-
-const CACHE_KEY_PREFIX = 'fileListCache_' // Prefix to create unique key per user
-const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
 function getDatabaseName() {
 	return `${authUserName} Database`
@@ -345,7 +345,7 @@ const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> =
 
 const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 	return new Promise((resolve, reject) => {
-		const open = indexedDB.open(getDatabaseName(), 2)
+		const open = indexedDB.open(getDatabaseName(), CACHE_DBASE_VER)
 
 		open.onupgradeneeded = () => {
 			// If the schema is outdated, we create or update it
