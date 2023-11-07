@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { IGapiFile } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
+import '../css/VideoPlayer.css'
 
 export interface Props {
 	allFiles: IGapiFile[];
@@ -9,47 +10,62 @@ export interface Props {
 }
 
 const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
-	const [optSchWord, setOptSchWord] = useState('')
-	const [shuffledImages, setShuffledImages] = useState<IGapiFile[]>([])
-	const [currentIndex, setCurrentIndex] = useState(0)
-	const [usedIndices, setUsedIndices] = useState<number[]>([])
-	const [currentImageUrl, setCurrentImageUrl] = useState('')
 	const [allVideos, setAllVideos] = useState<IGapiFile[]>([])
+	const [shfImages, setShfImages] = useState<IGapiFile[]>([])
+	const [currIndex, setCurrIndex] = useState(0)
+	const [usedIndexes, setUsedIndexes] = useState<number[]>([])
+	const [currentImageUrl, setCurrentImageUrl] = useState('')
+	const [optSchWord, setOptSchWord] = useState('')
 
+	/**
+	 * filter videos from all files and shuffle at startup
+	 */
 	useEffect(() => {
-		const videos = [...allFiles].filter((item) => item.mimeType.toLowerCase().indexOf('video/mp4') > -1)
-		setAllVideos(videos)
+		setAllVideos([...allFiles]
+			.filter((item) => item.mimeType.toLowerCase().indexOf('video/mp4') > -1)
+			.sort(() => Math.random() - 0.5))
 	}, [allFiles])
 
+	/**
+	 * update shuffled videos when search term changes
+	 */
 	useEffect(() => {
-		setShuffledImages(allVideos)
-	}, [allVideos])
+		setShfImages(allVideos
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		)
+	}, [allVideos, optSchWord])
 
 	useEffect(() => {
-		if (shuffledImages[currentIndex]?.id && !shuffledImages[currentIndex]?.videoBlobUrl) {
-			downloadFile(shuffledImages[currentIndex].id).then(() => {
-				setCurrentImageUrl(shuffledImages[currentIndex].videoBlobUrl || '')
+		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.videoBlobUrl) {
+			downloadFile(shfImages[currIndex].id).then(() => {
+				setCurrentImageUrl(shfImages[currIndex].videoBlobUrl || '')
 			})
 		}
 		else {
-			setCurrentImageUrl(shuffledImages[currentIndex]?.videoBlobUrl || '')
+			setCurrentImageUrl(shfImages[currIndex]?.videoBlobUrl || '')
 		}
-	}, [currentIndex, shuffledImages])
+	}, [currIndex, shfImages])
+
+	useEffect(() => {
+		setCurrIndex(0)
+	}, [optSchWord])
+
+	// --------------------------------------------------------------------------------------------
 
 	const goToNextSlide = () => {
-		if (shuffledImages.length === 0) return
-		const nextIndex = (currentIndex + 1) % shuffledImages.length
+		if (shfImages.length === 0) return
+		const nextIndex = (currIndex + 1) % shfImages.length
 		setCurrentImageUrl('')
-		setCurrentIndex(nextIndex)
-		setUsedIndices([...usedIndices, nextIndex])
+		setCurrIndex(nextIndex)
+		setUsedIndexes([...usedIndexes, nextIndex])
 	}
 
 	const goToPrevSlide = () => {
-		if (usedIndices.length <= 1) return  // Can't go back if there's only one or no image
-		const prevIndex = usedIndices[usedIndices.length - 2] // Get the second last index
-		setUsedIndices(usedIndices.slice(0, -1)) // Remove the last index
+		if (usedIndexes.length <= 1) return  // Can't go back if there's only one or no image
+		const prevIndex = usedIndexes[usedIndexes.length - 2] // Get the second last index
+		setUsedIndexes(usedIndexes.slice(0, -1)) // Remove the last index
 		setCurrentImageUrl('')
-		setCurrentIndex(prevIndex)
+		setCurrIndex(prevIndex)
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -58,31 +74,33 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 		return (
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
-					<div className="row w-100 align-items-center">
+					<div className="row w-100 align-items-center justify-content-between">
 						<div className='col-auto d-none d-xl-block'>
 							<a className="navbar-brand text-white"><i className="bi-camera-video me-2" />Video Viewer</a>
 						</div>
-						<div className="col-3 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPrevSlide} title="Prev">
-								<i className="bi-skip-backward me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
+						<div className="col">
+							<button className='btn btn-secondary w-100' disabled={usedIndexes.length <= 1} onClick={goToPrevSlide} title="Prev">
+								<i className="bi-chevron-left me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
 							</button>
 						</div>
-						<div className="col-3 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={shuffledImages.length === 0} onClick={goToNextSlide} title="Next">
-								<span className="d-none d-lg-inline-block">Next</span><i className="bi-skip-forward ms-0 ms-md-2"></i>
+						<div className="col">
+							<button className='btn btn-secondary w-100' disabled={shfImages.length === 0} onClick={goToNextSlide} title="Next">
+								<span className="d-none d-lg-inline-block">Next</span><i className="bi-chevron-right ms-0 ms-md-2"></i>
 							</button>
 						</div>
-						<div className="col col-md mt-3 mt-md-0">
+						<div className="col mt-3 mt-md-0">
 							<form className="d-flex" role="search">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</form>
 						</div>
-						<div className="col-auto col-md-auto mt-3 mt-md-0">
+						<div className="col-auto mt-3 mt-md-0">
 							<div className="text-muted">
-								{shuffledImages.length === 0
+								{shfImages.length === 0
 									? ('No videos to show')
-									: (<span>showing <b>{currentIndex + 1}</b>&nbsp;of&nbsp;<b>{shuffledImages.length}</b>&nbsp;(<b>{allVideos.length} total)</b></span>)
+									: optSchWord
+										? (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{shfImages.length}</b>&nbsp;(<b>{allVideos.length} total)</b></span>)
+										: (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{allVideos.length}</b></span>)
 								}
 							</div>
 						</div>
@@ -95,26 +113,30 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	function renderVideo(): JSX.Element {
 		return (
 			<section>
-				<div className='row align-items-center justify-content-evenly text-muted'>
-					<div className='col-auto h6 mb-0 py-2 px-3'>
-						{shuffledImages[currentIndex].name}
-					</div>
-					<div className='col-auto h6 mb-0 py-2 px-3'>
-						{parseFloat((Number(shuffledImages[currentIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
-					</div>
-					<div className='col-auto h6 mb-0 py-2 px-3'>
-						{new Date(shuffledImages[currentIndex].modifiedByMeTime).toLocaleString()}
-					</div>
-				</div>
-				<div className='text-center px-4'>
-					{!currentImageUrl
-						? <AlertLoading />
-						: <video width="90%" controls>
-							<source key={currentImageUrl} src={currentImageUrl} type={shuffledImages[currentIndex].mimeType} />
-							Your browser does not support the video tag.
-						</video>
-					}
-				</div>
+				{!currentImageUrl
+					? <AlertLoading />
+					: <section className="text-center">
+						<div className="position-relative">
+							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-25 text-opacity-50 text-white px-2 py-1 d-flex justify-content-between align-items-center">
+								<div className='col-auto h6 mb-0 py-2 px-3'>
+									{shfImages[currIndex].name}
+								</div>
+								<div className='col-auto h6 mb-0 py-2 px-3'>
+									{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
+								</div>
+								<div className='col-auto h6 mb-0 py-2 px-3'>
+									{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}
+								</div>
+							</div>
+						</div>
+						<div id="video-container">
+							<video controls>
+								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
+								Your browser does not support the video tag.
+							</video>
+						</div>
+					</section>
+				}
 			</section>
 		)
 	}
@@ -122,7 +144,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	return (
 		<section>
 			{renderTopBar()}
-			{shuffledImages.length === 0 ? <AlertNoImages /> : renderVideo()}
+			{shfImages.length === 0 ? <AlertNoImages /> : renderVideo()}
 		</section>
 	)
 }

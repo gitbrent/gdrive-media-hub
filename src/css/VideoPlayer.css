@@ -1,0 +1,18 @@
+#video-container {
+	max-width: 100%;
+	/* Maximum width of the video */
+	max-height: 100vh;
+	/* Maximum height of the video */
+	/* Adjust above as needed for your layout */
+}
+
+#video-container video {
+	width: 100%;
+	/* Make video responsive to container width */
+	height: auto;
+	/* Maintain aspect ratio */
+	max-height: calc(100vh - 70px);
+	/* Ensure it does not exceed the height of the viewport */
+	object-fit: contain;
+	/* Contain the video within the element bounds */
+}
