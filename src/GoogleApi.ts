@@ -49,7 +49,6 @@ const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
 const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
-const CACHE_KEY_PREFIX = 'fileListCache_' // Prefix to create unique key per user
 const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 const CACHE_DBASE_VER = 3
 let clientCallback: OnAuthChangeCallback
@@ -60,10 +59,6 @@ let tokenResponse: TokenResponse
 
 function getDatabaseName() {
 	return `${authUserName} Database`
-}
-
-function getCacheKey(userId: string) {
-	return `${CACHE_KEY_PREFIX}${userId}`
 }
 
 async function doLoadInitGsiGapi() {
