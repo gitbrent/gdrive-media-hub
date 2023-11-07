@@ -16,7 +16,6 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 		const fetchStatus = async () => {
 			const status = await getCacheStatus()
 			setCacheStatus(status)
-			console.log(status)
 		}
 
 		fetchStatus()
@@ -25,6 +24,8 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 	const userAuthState = useMemo(() => {
 		return getUserAuthState()
 	}, [getUserAuthState])
+
+	// --------------------------------------------------------------------------------------------
 
 	function renderProfile(): JSX.Element {
 		return (
@@ -54,7 +55,7 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 						<div className='card-body'>
 							<div className='row align-items-center mt-0'>
 								<div className='col'>Time Stamp</div>
-								<div className='col-auto'>{cacheStatus?.timeStamp}</div>
+								<div className='col-auto'>{new Date(cacheStatus?.timeStamp as number).toLocaleString()}</div>
 							</div>
 							<div className='row align-items-center mt-3'>
 								<div className='col'>File Count</div>
@@ -62,7 +63,7 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 							</div>
 						</div>
 						<div className='card-footer'>
-							<button type="button" className="btn btn-primary" onClick={handleClearFileCache}>Clear File Cache</button>
+							<button type="button" className="btn btn-danger" onClick={handleClearFileCache}>Clear File Cache</button>
 						</div>
 					</div>
 				</div>
