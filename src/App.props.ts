@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231105-1720'
+export const APP_BLD = '20231106-1940'
 export const APP_VER = '2.0.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
 
@@ -90,6 +90,11 @@ export interface IGapiFile extends gapi.client.drive.File {
 	imageBlobUrl?: string
 	imageW?: number
 	imageH?: number
+	/**
+	 * blob from google drive
+	 * - custom property (not in GAPI API)
+	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
+	 */
 	videoBlobUrl?: string
 	/**
 	 * FUTURE: show parent folder
@@ -99,6 +104,11 @@ export interface IGapiFile extends gapi.client.drive.File {
 	// parents: string[]
 }
 
+export interface IFileListCache {
+	timeStamp: number
+	gapiFiles: IGapiFile[]
+}
+
 export interface IFileAnalysis {
 	total_files: number
 	total_size: number
@@ -106,9 +116,4 @@ export interface IFileAnalysis {
 	file_years: Record<string, number>
 	common_names: Record<string, number>
 	size_categories: Record<string, number>
-}
-
-export interface IFileListCache {
-	timeStamp: number
-	gapiFiles: IGapiFile[]
 }
