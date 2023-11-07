@@ -50,7 +50,8 @@ const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-const CACHE_DBASE_VER = 3
+const CACHE_DBASE_VER = 4
+const CHUNK_SIZE = 10000 // Anything over ~18000 is not storage on iPad, hence we break into 10k chunks
 let clientCallback: OnAuthChangeCallback
 let authUserName = ''
 let authUserPict = ''
@@ -314,17 +315,38 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 //#region INDEXDB-CACHING
 
 const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> => {
+	// Helper function to chunk the array
+	function chunkArray(array: IGapiFile[], size: number) {
+		const chunkedArr = []
+		for (let i = 0; i < array.length; i += size) {
+			chunkedArr.push(array.slice(i, i + size))
+		}
+		return chunkedArr
+	}
+
 	return new Promise((resolve, reject) => {
-		const open = indexedDB.open(getDatabaseName(), 2)
+		const open = indexedDB.open(getDatabaseName(), CACHE_DBASE_VER)
+
+		open.onupgradeneeded = () => {
+			const db = open.result
+			if (!db.objectStoreNames.contains('GapiFileCache')) {
+				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			}
+		}
 
 		open.onsuccess = () => {
 			const db = open.result
 			const tx = db.transaction('GapiFileCache', 'readwrite')
 			const store = tx.objectStore('GapiFileCache')
 
-			// Save the files and timestamp separately
-			store.put({ id: 'gapiFiles', gapiFiles: fileListCache.gapiFiles })
+			// A: Save the timestamp
 			store.put({ id: 'timeStamp', timeStamp: fileListCache.timeStamp })
+
+			// B: Split the gapiFiles into chunks and save each chunk
+			const chunks = chunkArray(fileListCache.gapiFiles, CHUNK_SIZE)
+			chunks.forEach((chunk, index) => {
+				store.put({ id: `gapiFiles_${index}`, gapiFiles: chunk })
+			})
 
 			tx.oncomplete = () => {
 				db.close()
@@ -336,6 +358,11 @@ const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> =
 				reject(false)
 			}
 		}
+
+		open.onerror = (event) => {
+			console.error(event)
+			reject(false)
+		}
 	})
 }
 
@@ -343,49 +370,64 @@ const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 	return new Promise((resolve, reject) => {
 		const open = indexedDB.open(getDatabaseName(), CACHE_DBASE_VER)
 
-		open.onupgradeneeded = () => {
-			// If the schema is outdated, we create or update it
-			const db = open.result
-			// Create an object store or update its version
-			if (!db.objectStoreNames.contains('GapiFileCache')) {
-				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
-			}
-		}
-
-		open.onsuccess = () => {
+		open.onsuccess = async () => {
 			const db = open.result
 			const tx = db.transaction('GapiFileCache', 'readonly')
 			const store = tx.objectStore('GapiFileCache')
+			let gapiFiles: IGapiFile[] = []
+			let timeStamp: number
 
-			const filesRequest = store.get('gapiFiles')
+			// A: Retrieve the timestamp
 			const stampRequest = store.get('timeStamp')
-
-			filesRequest.onsuccess = () => {
-				stampRequest.onsuccess = () => {
-					// Now we have both the files and the timestamp
-					const gapiFiles = filesRequest.result // This is now the actual files array
-					const timeStamp = stampRequest.result // This is now the actual timestamp
-					if (gapiFiles && timeStamp) {
-						const cache: IFileListCache = {
-							timeStamp: timeStamp.timeStamp, // Assuming the timestamp here is a number
-							gapiFiles: gapiFiles.gapiFiles, // Assuming gapiFiles here is an array of IGapiFile
-						}
-						resolve(cache)
-					} else {
-						reject(null)
-					}
-				}
-				stampRequest.onerror = () => {
-					reject(stampRequest.error)
-				}
+			stampRequest.onsuccess = () => {
+				timeStamp = stampRequest.result.timeStamp
 			}
-			filesRequest.onerror = () => {
-				console.error(filesRequest.error)
-				reject(null)
+
+			// B: Determine how many chunks we have
+			const countRequest = store.count()
+			countRequest.onsuccess = async () => {
+				// Subtract 1 for the timestamp entry
+				const numberOfChunks = (countRequest.result - 1)
+
+				// Retrieve each chunk and combine them
+				for (let i = 0; i < numberOfChunks; i++) {
+					await new Promise((chunkResolve, chunkReject) => {
+						const chunkRequest = store.get(`gapiFiles_${i}`)
+						chunkRequest.onsuccess = () => {
+							if (chunkRequest.result && chunkRequest.result.gapiFiles) {
+								console.log(`Chunk ${i} retrieved with length:`, chunkRequest.result.gapiFiles.length) // Log each chunk's length
+								gapiFiles = gapiFiles.concat(chunkRequest.result.gapiFiles)
+								chunkResolve(true)
+							} else {
+								console.log(`Chunk ${i} is empty or malformed.`)
+								chunkResolve(false)
+							}
+						}
+						chunkRequest.onerror = () => {
+							chunkReject(chunkRequest.error)
+						}
+					})
+				}
+
+				// Once all chunks are retrieved, resolve the promise with the full cache
+				if (gapiFiles.length > 0 && timeStamp) {
+					console.log(`Total gapiFiles after retrieval: ${gapiFiles.length}`) // Log the total length after all retrievals
+					resolve({
+						timeStamp: timeStamp,
+						gapiFiles: gapiFiles,
+					})
+				} else {
+					reject(new Error('Cache is empty or timestamp is missing'))
+				}
 			}
 
 			tx.oncomplete = () => {
 				db.close()
+			}
+
+			tx.onerror = (event) => {
+				console.error(event)
+				reject('Error loading from IndexedDB')
 			}
 		}
 
