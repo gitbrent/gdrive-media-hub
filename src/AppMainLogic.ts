@@ -1,5 +1,5 @@
-import { FileSizeThresholds, IFileAnalysis, IGapiFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders } from './GoogleApi'
+import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IGapiFile, IS_LOCALHOST } from './App.props'
+import { initGoogleApi, userAuthState, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders, fetchCacheStatus } from './GoogleApi'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -62,9 +62,22 @@ export const handleSignOutClick = () => {
 	doAuthSignOut()
 }
 
-// TODO: Add to "Profile" page
 export const handleClearFileCache = () => {
 	doClearFileCache()
+}
+
+export const getUserAuthState = (): IAuthState => {
+	return userAuthState()
+}
+
+export const getCacheStatus = async (): Promise<IFileListCache | null> => {
+	try {
+		const cacheStatus = await fetchCacheStatus()
+		return cacheStatus
+	} catch (error) {
+		console.error('Error getting cache status:', error)
+		return null
+	}
 }
 
 /**
@@ -128,7 +141,6 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 		return false
 	}
 }
-
 
 export const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 	_isBusyGapiLoad = true

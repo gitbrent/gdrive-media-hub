@@ -32,6 +32,8 @@ export const useAppMain = () => {
 		handleClearFileCache: AppMainLogic.handleClearFileCache,
 		downloadFile: AppMainLogic.downloadFile,
 		loadPageImages: AppMainLogic.loadPageImages,
-		getFileAnalysis: AppMainLogic.getFileAnalysis
+		getFileAnalysis: AppMainLogic.getFileAnalysis,
+		getUserAuthState: AppMainLogic.getUserAuthState,
+		getCacheStatus: AppMainLogic.getCacheStatus
 	}
 }

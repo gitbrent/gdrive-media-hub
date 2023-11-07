@@ -6,6 +6,7 @@ import ImageGrid from './AppTabs/ImageGrid'
 import Slideshow from './AppTabs/Slideshow'
 import VideoPlayer from './AppTabs/VideoPlayer'
 import Settings from './AppTabs/Settings'
+import UserProfile from './AppTabs/UserProfile'
 import './css/AppMainUI.css'
 
 export enum AppTabs {
@@ -14,7 +15,7 @@ export enum AppTabs {
 	SlideShow = 'SlideShow',
 	VideoPlayer = 'VideoPlayer',
 	Settings = 'Settings',
-	Profile = 'Profile',
+	UserProfile = 'UserProfile',
 }
 
 export default function AppMainUI() {
@@ -29,6 +30,8 @@ export default function AppMainUI() {
 		handleClearFileCache,
 		isBusyGapiLoad,
 		loadPageImages,
+		getUserAuthState,
+		getCacheStatus,
 	} = useAppMain()
 	//
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
@@ -96,7 +99,7 @@ export default function AppMainUI() {
 							</a>
 							<ul className="dropdown-menu dropdown-menu-dark text-small shadow">
 								<li>
-									<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.Profile)}>Profile</a>
+									<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.UserProfile)}>Profile</a>
 								</li>
 								<li>
 									<a className="dropdown-item" href="#" onClick={handleClearFileCache}>Clear Cache</a>
@@ -151,8 +154,13 @@ export default function AppMainUI() {
 					setOptSortDir={setOptSortDir}
 					setOptIsShowCap={setOptIsShowCap} />
 				break
-			case AppTabs.Profile:
-				returnJsx = <div className='p-4'><h1>TODO:PROFILE</h1></div>
+			case AppTabs.UserProfile:
+				returnJsx = <UserProfile
+					getUserAuthState={getUserAuthState}
+					getCacheStatus={getCacheStatus}
+					handleClearFileCache={handleClearFileCache}
+					isBusyGapiLoad={isBusyGapiLoad}
+				/>
 				break
 			default:
 				returnJsx = <div />

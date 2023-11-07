@@ -317,6 +317,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 //#endregion
 
 //#region INDEXDB-CACHING
+
 const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> => {
 	return new Promise((resolve, reject) => {
 		const open = indexedDB.open(getDatabaseName(), 2)
@@ -418,9 +419,11 @@ async function doDeleteDatabase() {
 		return
 	}
 }
+
 //#endregion
 
 //#region PUBLIC-API
+
 export const initGoogleApi = (onAuthChange: OnAuthChangeCallback) => {
 	clientCallback = onAuthChange
 	doLoadInitGsiGapi()
@@ -546,4 +549,17 @@ export const doAuthSignOut = async () => {
 export const doClearFileCache = () => {
 	return doDeleteDatabase()
 }
+
+export const userAuthState = (): IAuthState => {
+	return ({
+		status: isAuthorized === true ? AuthState.Authenticated : AuthState.Unauthenticated,
+		userName: authUserName ? authUserName : '',
+		userPict: authUserPict ? authUserPict : '',
+	})
+}
+
+export const fetchCacheStatus = async (): Promise<IFileListCache> => {
+	return loadCacheFromIndexedDB()
+}
+
 //#endregion
