@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AuthState, IAuthState, IFileListCache } from '../App.props'
 import AlertLoading from '../components/AlertLoading'
 
@@ -10,20 +10,21 @@ interface Props {
 }
 
 const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handleClearFileCache, isBusyGapiLoad }) => {
+	const [userAuthState, setUserAuthState] = useState<IAuthState | null>(null)
 	const [cacheStatus, setCacheStatus] = useState<IFileListCache | null>(null)
+
+	useEffect(() => {
+		const authState = getUserAuthState()
+		setUserAuthState(authState)
+	}, [getUserAuthState])
 
 	useEffect(() => {
 		const fetchStatus = async () => {
 			const status = await getCacheStatus()
 			setCacheStatus(status)
 		}
-
 		fetchStatus()
 	}, [getCacheStatus])
-
-	const userAuthState = useMemo(() => {
-		return getUserAuthState()
-	}, [getUserAuthState])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -31,21 +32,23 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 		return (
 			<div className="row mt-4">
 				<div className='col'>
-					<div className='card h-100'>
-						<div className={`card-header ${userAuthState.status === AuthState.Authenticated ? 'text-bg-success' : 'text-bg-warning'}`}>
-							<h5 className="mb-0">Auth Status</h5>
-						</div>
-						<div className='card-body'>
-							<div className='row align-items-center'>
-								<div className='col-auto'>
-									<img src={userAuthState.userPict} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
-								</div>
-								<div className='col'>
-									<h5 className="mb-0">{userAuthState.userName}</h5>
+					{userAuthState &&
+						<div className='card h-100'>
+							<div className={`card-header ${userAuthState.status === AuthState.Authenticated ? 'text-bg-success' : 'text-bg-warning'}`}>
+								<h5 className="mb-0">Auth Status</h5>
+							</div>
+							<div className='card-body'>
+								<div className='row align-items-center'>
+									<div className='col-auto'>
+										<img src={userAuthState.userPict} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
+									</div>
+									<div className='col'>
+										<h5 className="mb-0">{userAuthState.userName}</h5>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					}
 				</div>
 				<div className="col">
 					<div className='card h-100'>
