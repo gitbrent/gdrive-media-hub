@@ -115,9 +115,9 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			<section>
 				{!currentImageUrl
 					? <AlertLoading />
-					: <section className="text-center">
+					: <section>
 						<div className="position-relative">
-							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-25 text-opacity-50 text-white px-2 py-1 d-flex justify-content-between align-items-center">
+							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-50 text-opacity-75 text-white px-2 py-1 d-flex justify-content-between align-items-center">
 								<div className='col-auto h6 mb-0 py-2 px-3'>
 									{shfImages[currIndex].name}
 								</div>
@@ -130,7 +130,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 							</div>
 						</div>
 						<div id="video-container">
-							<video controls>
+							<video id="video-player" controls>
 								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
 								Your browser does not support the video tag.
 							</video>

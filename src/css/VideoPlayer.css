@@ -1,12 +1,10 @@
 #video-container {
+	align-items: center;
 	max-width: 100%;
-	/* Maximum width of the video */
 	max-height: 100vh;
-	/* Maximum height of the video */
-	/* Adjust above as needed for your layout */
 }
 
-#video-container video {
+#video-player {
 	width: 100%;
 	/* Make video responsive to container width */
 	height: auto;
