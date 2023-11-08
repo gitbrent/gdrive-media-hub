@@ -73,7 +73,7 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 						</div>
 					</div>
 				</div>
-			</div >
+			</div>
 		)
 	}
 
