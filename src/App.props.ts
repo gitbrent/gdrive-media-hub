@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231106-1940'
+export const APP_BLD = '20231107-1900'
 export const APP_VER = '2.0.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
 
@@ -35,10 +35,11 @@ export const GridSizes: IGridSize[] = [
 ]
 
 export const FileSizeThresholds = {
-	Tiny: 100 * 1024,        // files up to 100KB
-	Small: 1 * 1024 * 1024,  // files up to 1MB
-	Medium: 5 * 1024 * 1024, // files up to 5MB
-	Large: 10 * 1024 * 1024, // files up to 10MB
+	Tiny: 100 * 1024,        // files up to 100kb
+	Small: 500 * 1024,       // files up to 500kb
+	Medium: 1 * 1024 * 1024, // files up to 1MB
+	Large: 5 * 1024 * 1024,  // files up to 5MB
+	Giant: 10 * 1024 * 1024, // files up to 10MB
 	Huge: 25 * 1024 * 1024,  // files up to 25MB
 }
 

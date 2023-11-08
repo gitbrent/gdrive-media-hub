@@ -53,7 +53,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 		return (
 			<div className="bg-secondary p-4">
-				<div className='row align-items-center'>
+				<div className="row align-items-center mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Type</h4></div>
 					<div className='col-auto'>
 						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
@@ -61,25 +61,29 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 						</span>
 					</div>
 				</div>
-				{Object.entries(fileAnalysis.file_types)
-					.sort(([, a], [, b]) => b - a)
-					.map(([type, count], index) => {
-						const percent = calculatePercent(count, totalFiles)
-						return (
-							<div key={index} className="card mt-4">
-								<div className="card-body">
-									<div className='row align-items-center mb-2'>
-										<div className='col'><h5 className="mb-0">{type}</h5></div>
-										<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
-									</div>
-									<div className="progress">
-										<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+				<div className="row row-cols-1 row-cols-md-2 g-4">
+					{Object.entries(fileAnalysis.file_types)
+						.sort(([, a], [, b]) => b - a)
+						.map(([type, count], index) => {
+							const percent = calculatePercent(count, totalFiles)
+							return (
+								<div key={index} className="col">
+									<div className="card">
+										<div className="card-body">
+											<div className='row align-items-center mb-2'>
+												<div className='col'><h5 className="mb-0">{type}</h5></div>
+												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+											</div>
+											<div className="progress">
+												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+											</div>
+										</div>
 									</div>
 								</div>
-							</div>
-						)
-					})
-				}
+							)
+						})
+					}
+				</div>
 			</div>
 		)
 	}
@@ -99,7 +103,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 		return (
 			<div className="bg-secondary p-4">
-				<div className='row align-items-center flex-nowrap'>
+				<div className="row align-items-center flex-nowrap mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Size</h4></div>
 					<div className='col-auto'>
 						<span className="badge bg-primary rounded-pill fw-lighter mb-0" style={{ fontSize: '1rem' }}>
@@ -107,28 +111,32 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 						</span>
 					</div>
 				</div>
-				{Object.entries(FileSizeThresholds)
-					.map(([category, size], index) => {
-						const catTotal = fileAnalysis.size_categories[category]
-						const percent = calculatePercent(catTotal, fileAnalysis.total_files)
-						return (
-							<div key={index} className="card mt-4">
-								<div className="card-body">
-									<div className="row align-items-center mb-2">
-										<div className="col">
-											<h5 className="mb-0">{category} <span className="h6 text-muted ms-2">({formatBytes(size)})</span></h5>
+				<div className="row row-cols-1 row-cols-md-2 g-4">
+					{Object.entries(FileSizeThresholds)
+						.map(([category, size], index) => {
+							const catTotal = fileAnalysis.size_categories[category]
+							const percent = calculatePercent(catTotal, fileAnalysis.total_files)
+							return (
+								<div key={index} className="col">
+									<div className="card">
+										<div className="card-body">
+											<div className="row align-items-center mb-2">
+												<div className="col">
+													<h5 className="mb-0">{category} <span className="h6 text-muted ms-2">({formatBytes(size)})</span></h5>
+												</div>
+												<div className="col-auto">
+													<span className="badge bg-primary">{catTotal}</span>
+												</div>
+											</div>
+											<div className="progress">
+												<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+											</div>
 										</div>
-										<div className="col-auto">
-											<span className="badge bg-primary">{catTotal}</span>
-										</div>
-									</div>
-									<div className="progress">
-										<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
 									</div>
 								</div>
-							</div>
-						)
-					})}
+							)
+						})}
+				</div>
 			</div>
 		)
 	}
