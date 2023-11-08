@@ -43,34 +43,37 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 										<img src={userAuthState.userPict} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
 									</div>
 									<div className='col'>
-										<h5 className="mb-0">{userAuthState.userName}</h5>
+										<h4 className="mb-0">{userAuthState.userName}</h4>
 									</div>
 								</div>
+							</div>
+							<div className='card-footer text-center'>
+								<button type="button" className="btn btn-outline-danger" onClick={() => { alert('TODO:') }}>Sign Out</button>
 							</div>
 						</div>
 					}
 				</div>
 				<div className="col">
 					<div className='card h-100'>
-						<div className='card-header'>
+						<div className='card-header text-bg-primary'>
 							<h5 className="mb-0">File Cache</h5>
 						</div>
 						<div className='card-body'>
 							<div className='row align-items-center mt-0'>
-								<div className='col'>Time Stamp</div>
+								<div className='col'><h4 className='mb-0'>Time Stamp</h4></div>
 								<div className='col-auto'>{new Date(cacheStatus?.timeStamp as number).toLocaleString()}</div>
 							</div>
-							<div className='row align-items-center mt-3'>
-								<div className='col'>File Count</div>
+							<div className='row align-items-center mt-4'>
+								<div className='col'><h4 className='mb-0'>File Count</h4></div>
 								<div className='col-auto'>{cacheStatus?.gapiFiles?.length}</div>
 							</div>
 						</div>
-						<div className='card-footer'>
-							<button type="button" className="btn btn-danger" onClick={handleClearFileCache}>Clear File Cache</button>
+						<div className='card-footer text-center'>
+							<button type="button" className="btn btn-outline-danger" onClick={handleClearFileCache}>Clear Cache</button>
 						</div>
 					</div>
 				</div>
-			</div>
+			</div >
 		)
 	}
 
