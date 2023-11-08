@@ -65,7 +65,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 					{Object.entries(fileAnalysis.file_types)
 						.sort(([, a], [, b]) => b - a)
 						.map(([type, count], index) => {
-							const percent = calculatePercent(count, totalFiles)
+							const percent = Math.round(calculatePercent(count, totalFiles))
 							return (
 								<div key={index} className="col">
 									<div className="card">
@@ -74,7 +74,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 												<div className='col'><h5 className="mb-0">{type}</h5></div>
 												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
 											</div>
-											<div className="progress">
+											<div className="progress" title={`${percent}%`}>
 												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
 											</div>
 										</div>
@@ -114,8 +114,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 				<div className="row row-cols-1 row-cols-md-2 g-4">
 					{Object.entries(FileSizeThresholds)
 						.map(([category, size], index) => {
-							const catTotal = fileAnalysis.size_categories[category]
-							const percent = calculatePercent(catTotal, fileAnalysis.total_files)
+							const catTotal = fileAnalysis.size_categories[category] || 0
+							const percent = Math.round(calculatePercent(catTotal, fileAnalysis.total_files))
 							return (
 								<div key={index} className="col">
 									<div className="card">
@@ -128,8 +128,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 													<span className="badge bg-primary">{catTotal}</span>
 												</div>
 											</div>
-											<div className="progress">
-												<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+											<div className="progress" title={`${percent}%`}>
+												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
 											</div>
 										</div>
 									</div>
@@ -173,7 +173,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 					{sortedFileYears
 						.filter(([year]) => currentYear - parseInt(year) <= 10)
 						.map(([year, count], index) => {
-							const percent = calculatePercent(count, totalFiles)
+							const percent = Math.round(calculatePercent(count, totalFiles))
 							return (
 								<div key={`${year}${index}`} className="col">
 									<div className="card mt-4">
@@ -182,8 +182,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 												<div className='col'><h5 className="mb-0">{year}</h5></div>
 												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
 											</div>
-											<div className="progress">
-												<div className="progress-bar" role="progressbar" title={`${percent}%`} style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
+											<div className="progress" title={`${percent}%`}>
+												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
 											</div>
 										</div>
 									</div>
