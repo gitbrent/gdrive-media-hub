@@ -50,7 +50,7 @@ const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-const CACHE_DBASE_VER = 4
+const CACHE_DBASE_VER = 6
 const CHUNK_SIZE = 10000 // Anything over ~18000 is not storage on iPad, hence we break into 10k chunks
 let clientCallback: OnAuthChangeCallback
 let authUserName = ''
@@ -59,7 +59,7 @@ let isAuthorized = false
 let tokenResponse: TokenResponse
 
 function getDatabaseName() {
-	return `${authUserName} Database`
+	return `${authUserName}-File-Cache`
 }
 
 async function doLoadInitGsiGapi() {
@@ -369,6 +369,13 @@ const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boolean> =
 const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 	return new Promise((resolve, reject) => {
 		const open = indexedDB.open(getDatabaseName(), CACHE_DBASE_VER)
+
+		open.onupgradeneeded = () => {
+			const db = open.result
+			if (!db.objectStoreNames.contains('GapiFileCache')) {
+				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			}
+		}
 
 		open.onsuccess = async () => {
 			const db = open.result
