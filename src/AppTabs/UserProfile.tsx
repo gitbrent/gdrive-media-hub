@@ -83,13 +83,13 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 				<div className="container-fluid">
 					<div className="row align-items-center">
 						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand text-white"><i className="bi-person-circle me-2" />User Profile</a>
+							<a className="navbar-brand me-0 text-white">User Profile</a>
 						</div>
 					</div>
 				</div>
 			</nav>
 			<section className='p-4'>
-				<h3>User Profile</h3>
+				<h3>Welcome!</h3>
 				{isBusyGapiLoad ? <AlertLoading /> : renderProfile()}
 			</section>
 		</>

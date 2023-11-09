@@ -55,15 +55,16 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	const goToNextSlide = () => {
 		if (shfImages.length === 0) return
 		const nextIndex = (currIndex + 1) % shfImages.length
+		setUsedIndexes(usedIndexes => [...usedIndexes, currIndex]) // Add current index before changing
 		setCurrentImageUrl('')
 		setCurrIndex(nextIndex)
-		setUsedIndexes([...usedIndexes, nextIndex])
 	}
 
 	const goToPrevSlide = () => {
 		if (usedIndexes.length <= 1) return  // Can't go back if there's only one or no image
-		const prevIndex = usedIndexes[usedIndexes.length - 2] // Get the second last index
-		setUsedIndexes(usedIndexes.slice(0, -1)) // Remove the last index
+		const newUsedIndexes = usedIndexes.slice(0, -1) // Remove the last index to go back
+		const prevIndex = newUsedIndexes[newUsedIndexes.length - 1] // Get the new last index
+		setUsedIndexes(newUsedIndexes)
 		setCurrentImageUrl('')
 		setCurrIndex(prevIndex)
 	}
@@ -76,7 +77,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className='col-auto d-none d-xl-block'>
-							<a className="navbar-brand text-white"><i className="bi-camera-video me-2" />Video Viewer</a>
+							<a className="navbar-brand me-0 text-white">Video Viewer</a>
 						</div>
 						<div className="col">
 							<button className='btn btn-secondary w-100' disabled={usedIndexes.length <= 1} onClick={goToPrevSlide} title="Prev">
@@ -117,14 +118,14 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 					? <AlertLoading />
 					: <section>
 						<div className="position-relative">
-							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-50 text-opacity-75 text-white px-2 py-1 d-flex justify-content-between align-items-center">
-								<div className='col-auto h6 mb-0 py-2 px-3'>
+							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-50 text-opacity-75 text-white px-2 py-1 d-flex align-items-center">
+								<div className='col text-end h6 mb-0 py-2 px-3'>
 									{shfImages[currIndex].name}
 								</div>
 								<div className='col-auto h6 mb-0 py-2 px-3'>
 									{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
 								</div>
-								<div className='col-auto h6 mb-0 py-2 px-3'>
+								<div className='col text-start h6 mb-0 py-2 px-3'>
 									{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}
 								</div>
 							</div>

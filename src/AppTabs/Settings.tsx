@@ -110,7 +110,7 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 				<div className="container-fluid">
 					<div className="row align-items-center">
 						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand text-white"><i className="bi-sliders me-2" />Settings</a>
+							<a className="navbar-brand me-0 text-white">Settings</a>
 						</div>
 					</div>
 				</div>

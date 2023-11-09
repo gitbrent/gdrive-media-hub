@@ -18,8 +18,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<div className="row align-items-center">
-						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand text-white"><i className="bi-house me-2" />Home</a>
+						<div className="col-auto d-none d-lg-block">
+							<a className="navbar-brand me-0 text-white">Home</a>
 						</div>
 					</div>
 				</div>
