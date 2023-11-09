@@ -88,7 +88,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 	try {
 		const file = _gapiFiles.find(item => item.id === fileId)
 		if (!file) {
-			console.warn('File not found')
+			console.warn(`File not found! "${fileId}"`)
 			return false
 		}
 
@@ -129,7 +129,8 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 				_gapiFiles = updFiles
 				return true
 			} else {
-				console.warn('Unknown file type')
+				console.warn(`Unknown blob.type: ${blob.type}`)
+				console.warn(`....... file.name: ${file.name}`)
 				return false
 			}
 		} else {
