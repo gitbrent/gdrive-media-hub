@@ -45,6 +45,7 @@ export default function ImageGrid(props: IProps) {
 
 		// B: filter, sort, populate image array
 		props.allFiles
+			.filter((item) => item.mimeType.indexOf('image') > -1)
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {
@@ -194,11 +195,11 @@ export default function ImageGrid(props: IProps) {
 		return (
 			<nav className="navbar sticky-top bg-dark" id="topGridBar">
 				<form className="container-fluid">
-					<div className="row justify-content-around align-items-center">
+					<div className="row w-100 align-items-center justify-content-between">
 						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand text-white"><i className="bi-grid me-2" />Image Grid</a>
+							<a className="navbar-brand me-0 text-white">Image Grid</a>
 						</div>
-						<div className="col-12 col-md mb-2 mb-md-0">
+						<div className="col-12 col-md-auto mb-2 mb-md-0">
 							{renderMainContBody_TopBar_Paging()}
 						</div>
 						<div className="col col-md mt-2 mt-md-0">
@@ -243,7 +244,11 @@ export default function ImageGrid(props: IProps) {
 											{props.isShowCap && <figcaption>{item.caption}</figcaption>}
 										</figure>)
 										:
-										(<figure className="text-muted" title={item.caption} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+										(<figure
+											title={item.caption}
+											onClick={() => props.loadPageImages([item?.id?.toString() || ''])}
+											className="text-muted"
+											style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 											<i className="h1 mb-0 bi-arrow-repeat" />
 										</figure>)
 								)}
