@@ -104,10 +104,8 @@ export interface IMediaFile extends IGapiFile {
 	// Other media-specific properties...
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IGapiFolder extends IGapiItem {
-	// Folder-specific properties if any...
-	// WIP:
+	children: IGapiFolder[]
 }
 
 export interface IDirectory {

@@ -1,5 +1,14 @@
 import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, userAuthState, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders, fetchCacheStatus } from './GoogleApi'
+import {
+	doAuthSignIn,
+	doAuthSignOut,
+	doClearFileCache,
+	loadCacheFromIndexedDB,
+	fetchDriveFiles,
+	fetchFileImgBlob,
+	initGapiClient,
+	userAuthState,
+} from './api'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -25,27 +34,24 @@ export const authUserPict = () => _authUserPict
 
 export const isBusyGapiLoad = () => _isBusyGapiLoad
 
-export const doInitGoogleApi = (initCallback: () => void) => {
-	_isBusyGapiLoad = true
-	initGoogleApi((authState) => {
+export const doInitGoogleApi = async (initCallback: () => void) => {
+	try {
+		_isBusyGapiLoad = true
+		await initGapiClient()
+		const authState = userAuthState()
 		_authUserName = authState.userName
 		_authUserPict = authState.userPict
 		if (_authUserName) {
 			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_authUserName}"`)
-			fetchDriveFiles().then((files) => {
-				_gapiFiles = files
-				_isBusyGapiLoad = false
-				initCallback()
-			})
-			fetchDriveFolders().then((folders) => {
-				// WIP: NEW:
-				console.log('fetchDriveFolders', folders)
-			})
+			const files = await fetchDriveFiles()
+			_gapiFiles = files
 		}
-		else {
-			initCallback()
-		}
-	})
+		initCallback()
+	} catch (error) {
+		console.error('Initialization failed:', error)
+	} finally {
+		_isBusyGapiLoad = false
+	}
 }
 
 /**
@@ -72,7 +78,7 @@ export const getUserAuthState = (): IAuthState => {
 
 export const getCacheStatus = async (): Promise<IFileListCache | null> => {
 	try {
-		const cacheStatus = await fetchCacheStatus()
+		const cacheStatus = await loadCacheFromIndexedDB()
 		return cacheStatus
 	} catch (error) {
 		console.error('Error getting cache status:', error)
