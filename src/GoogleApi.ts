@@ -22,7 +22,7 @@
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
-import { AuthState, IAuthState, IFileListCache, IGapiFile, IS_LOCALHOST } from './App.props'
+import { AuthState, IAuthState, IDirectory, IFileListCache, IGapiFile, IS_LOCALHOST } from './App.props'
 import { IGapiFolder, TokenClientConfig, TokenResponse } from './googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
@@ -245,6 +245,7 @@ async function updateUserAuthStatus() {
 //#endregion
 
 //#region Folders
+
 const getRootFolderId = async () => {
 	try {
 		const response = await gapi.client.drive.files.get({
@@ -310,6 +311,35 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 		return []
 	}
 }
+
+async function fetchFolderContents(folderId: string): Promise<IDirectory> {
+	try {
+		const response = await gapi.client.drive.files.list({
+			q: `'${folderId}' in parents and trashed = false`,
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, webContentLink)',
+		})
+
+		const files: IGapiFile[] = []
+		const folders: IGapiFolder[] = []
+		const results: IGapiFile[] = (response.result.files || []) as IGapiFile[]
+		results.forEach((file) => {
+			if (file.mimeType === 'application/vnd.google-apps.folder') {
+				folders.push(file as IGapiFolder)
+			} else {
+				files.push(file as IGapiFile)
+			}
+		})
+
+		return {
+			currentFolder: { /* current folder details */ },
+			items: [...folders, ...files],
+		} as IDirectory
+	} catch (error) {
+		console.error('Error fetching folder contents:', error)
+		throw error
+	}
+}
+
 //#endregion
 
 //#region INDEXDB-CACHING
