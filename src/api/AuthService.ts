@@ -26,7 +26,6 @@ import { AuthState, IAuthState, IS_LOCALHOST } from '../App.props'
 import { TokenClientConfig, TokenResponse } from '../googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
-import { checkGapiInitialized } from './GapiClient'
 
 declare global {
 	interface Window {
@@ -47,6 +46,8 @@ declare global {
 type OnAuthChangeCallback = (authState: IAuthState) => void;
 
 const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
+const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
+const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 let clientCallback: OnAuthChangeCallback
 let authUserName = ''
@@ -56,7 +57,7 @@ let tokenResponse: TokenResponse
 
 export async function doLoadInitGsiGapi() {
 	// GAPI (1/2)
-	checkGapiInitialized()
+	if (typeof gapi === 'undefined' || !gapi.client) await loadGapiScript()
 
 	// GSI (2/2)
 	if (typeof window.google === 'undefined' || !window.google) await loadGsiScript()
@@ -90,8 +91,10 @@ async function doAuthorizeUser() {
 	}
 
 	// STEP 2: now that token exists, setup gapi so we can use Drive API's with the token from prev step
-	if (IS_LOCALHOST) console.log('\nGSI-STEP-3: initGapiClient() ---------')
-	checkGapiInitialized()
+	if (typeof gapi === 'undefined' || !gapi.client) {
+		if (IS_LOCALHOST) console.log('\nGSI-STEP-3: initGapiClient() ---------')
+		await initGapiClient()
+	}
 
 	// STEP 3: checks user scopes, sets `isAuthorized`
 	if (IS_LOCALHOST) console.log('\nGSI-STEP-4: updateUserAuthStatus() ---')
@@ -119,6 +122,28 @@ async function doAuthorizeSignOut() {
 	//_authUserName = ''
 	//_gapiFiles = []
 }
+
+//#region GAPI
+async function loadGapiScript() {
+	return new Promise((resolve) => {
+		const script = document.createElement('script')
+		script.src = 'https://apis.google.com/js/api.js'
+		// Load gapi script, load client, load gapi drive client (`drive` must be loaded!) = ready
+		script.onload = () => gapi.load('client', () => gapi.client.load('drive', 'v3').then(() => resolve(true)))
+		document.body.appendChild(script)
+	})
+}
+
+/** called after gsi, not called from script load above */
+async function initGapiClient() {
+	return await gapi.client.init({
+		apiKey: GAPI_API_KEY,
+		clientId: GAPI_CLIENT_ID,
+		scope: GAPI_SCOPES,
+		discoveryDocs: GAPI_DISC_DOCS
+	})
+}
+//#endregion
 
 //#region GSI
 

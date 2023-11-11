@@ -3,10 +3,10 @@ import {
 	doAuthSignIn,
 	doAuthSignOut,
 	doClearFileCache,
-	loadCacheFromIndexedDB,
 	fetchDriveFiles,
 	fetchFileImgBlob,
 	initGapiClient,
+	loadCacheFromIndexedDB,
 	userAuthState,
 } from './api'
 
@@ -35,10 +35,12 @@ export const authUserPict = () => _authUserPict
 export const isBusyGapiLoad = () => _isBusyGapiLoad
 
 export const doInitGoogleApi = async (initCallback: () => void) => {
+	if (_isBusyGapiLoad) return // IMPORTANT: This method gets called 2-3 times due to how React starts/inits, so we need this!
 	try {
 		_isBusyGapiLoad = true
 		await initGapiClient()
 		const authState = userAuthState()
+		if (IS_LOCALHOST) console.log(`[AppMainLogic.doInitGoogleApi] authState = ${authState}`)
 		_authUserName = authState.userName
 		_authUserPict = authState.userPict
 		if (_authUserName) {
