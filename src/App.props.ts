@@ -1,6 +1,6 @@
 // APP
 // @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231108-2110'
+export const APP_BLD = '20231110-1910'
 export const APP_VER = '2.0.0-WIP'
 export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
 
@@ -56,7 +56,9 @@ export interface IAuthState {
 	userPict: string
 }
 
-export interface IGapiFile extends gapi.client.drive.File {
+// ----------------------------------------------------------------------------
+
+export interface IGapiItem extends gapi.client.drive.File {
 	/**
 	 * id
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
@@ -84,30 +86,40 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 */
 	size?: string
 	/**
-	 * blob from google drive
-	 * - custom property (not in GAPI API)
-	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
-	 */
-	imageBlobUrl?: string
-	imageW?: number
-	imageH?: number
-	/**
-	 * blob from google drive
-	 * - custom property (not in GAPI API)
-	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
-	 */
-	videoBlobUrl?: string
-	/**
-	 * FUTURE: show parent folder
-	 * `application/vnd.google-apps.folder`
+	 * IDs of parent folders
 	 * @example ["1jjOs28hGj3as3vorJveCI00NY1PmDbTr"]
 	 */
-	// parents: string[]
+	parents: string[]
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IGapiFile extends IGapiItem {
+}
+
+export interface IMediaFile extends IGapiFile {
+	imageBlobUrl?: string;
+	imageW?: number;
+	imageH?: number;
+	videoBlobUrl?: string;
+	// Other media-specific properties...
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface IGapiFolder extends IGapiItem {
+	// Folder-specific properties if any...
+	// WIP:
+}
+
+export interface IDirectory {
+	currentFolder: IGapiFolder
+	items: Array<IGapiFile | IGapiFolder>
+}
+
+// ===========
 
 export interface IFileListCache {
 	timeStamp: number
-	gapiFiles: IGapiFile[]
+	gapiFiles: IMediaFile[]
 }
 
 export interface IFileAnalysis {

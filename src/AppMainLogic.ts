@@ -1,4 +1,4 @@
-import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IGapiFile, IS_LOCALHOST } from './App.props'
+import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, IS_LOCALHOST } from './App.props'
 import { initGoogleApi, userAuthState, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders, fetchCacheStatus } from './GoogleApi'
 
 export interface AppMainLogicInterface {
@@ -10,7 +10,7 @@ export interface AppMainLogicInterface {
 
 // --------------------------------------------------------------------------------------------
 
-let _gapiFiles: IGapiFile[] = []
+let _gapiFiles: IMediaFile[] = []
 let _authUserName = ''
 let _authUserPict = ''
 let _isBusyGapiLoad = false
