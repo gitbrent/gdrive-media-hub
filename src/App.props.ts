@@ -1,8 +1,30 @@
-// APP
-// @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231111-2310'
+/**
+ * APP
+ * @see [SampleImages](https://unsample.net/)
+ */
+export const APP_BLD = '20231112-1310'
 export const APP_VER = '2.0.0-WIP'
-export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
+
+// ============================================================================
+
+export const getLogLevel = (): number => {
+	const urlParams = new URLSearchParams(window.location.search)
+	const mode = urlParams.get('mode')
+
+	switch (mode) {
+		case 'debug': return 3
+		case 'api': return 2
+		case 'core': return 1
+		default: return 0
+	}
+}
+export const LOG_LEVEL = getLogLevel()
+
+export const log = (level: number, message: string) => {
+	if (level <= LOG_LEVEL) {
+		console.log(message)
+	}
+}
 
 // ============================================================================
 

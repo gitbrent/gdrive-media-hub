@@ -1,4 +1,4 @@
-import { IFileListCache, IGapiFile, IS_LOCALHOST } from '../App.props'
+import { IFileListCache, IGapiFile, log } from '../App.props'
 import { CACHE_EXPIRY_TIME, loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
 import { getAccessToken } from './AuthService'
 
@@ -8,17 +8,17 @@ export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
 	let isFullRefresh = true
 
 	const objCache = await loadCacheFromIndexedDB().catch(() => {
-		if (IS_LOCALHOST) console.log('FYI: loadCacheFromIndexedDB failed')
+		log(2, '[FileService]: loadCacheFromIndexedDB failed')
 	})
 
 	if (objCache?.timeStamp && objCache?.gapiFiles?.length > 0) {
 		if (Date.now() - objCache.timeStamp < CACHE_EXPIRY_TIME) {
-			if (IS_LOCALHOST) console.log('[fetchDriveFiles] FYI: using cachedData')
+			log(2, '[FileService] FYI: fetchDriveFiles = using cachedData')
 			cachedFiles = objCache.gapiFiles
 		}
 	}
 	isFullRefresh = !cachedFiles || cachedFiles.length === 0
-	if (IS_LOCALHOST) console.log('isFullRefresh', isFullRefresh)
+	log(2, `[FileService]: FYI: isFullRefresh = ${isFullRefresh}`)
 
 	// Cache is stale or not present, so fetch new data using fetchDriveFilesAll
 	const newFiles = await fetchDriveFilesAll(isFullRefresh)
@@ -79,10 +79,7 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 		badgeElement.textContent = `Loading files... (${allFiles?.length})`
 	} while (pageToken)
 
-	if (IS_LOCALHOST) {
-		console.log(`[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
-		if (allFiles.length > 0) console.log('allFiles[0]', allFiles[0])
-	}
+	log(2, `[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
 
 	// C: update UI loading status
 	document.getElementById('file-load-badge')?.remove()
@@ -90,11 +87,7 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 	// D: done
 	return allFiles
 }
-/* TODO: WIP:
-export const fetchDriveFolders = async (): Promise<IGapiFolder[]> => {
-	return buildFolderHierarchy()
-}
-*/
+
 export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
 	try {
 		return chgFile?.id ?

@@ -22,7 +22,7 @@
  * @see https://developers.google.com/drive/api/v3/reference/files/get
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
-import { AuthState, IAuthState, IS_LOCALHOST } from '../App.props'
+import { AuthState, IAuthState, log } from '../App.props'
 import { TokenClientConfig, TokenResponse } from '../types/googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
@@ -53,6 +53,8 @@ let isAuthorized = false
 let tokenResponse: TokenResponse
 
 async function doLoadInitGsiGapi() {
+	log(1, '[AuthService] doLoadInitGsiGapi')
+
 	// GAPI (1/2)
 	if (typeof gapi === 'undefined' || !gapi.client) await loadGapiScript()
 
@@ -60,11 +62,13 @@ async function doLoadInitGsiGapi() {
 	if (typeof window.google === 'undefined' || !window.google) await loadGsiScript()
 	else if (window.google.accounts && !authUserName) await initGsiClient()
 
+	log(1, '[AuthService] GAPI and GSI loaded')
+
 	// check for current token
 	const tokenData = sessionStorage.getItem('googleTokenData')
 	const tokenJson: TokenResponse = tokenData ? JSON.parse(tokenData) : null
 	const isExp = !tokenJson || (tokenJson && tokenJson?.expiresTime <= Date.now()) ? true : false
-	if (IS_LOCALHOST) console.log(`[doLoadInit] tokenJson=${tokenJson?.expiresTime} <= dateNow=${Date.now()} ??? (isExp = ${isExp})`)
+	log(3, `[doLoadInitGsiGapi] tokenJson=${tokenJson?.expiresTime} <= dateNow=${Date.now()} ??? (isExp = ${isExp})`)
 	if (!isExp) tokenResponse = tokenJson
 
 	// proceed to read data files, etc as we're good to go
@@ -73,6 +77,8 @@ async function doLoadInitGsiGapi() {
 }
 
 async function doAuthorizeUser() {
+	log(1, '[AuthService] doAuthorizeUser')
+
 	if (tokenResponse?.access_token) {
 		// A: set auth
 		isAuthorized = true
@@ -82,22 +88,23 @@ async function doAuthorizeUser() {
 	else {
 		// STEP 1: now that gsi is init and user is signed-in, get access token
 		if (!tokenResponse?.access_token) {
-			if (IS_LOCALHOST) console.log('\nGSI-STEP-2: tokenFlow() --------------')
+			log(3, '\nGSI-STEP-2: tokenFlow() --------------')
 			await tokenFlow()
 		}
 	}
 
 	// STEP 2: now that token exists, setup gapi so we can use Drive API's with the token from prev step
 	if (typeof gapi === 'undefined' || !gapi.client) {
-		if (IS_LOCALHOST) console.log('\nGSI-STEP-3: initGapiClient() ---------')
+		log(3, '\nGSI-STEP-3: initGapiClient() ---------')
 		await initGapiClient()
 	}
 
 	// STEP 3: checks user scopes, sets `isAuthorized`
-	if (IS_LOCALHOST) console.log('\nGSI-STEP-4: updateUserAuthStatus() ---')
+	log(3, '\nGSI-STEP-4: updateUserAuthStatus() ---')
 	await updateUserAuthStatus()
 
 	// FINALLY: callback to notify class/data is loaded
+	log(1, '[AuthService] DONE! (calling clientCallback)')
 	clientCallback()
 }
 
@@ -173,11 +180,11 @@ async function initGsiCallback(response: CredentialResponse) {
 	 */
 	const responsePayload = decodeJwt(response.credential)
 
-	if (IS_LOCALHOST) console.log('\nGSI-STEP-1: responsePayload ----------')
+	log(3, '\nGSI-STEP-1: responsePayload ----------')
 	authUserName = responsePayload?.name?.toString() || ''
 	authUserPict = responsePayload?.picture?.toString() || ''
-	if (IS_LOCALHOST) console.log('authUserName', authUserName)
-	if (IS_LOCALHOST) console.log('authUserPict', authUserPict)
+	log(2, `[initGsiCallback] authUserName: ${authUserName}`)
+	log(2, `[initGsiCallback] authUserPict: ${authUserPict}`)
 
 	return
 }
@@ -196,7 +203,7 @@ async function tokenFlow() {
 				// A: capture token
 				tokenResponse = tokenResp
 				tokenResp.expiresTime = Date.now() + tokenResp.expires_in * 1000
-				if (IS_LOCALHOST) console.log(`- tokenResponse.expires_in = ${tokenResp?.expires_in}`)
+				log(3, `- tokenResponse.expires_in = ${tokenResp?.expires_in}`)
 
 				// B: store the token data in session storage
 				sessionStorage.setItem('googleTokenData', JSON.stringify(tokenResp))
@@ -216,10 +223,8 @@ async function tokenFlow() {
 async function updateUserAuthStatus() {
 	isAuthorized = window.google.accounts.oauth2.hasGrantedAllScopes(tokenResponse, GAPI_SCOPES)
 
-	if (IS_LOCALHOST) {
-		if (!isAuthorized) console.warn('Unauthorized?!')
-		else console.log('- isAuthorized = ', isAuthorized)
-	}
+	if (!isAuthorized) log(3, '[updateUserAuthStatus] Not Authorized?!')
+	else log(3, `[updateUserAuthStatus] FYI: isAuthorized = ${isAuthorized}`)
 
 	return
 }

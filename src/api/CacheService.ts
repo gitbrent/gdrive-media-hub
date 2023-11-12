@@ -1,4 +1,4 @@
-import { IFileListCache, IGapiFile } from '../App.props'
+import { IFileListCache, IGapiFile, log } from '../App.props'
 import { authUserName } from '../AppMainLogic'
 
 export const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
@@ -101,11 +101,11 @@ export const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 						const chunkRequest = store.get(`gapiFiles_${i}`)
 						chunkRequest.onsuccess = () => {
 							if (chunkRequest.result && chunkRequest.result.gapiFiles) {
-								console.log(`Chunk ${i} retrieved with length:`, chunkRequest.result.gapiFiles.length) // Log each chunk's length
+								log(3, `[CacheService] Chunk ${i} retrieved with length: ${chunkRequest.result.gapiFiles.length}`) // Log each chunk's length
 								gapiFiles = gapiFiles.concat(chunkRequest.result.gapiFiles)
 								chunkResolve(true)
 							} else {
-								console.log(`Chunk ${i} is empty or malformed.`)
+								log(3, `[CacheService] Chunk ${i} is empty or malformed.`)
 								chunkResolve(false)
 							}
 						}
@@ -117,7 +117,7 @@ export const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 
 				// Once all chunks are retrieved, resolve the promise with the full cache
 				if (gapiFiles.length > 0 && timeStamp) {
-					console.log(`Total gapiFiles after retrieval: ${gapiFiles.length}`) // Log the total length after all retrievals
+					log(3, `[CacheService] Total gapiFiles after retrieval: ${gapiFiles.length}`) // Log the total length after all retrievals
 					resolve({
 						timeStamp: timeStamp,
 						gapiFiles: gapiFiles,

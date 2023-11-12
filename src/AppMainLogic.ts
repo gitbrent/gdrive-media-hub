@@ -1,4 +1,4 @@
-import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, IS_LOCALHOST } from './App.props'
+import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, log } from './App.props'
 import {
 	doAuthSignIn,
 	doAuthSignOut,
@@ -45,13 +45,13 @@ export const doInitGoogleApi = (initCallback: () => void) => {
 async function initGapiCallback() {
 	try {
 		const authState = userAuthState()
-		if (IS_LOCALHOST) console.log(`[AppMainLogic.doInitGoogleApi] authState = ${authState.status}`)
+		log(2, `[AppMainLogic.doInitGoogleApi] authState = ${authState.status}`)
 		_authUserName = authState.userName
 		_authUserPict = authState.userPict
 		if (_authUserName) {
-			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_authUserName}"`)
+			log(2, `[AppMainLogic] signedInUser = "${_authUserName}"`)
 			_gapiFiles = await fetchDriveFiles()
-			if (IS_LOCALHOST) console.log(`[AppMainLogic] _gapiFiles.length = ${_gapiFiles.length}`)
+			log(2, `[AppMainLogic] _gapiFiles.length = ${_gapiFiles.length}`)
 		}
 	} catch (error) {
 		console.error('Initialization failed:', error)
