@@ -23,7 +23,7 @@
  * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
  */
 import { AuthState, IAuthState, IS_LOCALHOST } from '../App.props'
-import { TokenClientConfig, TokenResponse } from '../googlegsi.types'
+import { TokenClientConfig, TokenResponse } from '../types/googlegsi.types'
 import { CredentialResponse } from 'google-one-tap'
 import { decodeJwt } from 'jose'
 
@@ -42,20 +42,17 @@ declare global {
 	}
 }
 
-// This callback will be called whenever the auth state changes
-type OnAuthChangeCallback = (authState: IAuthState) => void;
-
 const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
 const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
-let clientCallback: OnAuthChangeCallback
+let clientCallback: () => void
 let authUserName = ''
 let authUserPict = ''
 let isAuthorized = false
 let tokenResponse: TokenResponse
 
-export async function doLoadInitGsiGapi() {
+async function doLoadInitGsiGapi() {
 	// GAPI (1/2)
 	if (typeof gapi === 'undefined' || !gapi.client) await loadGapiScript()
 
@@ -100,18 +97,8 @@ async function doAuthorizeUser() {
 	if (IS_LOCALHOST) console.log('\nGSI-STEP-4: updateUserAuthStatus() ---')
 	await updateUserAuthStatus()
 
-	// STEP 4: download all image files
-	if (IS_LOCALHOST) console.log('\nGSI-STEP-5: listFiles() --------------')
-	//if (isAuthorized) await listFiles()
-
 	// FINALLY: callback to notify class/data is loaded
-	clientCallback({
-		status: isAuthorized === true ? AuthState.Authenticated : AuthState.Unauthenticated,
-		userName: authUserName ? authUserName : '',
-		userPict: authUserPict ? authUserPict : '',
-	})
-
-	return
+	clientCallback()
 }
 
 async function doAuthorizeSignOut() {
@@ -240,6 +227,11 @@ async function updateUserAuthStatus() {
 //#endregion
 
 // PUBLIC
+
+export const initGoogleApi = (onAuthChange: () => void) => {
+	clientCallback = onAuthChange
+	doLoadInitGsiGapi()
+}
 
 export const getAccessToken = () => {
 	return tokenResponse.access_token

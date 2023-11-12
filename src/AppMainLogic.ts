@@ -23,6 +23,7 @@ let _gapiFiles: IMediaFile[] = []
 let _authUserName = ''
 let _authUserPict = ''
 let _isBusyGapiLoad = false
+let _initCallback: () => void
 
 // --------------------------------------------------------------------------------------------
 
@@ -34,25 +35,29 @@ export const authUserPict = () => _authUserPict
 
 export const isBusyGapiLoad = () => _isBusyGapiLoad
 
-export const doInitGoogleApi = async (initCallback: () => void) => {
-	if (_isBusyGapiLoad) return // IMPORTANT: This method gets called 2-3 times due to how React starts/inits, so we need this!
+// Called from `useAppMain.ts` at startup
+export const doInitGoogleApi = (initCallback: () => void) => {
+	_isBusyGapiLoad = true
+	_initCallback = initCallback
+	initGapiClient(initGapiCallback)
+}
+
+async function initGapiCallback() {
 	try {
-		_isBusyGapiLoad = true
-		await initGapiClient()
 		const authState = userAuthState()
-		if (IS_LOCALHOST) console.log(`[AppMainLogic.doInitGoogleApi] authState = ${authState}`)
+		if (IS_LOCALHOST) console.log(`[AppMainLogic.doInitGoogleApi] authState = ${authState.status}`)
 		_authUserName = authState.userName
 		_authUserPict = authState.userPict
 		if (_authUserName) {
 			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_authUserName}"`)
-			const files = await fetchDriveFiles()
-			_gapiFiles = files
+			_gapiFiles = await fetchDriveFiles()
+			if (IS_LOCALHOST) console.log(`[AppMainLogic] _gapiFiles.length = ${_gapiFiles.length}`)
 		}
-		initCallback()
 	} catch (error) {
 		console.error('Initialization failed:', error)
 	} finally {
 		_isBusyGapiLoad = false
+		_initCallback()
 	}
 }
 

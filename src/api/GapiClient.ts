@@ -1,6 +1,7 @@
-import { doLoadInitGsiGapi } from './AuthService'
+import { initGoogleApi } from './AuthService'
 
 let isGapiInitialized = false
+let useAppMainCallback: () => void
 
 export const checkGapiInitialized = () => {
 	if (!isGapiInitialized) {
@@ -8,9 +9,14 @@ export const checkGapiInitialized = () => {
 	}
 }
 
-export const initGapiClient = async () => {
+function callbackInit() {
+	isGapiInitialized = true
+	useAppMainCallback()
+}
+
+export const initGapiClient = (initCallback: () => void) => {
+	useAppMainCallback = initCallback
 	if (!isGapiInitialized) {
-		await doLoadInitGsiGapi()
-		isGapiInitialized = true
+		initGoogleApi(callbackInit)
 	}
 }
