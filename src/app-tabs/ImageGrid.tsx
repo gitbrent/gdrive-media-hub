@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
-import { FixedItemProps } from './ImageGrid.props'
+import { FixedItemProps } from '../types/ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'

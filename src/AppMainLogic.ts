@@ -1,5 +1,14 @@
-import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, IS_LOCALHOST } from './App.props'
-import { initGoogleApi, userAuthState, doAuthSignIn, doAuthSignOut, doClearFileCache, fetchDriveFiles, fetchFileImgBlob, fetchDriveFolders, fetchCacheStatus } from './GoogleApi'
+import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, log } from './App.props'
+import {
+	doAuthSignIn,
+	doAuthSignOut,
+	doClearFileCache,
+	fetchDriveFiles,
+	fetchFileImgBlob,
+	initGapiClient,
+	loadCacheFromIndexedDB,
+	userAuthState,
+} from './api'
 
 export interface AppMainLogicInterface {
 	doInitGoogleApi: (callback: () => void) => void;
@@ -14,6 +23,7 @@ let _gapiFiles: IMediaFile[] = []
 let _authUserName = ''
 let _authUserPict = ''
 let _isBusyGapiLoad = false
+let _initCallback: () => void
 
 // --------------------------------------------------------------------------------------------
 
@@ -25,27 +35,30 @@ export const authUserPict = () => _authUserPict
 
 export const isBusyGapiLoad = () => _isBusyGapiLoad
 
+// Called from `useAppMain.ts` at startup
 export const doInitGoogleApi = (initCallback: () => void) => {
 	_isBusyGapiLoad = true
-	initGoogleApi((authState) => {
+	_initCallback = initCallback
+	initGapiClient(initGapiCallback)
+}
+
+async function initGapiCallback() {
+	try {
+		const authState = userAuthState()
+		log(2, `[AppMainLogic.doInitGoogleApi] authState = ${authState.status}`)
 		_authUserName = authState.userName
 		_authUserPict = authState.userPict
 		if (_authUserName) {
-			if (IS_LOCALHOST) console.log(`[AppMainLogic] signedInUser = "${_authUserName}"`)
-			fetchDriveFiles().then((files) => {
-				_gapiFiles = files
-				_isBusyGapiLoad = false
-				initCallback()
-			})
-			fetchDriveFolders().then((folders) => {
-				// WIP: NEW:
-				console.log('fetchDriveFolders', folders)
-			})
+			log(2, `[AppMainLogic] signedInUser = "${_authUserName}"`)
+			_gapiFiles = await fetchDriveFiles()
+			log(2, `[AppMainLogic] _gapiFiles.length = ${_gapiFiles.length}`)
 		}
-		else {
-			initCallback()
-		}
-	})
+	} catch (error) {
+		console.error('Initialization failed:', error)
+	} finally {
+		_isBusyGapiLoad = false
+		_initCallback()
+	}
 }
 
 /**
@@ -72,7 +85,7 @@ export const getUserAuthState = (): IAuthState => {
 
 export const getCacheStatus = async (): Promise<IFileListCache | null> => {
 	try {
-		const cacheStatus = await fetchCacheStatus()
+		const cacheStatus = await loadCacheFromIndexedDB()
 		return cacheStatus
 	} catch (error) {
 		console.error('Error getting cache status:', error)
