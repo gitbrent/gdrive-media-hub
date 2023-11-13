@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './api/useAppMain'
 import Home from './app-tabs/Home'
+import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
@@ -11,6 +12,7 @@ import './css/AppMainUI.css'
 
 export enum AppTabs {
 	Home = 'Home',
+	FileBrowser = 'FileBrowser',
 	ImageGrid = 'ImageGrid',
 	SlideShow = 'SlideShow',
 	VideoPlayer = 'VideoPlayer',
@@ -64,6 +66,13 @@ export default function AppMainUI() {
 								<i className="fs-4 bi-house" /><span className="ms-2 d-inline">Home</span>
 							</a>
 						</li>
+						{authUserName &&
+							<li className="nav-item px-0 align-middle text-nowrap">
+								<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.FileBrowser)} className={`nav-link px-0 ${currentTab === AppTabs.FileBrowser ? 'active' : ''}`} title="file browser" aria-label="file browser">
+									<i className="fs-4 bi-folder" /><span className={`ms-2 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>File Browser</span>
+								</a>
+							</li>
+						}
 						{authUserName &&
 							<li className="nav-item px-0 align-middle text-nowrap">
 								<a href="#" role="button" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link px-0 ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
@@ -136,6 +145,9 @@ export default function AppMainUI() {
 					getFileAnalysis={getFileAnalysis}
 					isBusyGapiLoad={isBusyGapiLoad}
 					handleAuthClick={handleAuthClick} />
+				break
+			case AppTabs.FileBrowser:
+				returnJsx = <FileBrowser isBusyGapiLoad={isBusyGapiLoad} />
 				break
 			case AppTabs.ImageGrid:
 				returnJsx = <ImageGrid

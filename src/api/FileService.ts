@@ -67,7 +67,7 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 		if (!isFullSync) query = `modifiedTime > '${oneDayAgo}' and ${query}`
 		const response = await gapi.client.drive.files.list({
 			q: query,
-			fields: 'nextPageToken, files(id, name, mimeType, size, modifiedByMeTime)',
+			fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
 			//orderBy: 'modifiedByMeTime desc',
 			pageSize: 1000,
 			pageToken: pageToken,

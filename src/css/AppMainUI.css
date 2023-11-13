@@ -66,6 +66,12 @@
 	cursor: pointer;
 }
 
+.text-noselect {
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 /* remove little drop-down chevron after profile pic, lower-left, leftNav */
 #dropdownUser1::after {
 	content: none;

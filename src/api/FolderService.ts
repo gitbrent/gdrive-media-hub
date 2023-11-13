@@ -1,7 +1,7 @@
 import { IDirectory, IGapiFile, IGapiFolder } from '../App.props'
 import { checkGapiInitialized } from './GapiClient'
 
-const getRootFolderId = async () => {
+export const getRootFolderId = async () => {
 	checkGapiInitialized()
 
 	try {
@@ -16,50 +16,56 @@ const getRootFolderId = async () => {
 		return ''
 	}
 }
-/*
+
 async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 	try {
 		const folderMap = new Map<string, IGapiFolder>()
 		const rootFolders: IGapiFolder[] = []
 
-		// A:
 		const rootFolderId = await getRootFolderId()
 		if (!rootFolderId) throw new Error('unable to fetch root folder id')
 
-		// B:
 		const response = await gapi.client.drive.files.list({
 			q: 'mimeType=\'application/vnd.google-apps.folder\' and trashed = false',
-			fields: 'nextPageToken, files(id, name, parents)',
+			fields: 'nextPageToken, files(id, name, mimeType, parents)',
 		})
 
-		// C: First pass: Populate folderMap with all folders
-		response.result.files?.forEach((folder) => {
-			const id = folder.id || ''
-			const name = folder.name || ''
-			const currentFolder = folderMap.get(id) || { id, name, children: [] }
-
-			folderMap.set(id, currentFolder)
-		})
-
-		// D: Second pass: Populate children and identify root folders
-		response.result.files?.forEach((folder) => {
-			const id = folder.id || ''
-			const currentFolder = folderMap.get(id)
-
-			const parentIds = folder.parents || []
-
-			if (currentFolder && (parentIds.length === 0 || parentIds.includes(rootFolderId))) {
-				rootFolders.push(currentFolder)
-				return
-			}
-
-			parentIds.forEach((parentId) => {
-				const parentFolder = folderMap.get(parentId)
-
-				if (parentFolder && currentFolder && !parentFolder.children?.includes(currentFolder)) {
-					parentFolder.children?.push(currentFolder)
+		// First pass: Populate folderMap with all folders
+		response.result.files?.forEach((file) => {
+			if (file.id && file.mimeType === 'application/vnd.google-apps.folder') {
+				const folder: IGapiFolder = {
+					...file,
+					id: file.id || '',
+					mimeType: file.mimeType || '',
+					modifiedByMeTime: file.modifiedByMeTime || '',
+					name: file.name || '',
+					parents: file.parents || [],
+					children: []
 				}
-			})
+				if (folder.id) folderMap.set(folder.id, folder)
+			}
+		})
+
+		// Second pass: Populate children and identify root folders
+		response.result.files?.forEach((file) => {
+			if (file.mimeType !== 'application/vnd.google-apps.folder') return
+
+			if (file.id) {
+				const currentFolder = folderMap.get(file.id)
+				if (!currentFolder) return
+
+				const parentIds = file.parents || []
+				if (parentIds.length === 0 || parentIds.includes(rootFolderId)) {
+					rootFolders.push(currentFolder)
+				} else {
+					parentIds.forEach((parentId) => {
+						const parentFolder = folderMap.get(parentId)
+						if (parentFolder) {
+							parentFolder.children.push(currentFolder)
+						}
+					})
+				}
+			}
 		})
 
 		return rootFolders
@@ -69,11 +75,13 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 	}
 }
 
-async function fetchFolderContents(folderId: string): Promise<IDirectory> {
+export async function fetchFolderContents(folderId: string): Promise<IDirectory> {
+	checkGapiInitialized()
+
 	try {
 		const response = await gapi.client.drive.files.list({
-			q: `'${folderId}' in parents and trashed = false`,
-			fields: 'nextPageToken, files(id, name, mimeType, parents, size, webContentLink)',
+			q: `'${folderId}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/' or mimeType contains 'video/')`,
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, webContentLink)',
 		})
 
 		const files: IGapiFile[] = []
@@ -88,7 +96,7 @@ async function fetchFolderContents(folderId: string): Promise<IDirectory> {
 		})
 
 		return {
-			currentFolder: { }, // current folder details
+			currentFolder: {}, // current folder details
 			items: [...folders, ...files],
 		} as IDirectory
 	} catch (error) {
@@ -96,4 +104,3 @@ async function fetchFolderContents(folderId: string): Promise<IDirectory> {
 		throw error
 	}
 }
-*/
