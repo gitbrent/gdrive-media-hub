@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20231112-2020'
+export const APP_BLD = '20231113-1930'
 export const APP_VER = '2.0.0-WIP'
 
 // ============================================================================
@@ -138,8 +138,8 @@ export interface IGapiItem extends gapi.client.drive.File {
 	parents: string[]
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IGapiFile extends IGapiItem {
+	blobUrl?: string
 }
 
 export interface IMediaFile extends IGapiFile {
