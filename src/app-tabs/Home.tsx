@@ -252,11 +252,11 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		return (
 			<section className='p-4'>
 				<h5 className='mb-4'>Welcome {authUserName}!</h5>
-				<div className='row g-4'>
+				<div className='row row-cols g-4'>
 					<div className='col-12 col-md'>{renderFilesBySize()}</div>
 					<div className='col-12 col-md'>{renderFilesByType()}</div>
-					<div className='col-12 col-md-12'>{renderFilesByYear()}</div>
-					<div className='col-12 col-md-12'>{renderTopFileNames()}</div>
+					<div className='col-12'>{renderFilesByYear()}</div>
+					<div className='col-12'>{renderTopFileNames()}</div>
 				</div>
 			</section>
 		)
