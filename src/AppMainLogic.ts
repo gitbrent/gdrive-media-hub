@@ -105,7 +105,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 			return false
 		}
 
-		const response = await fetchFileImgBlob(file)
+		const response = await fetchFileImgBlob(file.id)
 		if (response) {
 			const blob = await response.blob()
 			const objectUrl = URL.createObjectURL(blob)
