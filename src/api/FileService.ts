@@ -88,10 +88,10 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 	return allFiles
 }
 
-export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
+export const fetchFileImgBlob = async (fileId: IGapiFile['id']) => {
 	try {
-		return chgFile?.id ?
-			await fetch(`https://www.googleapis.com/drive/v3/files/${chgFile.id}?alt=media`, {
+		return fileId ?
+			await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
 				method: 'GET',
 				headers: { Authorization: `Bearer ${getAccessToken()}` },
 			})
@@ -101,5 +101,16 @@ export const fetchFileImgBlob = async (chgFile: IGapiFile) => {
 	catch (ex) {
 		console.error(ex)
 		return false
+	}
+}
+
+export const getBlobForFile = async (fileId: IGapiFile['id']): Promise<string | null> => {
+	const response = await fetchFileImgBlob(fileId)
+	if (response) {
+		const blob = await response.blob()
+		return URL.createObjectURL(blob)
+	}
+	else {
+		return null
 	}
 }
