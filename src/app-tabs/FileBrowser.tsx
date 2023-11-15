@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder, formatBytes, formatDate } from '../App.props'
-import { fetchFolderContents, getRootFolderId } from '../api/FolderService' // Import from your service
+import { BreadcrumbSegment, IGapiFile, IGapiFolder, IGapiItem, formatBytes, formatDate } from '../App.props'
+import { fetchFolderContents, getRootFolderId } from '../api/FolderService'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import { Gallery, Item } from 'react-photoswipe-gallery'
+import { getBlobForFile } from '../api'
+import '../css/FileBrowser.css'
 
 interface Props {
 	isBusyGapiLoad: boolean
 }
 
-type SortKey = keyof IGapiFile | keyof IGapiFolder
+type SortKey = keyof IGapiItem
 type SortDirection = 'ascending' | 'descending'
 
 interface SortConfig {
@@ -21,8 +23,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	//
 	const [currentFolderContents, setCurrentFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
-	//
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
+	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -73,7 +75,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		}
 
 		const sortItems = (items: Array<IGapiFile | IGapiFolder>, key: SortKey | null, direction: SortDirection) => {
-			if (!key || key === 'children') return items // Exclude 'children' or any other non-common keys
+			if (!key) return items // Exclude other non-common keys
 
 			const sortedItems = [...items].sort((a, b) => {
 				return compareValues(key, a, b, direction)
@@ -82,7 +84,6 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			return sortedItems
 		}
 
-		// Assuming `originalFolderContents` holds the original unsorted data
 		const sortedItems = sortItems([...currentFolderContents], sortConfig.key, sortConfig.direction)
 		setCurrentFolderContents(sortedItems)
 	}, [sortConfig])
@@ -114,6 +115,15 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
 	}
 
+	const handleFileClick = async (file: IGapiFile) => {
+		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
+			const blobUrl = await getBlobForFile(file.id)
+			if (blobUrl) {
+				setSelectedFile({ ...file, blobUrl: blobUrl })
+			}
+		}
+	}
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderTopBar(): JSX.Element {
@@ -130,10 +140,43 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		)
 	}
 
+	const ImageViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
+		if (!selectedFile) return null
+
+		return (
+			<div className="image-viewer-overlay cursor-link" onClick={() => setSelectedFile(null)}>
+				<div className="image-viewer-content">
+					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
+				</div>
+			</div>
+		)
+	}
+
+	const VideoViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
+		if (!selectedFile) return null
+
+		return (
+			<div className="video-viewer-overlay cursor-link" onClick={() => setSelectedFile(null)}>
+				<div className="video-viewer-content">
+					<video id="video-player" controls>
+						<source src={selectedFile.blobUrl} type={selectedFile.mimeType} />
+						Your browser does not support the video tag.
+					</video>
+				</div>
+			</div>
+		)
+	}
+
 	function renderBrowser(): JSX.Element {
 		return (
 			<section>
 				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
+				{selectedFile && (
+					// eslint-disable-next-line react/prop-types
+					selectedFile.mimeType.includes('video/') ?
+						<VideoViewerOverlay selectedFile={selectedFile} /> :
+						<ImageViewerOverlay selectedFile={selectedFile} />
+				)}
 				<section className='p-4'>
 					<div className='p-4 bg-black'>
 						<div className='table-responsive'>
@@ -145,6 +188,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 											Name&nbsp;
 											{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 										</th>
+										<th className='cursor-link text-nowrap text-end' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 										<th className='cursor-link text-nowrap text-end' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 										<th className='cursor-link text-nowrap text-center' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 										<th className='cursor-link text-nowrap text-center' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
@@ -152,44 +196,42 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								</thead>
 								<tbody>
 									{currentFolderContents.map((item, index) => {
-										const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
+										const isFolder = item.mimeType?.includes('folder')
+										const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
 										return (
-											<tr key={index} className={item.mimeType?.indexOf('folder') > -1 ? 'text-success' : 'text-info'}>
+											<tr key={index}>
 												<td>
-													<i className={
-														item.mimeType?.indexOf('folder') > -1
-															? 'fs-4 bi-folder-fill'
-															: item.mimeType?.indexOf('image') > -1
-																? 'fs-4 bi-image-fill'
-																: item.mimeType?.indexOf('video') > -1
-																	? 'fs-4 bi-camera-video-fill'
-																	: 'fs-4 bi-file-x text-light'
-													} />
+													<div className={mimeTextClass}>
+														<i className={
+															item.mimeType?.indexOf('folder') > -1
+																? 'fs-4 bi-folder-fill'
+																: item.mimeType?.indexOf('image') > -1
+																	? 'fs-4 bi-image-fill'
+																	: item.mimeType?.indexOf('video') > -1
+																		? 'fs-4 bi-camera-video-fill'
+																		: 'fs-4 bi-file-x text-light'
+														} />
+													</div>
 												</td>
 												<td className='cursor-link'>
 													{isFolder ?
 														<div
-															className='fw-bold'
+															className={`${mimeTextClass} fw-bold`}
 															onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
 															{item.name}
 														</div>
-														: item.mimeType.includes('image/') ?
-															<Gallery>
-																<Item original={item.webContentLink} thumbnail={item.webContentLink}>
-																	{({ ref, open }) => (
-																		<a ref={ref as React.MutableRefObject<HTMLAnchorElement>} onClick={open}>
-																			{item.name}
-																		</a>
-																	)}
-																</Item>
-															</Gallery>
+														: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
+															<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
+																{item.name}
+															</div>
 															:
 															<div>{item.name}</div>
 													}
 												</td>
-												<td className='text-nowrap text-end'>{item.size ? formatBytes(Number(item.size)) : ''}</td>
-												<td className='text-nowrap text-end'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-												<td className='text-nowrap text-end'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+												<td className='text-nowrap text-end text-muted'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+												<td className='text-nowrap text-end text-muted'>{item.size ? formatBytes(Number(item.size)) : ''}</td>
+												<td className='text-nowrap text-end text-muted'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+												<td className='text-nowrap text-end text-muted'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
 											</tr>
 										)
 									})}
