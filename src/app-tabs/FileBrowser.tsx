@@ -24,6 +24,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
 	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
+	const [isMediaLoading, setIsMediaLoading] = useState(false)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -121,12 +122,19 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	const handleFileClick = async (file: IGapiFile) => {
 		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
+			setIsMediaLoading(true)
+
 			const blobUrl = await getBlobForFile(file.id)
 			if (blobUrl) {
 				setSelectedFile({ ...file, blobUrl: blobUrl })
 			}
+
+			setIsMediaLoading(false)
+		} else {
+			// TODO: Handle error scenario (e.g., show an error message)
 		}
 	}
+
 
 	// --------------------------------------------------------------------------------------------
 
@@ -175,12 +183,23 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		return (
 			<section>
 				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
-				{selectedFile && (
-					// eslint-disable-next-line react/prop-types
-					selectedFile.mimeType.includes('video/') ?
-						<VideoViewerOverlay selectedFile={selectedFile} /> :
-						<ImageViewerOverlay selectedFile={selectedFile} />
-				)}
+				{isMediaLoading
+					? (
+						<div className="media-loading-indicator">
+							<div className="spinner-border text-light" role="status">
+								<span className="visually-hidden">Loading...</span>
+							</div>
+							<strong className="ms-3" role="status">Loading...</strong>
+						</div>
+					)
+					: selectedFile ? (
+						// eslint-disable-next-line react/prop-types
+						selectedFile.mimeType.includes('video/') ?
+							<VideoViewerOverlay selectedFile={selectedFile} /> :
+							<ImageViewerOverlay selectedFile={selectedFile} />
+					) :
+						<div />
+				}
 				<section className='p-4'>
 					<div className='p-4 bg-black'>
 						<div className='table-responsive'>
