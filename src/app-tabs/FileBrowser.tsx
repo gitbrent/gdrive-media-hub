@@ -34,6 +34,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		const loadRootFolder = async () => {
 			// A:
 			const rootFolderId = await getRootFolderId() || ''
+			// TODO: [20231117] combine below with "handleFolderClick()" so we get common err handling for expired etc!
 			const rootContents = await fetchFolderContents(rootFolderId)
 			setCurrentFolderPath([{ folderName: 'My Drive', folderId: rootFolderId }])
 			setCurrentFolderContents(rootContents.items)
@@ -103,10 +104,29 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	}
 
 	const handleFolderClick = async (folderId: string, folderName: string) => {
-		const contents = await fetchFolderContents(folderId)
-		setCurrentFolderContents(contents.items)
-		// Append the clicked folder to the path
-		setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
+		try {
+			const contents = await fetchFolderContents(folderId)
+			setCurrentFolderContents(contents.items)
+			// Append the clicked folder to the path
+			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
+		} catch (err: any) {
+			if (err.response && err.response.status === 401) {
+				// Detected a 401 error, attempt to refresh the token
+				try {
+					//await refreshToken() // TODO:
+					// Retry the original request after refreshing the token
+					const contents = await fetchFolderContents(folderId)
+					setCurrentFolderContents(contents.items)
+					setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
+				} catch (refreshErr) {
+					console.error('Error refreshing token:', refreshErr)
+					// Handle token refresh error (e.g., navigate to login page)
+				}
+			} else {
+				console.error('Error fetching folder contents:', err)
+				// Handle other types of errors
+			}
+		}
 	}
 
 	const handleFileClick = async (file: IGapiFile) => {
@@ -212,6 +232,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					<div className="row align-items-center">
 						<div className='col-auto d-none d-lg-block'>
 							<a className="navbar-brand me-0 text-white">File Browser</a>
+						</div>
+						<div className='col text-end'>
+							{`${currentFolderContents.filter(item => item.mimeType === 'application/vnd.google-apps.folder').length} Folders / ${currentFolderContents.filter(item => item.mimeType !== 'application/vnd.google-apps.folder').length} Files`}
 						</div>
 					</div>
 				</div>
