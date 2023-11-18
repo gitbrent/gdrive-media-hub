@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
-import { FixedItemProps } from './ImageGrid.props'
+import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
+import { FixedItemProps } from '../types/ImageGrid.props'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
@@ -8,7 +8,7 @@ import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
 interface IProps {
-	allFiles: IGapiFile[]
+	allFiles: IMediaFile[]
 	loadPageImages: (fileIds: string[]) => Promise<boolean>
 	isShowCap: boolean
 	optSortBy: OPT_SORTBY
@@ -28,7 +28,7 @@ export default function ImageGrid(props: IProps) {
 		const showImages: FixedItemProps[] = []
 
 		// A: define sorter
-		const sorter = (a: IGapiFile, b: IGapiFile) => {
+		const sorter = (a: IMediaFile, b: IMediaFile) => {
 			if (props.optSortBy === OPT_SORTBY.filName) {
 				return a.name < b.name ? (props.optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}

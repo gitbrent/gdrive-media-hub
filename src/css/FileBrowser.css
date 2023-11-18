@@ -1,0 +1,59 @@
+.image-viewer-overlay,
+.video-viewer-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(10, 10, 10, 0.7);
+	z-index: 1021;
+	/* High z-index to cover other content (bs-navbar is z=1020 */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.image-viewer-content {
+	text-align: center;
+}
+
+.image-viewer-content img {
+	max-width: 95%;
+	max-height: 95vh;
+}
+
+.video-viewer-content {
+	align-items: center;
+	width: 100%;
+	max-width: 90%;
+	max-height: 90vh;
+}
+
+.video-viewer-content video {
+	width: 100%;
+	/* Make video responsive to container width */
+	height: auto;
+	/* Maintain aspect ratio */
+	max-height: calc(100vh - 70px);
+	/* Ensure it does not exceed the height of the viewport */
+	object-fit: contain;
+	/* Contain the video within the element bounds */
+}
+
+/* ================================================================================ */
+
+.media-loading-indicator {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(10, 10, 10, 0.7);
+	/* Same as image/video overlay */
+	z-index: 1021;
+	/* Ensure it's on top */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* You can add additional styling here */
+}

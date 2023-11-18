@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IGapiFile } from '../App.props'
+import { IMediaFile } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import '../css/Slideshow.css'
 
@@ -10,16 +10,16 @@ enum SlideShowDelay {
 }
 
 interface Props {
-	allFiles: IGapiFile[];
+	allFiles: IMediaFile[];
 	downloadFile: (fileId: string) => Promise<boolean>;
 }
 
 const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
-	const [allImages, setAllImages] = useState<IGapiFile[]>([])
+	const [allImages, setAllImages] = useState<IMediaFile[]>([])
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(SlideShowDelay.Normal)
 	const [optSchWord, setOptSchWord] = useState('')
 	//
-	const [shfImages, setShfImages] = useState<IGapiFile[]>([])
+	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
 	//

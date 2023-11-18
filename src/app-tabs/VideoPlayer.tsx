@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { IGapiFile } from '../App.props'
+import { IMediaFile } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import '../css/VideoPlayer.css'
 
 export interface Props {
-	allFiles: IGapiFile[];
+	allFiles: IMediaFile[];
 	downloadFile: (fileId: string) => Promise<boolean>;
 }
 
 const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
-	const [allVideos, setAllVideos] = useState<IGapiFile[]>([])
-	const [shfImages, setShfImages] = useState<IGapiFile[]>([])
+	const [allVideos, setAllVideos] = useState<IMediaFile[]>([])
+	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndexes, setUsedIndexes] = useState<number[]>([])
 	const [currentImageUrl, setCurrentImageUrl] = useState('')

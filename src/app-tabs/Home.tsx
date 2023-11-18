@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { FileSizeThresholds, IFileAnalysis, IGapiFile } from '../App.props'
+import { FileSizeThresholds, IFileAnalysis, IGapiFile, formatBytes } from '../App.props'
 import '../css/Home.css'
 
 interface Props {
@@ -72,7 +72,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 										<div className="card-body">
 											<div className='row align-items-center mb-2'>
 												<div className='col'><h5 className="mb-0">{type}</h5></div>
-												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+												<div className='col-auto d-none d-lg-block'><span className="badge bg-primary">{count}</span></div>
 											</div>
 											<div className="progress" title={`${percent}%`}>
 												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
@@ -91,14 +91,6 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 	function renderFilesBySize(): JSX.Element {
 		const calculatePercent = (size: number, total: number) => {
 			return (size / total) * 100
-		}
-		const formatBytes = (bytes: number, decimals = 2) => {
-			if (bytes === 0) return '0 Bytes'
-			const k = 1024
-			const dm = decimals < 0 ? 0 : decimals
-			const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-			const i = Math.floor(Math.log(bytes) / Math.log(k))
-			return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 		}
 
 		return (
@@ -121,10 +113,10 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 									<div className="card">
 										<div className="card-body">
 											<div className="row align-items-center mb-2">
-												<div className="col">
-													<h5 className="mb-0">{category} <span className="h6 text-muted ms-2">({formatBytes(size)})</span></h5>
+												<div className="col text-nowrap">
+													<h5 className="mb-0">{category} <span className="h6 mb-0 text-muted ms-2 d-none d-xl-inline-block">({formatBytes(size)})</span></h5>
 												</div>
-												<div className="col-auto">
+												<div className="col-auto d-none d-lg-block">
 													<span className="badge bg-primary">{catTotal}</span>
 												</div>
 											</div>
@@ -260,11 +252,11 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		return (
 			<section className='p-4'>
 				<h5 className='mb-4'>Welcome {authUserName}!</h5>
-				<div className='row g-4'>
+				<div className='row row-cols g-4'>
 					<div className='col-12 col-md'>{renderFilesBySize()}</div>
 					<div className='col-12 col-md'>{renderFilesByType()}</div>
-					<div className='col-12 col-md-12'>{renderFilesByYear()}</div>
-					<div className='col-12 col-md-12'>{renderTopFileNames()}</div>
+					<div className='col-12'>{renderFilesByYear()}</div>
+					<div className='col-12'>{renderTopFileNames()}</div>
 				</div>
 			</section>
 		)

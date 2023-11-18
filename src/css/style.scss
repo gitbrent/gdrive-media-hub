@@ -29,6 +29,9 @@ $nav-pills-link-active-bg: $gray-800;
 // This way we dont have to add `mb-0` to every <h5> in .card-title
 $card-title-spacer-y: 0;
 
+$breadcrumb-divider: quote(">");
+//$breadcrumb-active-color: var(--bs-white);
+
 // Then, import Bootstrap's main SCSS
 @import "~bootstrap/scss/bootstrap";
 

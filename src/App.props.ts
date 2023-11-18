@@ -1,8 +1,64 @@
-// APP
-// @see [SampleImages](https://unsample.net/)
-export const APP_BLD = '20231108-2110'
+/**
+ * APP
+ * @see [SampleImages](https://unsample.net/)
+ */
+export const APP_BLD = '20231118-1320'
 export const APP_VER = '2.0.0-WIP'
-export const IS_LOCALHOST = window.location.href.toLowerCase().indexOf('?mode=debug') > -1
+
+// ============================================================================
+
+export const getLogLevel = (): number => {
+	const urlParams = new URLSearchParams(window.location.search)
+	const mode = urlParams.get('mode')
+
+	switch (mode) {
+		case 'debug': return 3
+		case 'api': return 2
+		case 'core': return 1
+		default: return 0
+	}
+}
+export const LOG_LEVEL = getLogLevel()
+
+export const log = (level: number, message: string) => {
+	if (level <= LOG_LEVEL) {
+		console.log(message)
+	}
+}
+
+// ============================================================================
+
+export const formatBytes = (bytes: number, decimals = 2) => {
+	if (bytes === 0) return '0 Bytes'
+	const k = 1024
+	const dm = decimals < 0 ? 0 : decimals
+	const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+	const i = Math.floor(Math.log(bytes) / Math.log(k))
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export const formatBytesToMB = (bytes: number, decimals = 2) => {
+	if (bytes === 0) return '0 MB'
+	const mb = bytes / (1024 * 1024)
+	const formattedMB = mb.toFixed(decimals < 0 ? 0 : decimals)
+	return `${formattedMB} MB`
+}
+
+export const formatDate = (dateString: string, format: 'full' | 'short' = 'full') => {
+	const date = new Date(dateString)
+
+	const year = date.getFullYear()
+	const month = (date.getMonth() + 1).toString().padStart(2, '0') // getMonth() is zero-based
+	const day = date.getDate().toString().padStart(2, '0')
+	const hours = date.getHours().toString().padStart(2, '0')
+	const minutes = date.getMinutes().toString().padStart(2, '0')
+
+	if (format === 'short') {
+		return `${year}-${month}-${day}`
+	} else { // full format
+		return `${year}-${month}-${day} @ ${hours}:${minutes}`
+	}
+}
 
 // ============================================================================
 
@@ -56,7 +112,9 @@ export interface IAuthState {
 	userPict: string
 }
 
-export interface IGapiFile extends gapi.client.drive.File {
+// ----------------------------------------------------------------------------
+
+export interface IGapiItem extends gapi.client.drive.File {
 	/**
 	 * id
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
@@ -84,30 +142,43 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 */
 	size?: string
 	/**
-	 * blob from google drive
-	 * - custom property (not in GAPI API)
-	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
-	 */
-	imageBlobUrl?: string
-	imageW?: number
-	imageH?: number
-	/**
-	 * blob from google drive
-	 * - custom property (not in GAPI API)
-	 * @example "blob:http://localhost:3000/2ba6f9a8-f8cf-4242-af53-b89418441b53"
-	 */
-	videoBlobUrl?: string
-	/**
-	 * FUTURE: show parent folder
-	 * `application/vnd.google-apps.folder`
+	 * IDs of parent folders
 	 * @example ["1jjOs28hGj3as3vorJveCI00NY1PmDbTr"]
 	 */
-	// parents: string[]
+	parents: string[]
 }
+
+export interface IGapiFile extends IGapiItem {
+	blobUrl?: string
+}
+
+export interface IMediaFile extends IGapiFile {
+	imageBlobUrl?: string;
+	imageW?: number;
+	imageH?: number;
+	videoBlobUrl?: string;
+	// Other media-specific properties...
+}
+
+export interface IGapiFolder extends IGapiItem {
+	children: IGapiFolder[]
+}
+
+export interface IDirectory {
+	currentFolder: IGapiFolder
+	items: Array<IGapiFile | IGapiFolder>
+}
+
+export interface BreadcrumbSegment {
+	folderName: string
+	folderId: string
+}
+
+// ----------------------------------------------------------------------------
 
 export interface IFileListCache {
 	timeStamp: number
-	gapiFiles: IGapiFile[]
+	gapiFiles: IMediaFile[]
 }
 
 export interface IFileAnalysis {
