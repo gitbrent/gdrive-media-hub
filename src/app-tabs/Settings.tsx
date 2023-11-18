@@ -109,7 +109,7 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<div className="row align-items-center">
-						<div className='col-auto d-none d-lg-block'>
+						<div className="col-auto d-none d-lg-block">
 							<a className="navbar-brand me-0 text-white">Settings</a>
 						</div>
 					</div>
