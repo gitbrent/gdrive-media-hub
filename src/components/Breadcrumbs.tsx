@@ -9,7 +9,7 @@ interface BreadcrumbProps {
 const Breadcrumbs: React.FC<BreadcrumbProps> = ({ path, onNavigate }) => {
 	return (
 		<nav className="text-noselect" aria-label="breadcrumb">
-			<ol className="breadcrumb">
+			<ol className="breadcrumb mb-0">
 				{path.map((segment, index) => (
 					<li
 						key={index}
