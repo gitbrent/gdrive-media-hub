@@ -37,6 +37,13 @@ export const formatBytes = (bytes: number, decimals = 2) => {
 	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
+export const formatBytesToMB = (bytes: number, decimals = 2) => {
+	if (bytes === 0) return '0 MB'
+	const mb = bytes / (1024 * 1024)
+	const formattedMB = mb.toFixed(decimals < 0 ? 0 : decimals)
+	return `${formattedMB} MB`
+}
+
 export const formatDate = (dateString: string) => {
 	const options: Intl.DateTimeFormatOptions = {
 		year: 'numeric',
