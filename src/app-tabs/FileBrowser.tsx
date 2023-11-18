@@ -19,12 +19,11 @@ interface SortConfig {
 }
 
 const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
-	//
 	const [currentFolderContents, setCurrentFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
-	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
 	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
+	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
 
 	// --------------------------------------------------------------------------------------------
 
@@ -93,16 +92,6 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	// --------------------------------------------------------------------------------------------
 
-	const handleBreadcrumbClick = async (pathIndex: number, folderId: string) => {
-		// A: Truncate the breadcrumb path
-		const newPath = currentFolderPath.slice(0, pathIndex + 1)
-		setCurrentFolderPath(newPath)
-
-		// B: Fetch the contents of the clicked folder
-		const contents = await fetchFolderContents(folderId)
-		setCurrentFolderContents(contents.items)
-	}
-
 	const requestSort = (key: SortKey) => {
 		let direction: SortDirection = 'ascending'
 
@@ -135,22 +124,57 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		}
 	}
 
+	const handleBreadcrumbClick = async (pathIndex: number, folderId: string) => {
+		// A: Fetch the contents of the clicked folder
+		const contents = await fetchFolderContents(folderId)
+		setCurrentFolderContents(contents.items)
+
+		// B: Truncate the breadcrumb path
+		// NOTE: Do this second as new currFolderPath triggers re-sort and we want contents to be set prior to sorting
+		const newPath = currentFolderPath.slice(0, pathIndex + 1)
+		setCurrentFolderPath(newPath)
+	}
 
 	// --------------------------------------------------------------------------------------------
 
-	function renderTopBar(): JSX.Element {
-		return (
-			<nav className="navbar sticky-top bg-dark">
-				<div className="container-fluid">
-					<div className="row align-items-center">
-						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand me-0 text-white">File Browser</a>
-						</div>
-					</div>
-				</div>
-			</nav>
-		)
+	useEffect(() => {
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'ArrowLeft') {
+				navigateToPrevFile()
+			}
+			else if (event.key === 'ArrowRight') {
+				navigateToNextFile()
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [currentFolderContents, selectedFile, handleFileClick])
+
+	const navigateToNextFile = () => {
+		const currentIndex = currentFolderContents.findIndex(item => item.id === selectedFile?.id)
+		if (currentIndex >= 0 && currentIndex < currentFolderContents.length - 1) {
+			const nextFile = currentFolderContents[currentIndex + 1]
+			if (nextFile.mimeType.includes('image/') || nextFile.mimeType.includes('video/')) {
+				handleFileClick(nextFile)
+			}
+		}
 	}
+
+	const navigateToPrevFile = () => {
+		const currentIndex = currentFolderContents.findIndex(item => item.id === selectedFile?.id)
+		if (currentIndex > 0) {
+			const prevFile = currentFolderContents[currentIndex - 1]
+			if (prevFile.mimeType.includes('image/') || prevFile.mimeType.includes('video/')) {
+				handleFileClick(prevFile)
+			}
+		}
+	}
+
+	// --------------------------------------------------------------------------------------------
 
 	const ImageViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
 		if (!selectedFile) return null
@@ -176,6 +200,22 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</video>
 				</div>
 			</div>
+		)
+	}
+
+	// --------------------------------------------------------------------------------------------
+
+	function renderTopBar(): JSX.Element {
+		return (
+			<nav className="navbar sticky-top bg-dark">
+				<div className="container-fluid">
+					<div className="row align-items-center">
+						<div className='col-auto d-none d-lg-block'>
+							<a className="navbar-brand me-0 text-white">File Browser</a>
+						</div>
+					</div>
+				</div>
+			</nav>
 		)
 	}
 
