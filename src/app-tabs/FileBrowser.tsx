@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder, IGapiItem, formatBytes, formatDate } from '../App.props'
 import { fetchFolderContents, getRootFolderId } from '../api/FolderService'
+import { getBlobForFile } from '../api'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
-import { Gallery, Item } from 'react-photoswipe-gallery'
-import { getBlobForFile } from '../api'
 import '../css/FileBrowser.css'
 
 interface Props {
@@ -45,6 +44,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		loadRootFolder()
 	}, [])
 
+	// sort (setCurrentFolderContents)
 	useEffect(() => {
 		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
 			// Place folders before files
@@ -86,7 +86,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 		const sortedItems = sortItems([...currentFolderContents], sortConfig.key, sortConfig.direction)
 		setCurrentFolderContents(sortedItems)
-	}, [sortConfig])
+	}, [sortConfig, currentFolderPath])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -102,9 +102,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	const requestSort = (key: SortKey) => {
 		let direction: SortDirection = 'ascending'
+
 		if (sortConfig.key === key && sortConfig.direction === 'ascending') {
 			direction = 'descending'
 		}
+
 		setSortConfig({ key, direction })
 	}
 
@@ -195,46 +197,53 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 									</tr>
 								</thead>
 								<tbody>
-									{currentFolderContents.map((item, index) => {
-										const isFolder = item.mimeType?.includes('folder')
-										const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
-										return (
-											<tr key={index}>
-												<td>
-													<div className={mimeTextClass}>
-														<i className={
-															item.mimeType?.indexOf('folder') > -1
-																? 'fs-4 bi-folder-fill'
-																: item.mimeType?.indexOf('image') > -1
-																	? 'fs-4 bi-image-fill'
-																	: item.mimeType?.indexOf('video') > -1
-																		? 'fs-4 bi-camera-video-fill'
-																		: 'fs-4 bi-file-x text-light'
-														} />
-													</div>
-												</td>
-												<td className='cursor-link'>
-													{isFolder ?
-														<div
-															className={`${mimeTextClass} fw-bold`}
-															onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
-															{item.name}
+									{currentFolderContents.length > 0
+										? currentFolderContents.map((item, index) => {
+											const isFolder = item.mimeType?.includes('folder')
+											const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
+											return (
+												<tr key={index}>
+													<td>
+														<div className={mimeTextClass}>
+															<i className={
+																item.mimeType?.indexOf('folder') > -1
+																	? 'fs-4 bi-folder-fill'
+																	: item.mimeType?.indexOf('image') > -1
+																		? 'fs-4 bi-image-fill'
+																		: item.mimeType?.indexOf('video') > -1
+																			? 'fs-4 bi-camera-video-fill'
+																			: 'fs-4 bi-file-x text-light'
+															} />
 														</div>
-														: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
-															<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
+													</td>
+													<td className='cursor-link'>
+														{isFolder ?
+															<div
+																className={`${mimeTextClass} fw-bold`}
+																onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
 																{item.name}
 															</div>
-															:
-															<div>{item.name}</div>
-													}
-												</td>
-												<td className='text-nowrap text-end text-muted'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
-												<td className='text-nowrap text-end text-muted'>{item.size ? formatBytes(Number(item.size)) : ''}</td>
-												<td className='text-nowrap text-end text-muted'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-												<td className='text-nowrap text-end text-muted'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+															: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
+																<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
+																	{item.name}
+																</div>
+																:
+																<div>{item.name}</div>
+														}
+													</td>
+													<td className='text-nowrap text-end text-muted'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+													<td className='text-nowrap text-end text-muted'>{item.size ? formatBytes(Number(item.size)) : ''}</td>
+													<td className='text-nowrap text-end text-muted'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+													<td className='text-nowrap text-end text-muted'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+												</tr>
+											)
+										})
+										: (
+											<tr>
+												<td colSpan={6} className='text-center text-muted p-3'>(no media files)</td>
 											</tr>
 										)
-									})}
+									}
 								</tbody>
 							</table>
 						</div>
