@@ -72,7 +72,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 										<div className="card-body">
 											<div className='row align-items-center mb-2'>
 												<div className='col'><h5 className="mb-0">{type}</h5></div>
-												<div className='col-auto'><span className="badge bg-primary">{count}</span></div>
+												<div className='col-auto d-none d-lg-block'><span className="badge bg-primary">{count}</span></div>
 											</div>
 											<div className="progress" title={`${percent}%`}>
 												<div className="progress-bar" role="progressbar" style={{ width: `${percent}%` }} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} />
@@ -113,10 +113,10 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 									<div className="card">
 										<div className="card-body">
 											<div className="row align-items-center mb-2">
-												<div className="col">
-													<h5 className="mb-0">{category} <span className="h6 text-muted ms-2">({formatBytes(size)})</span></h5>
+												<div className="col text-nowrap">
+													<h5 className="mb-0">{category} <span className="h6 mb-0 text-muted ms-2 d-none d-xl-inline-block">({formatBytes(size)})</span></h5>
 												</div>
-												<div className="col-auto">
+												<div className="col-auto d-none d-lg-block">
 													<span className="badge bg-primary">{catTotal}</span>
 												</div>
 											</div>
