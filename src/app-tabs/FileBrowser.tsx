@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder, IGapiItem, formatBytes, formatDate } from '../App.props'
+import { BreadcrumbSegment, IGapiFile, IGapiFolder, IGapiItem, formatBytesToMB, formatDate } from '../App.props'
 import { fetchFolderContents, getRootFolderId } from '../api/FolderService'
 import { getBlobForFile } from '../api'
 import AlertLoading from '../components/AlertLoading'
@@ -44,7 +44,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		loadRootFolder()
 	}, [])
 
-	// sort (setCurrentFolderContents)
+	/**
+	 * sort (setCurrentFolderContents)
+	 */
 	useEffect(() => {
 		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
 			// Place folders before files
@@ -190,9 +192,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 											Name&nbsp;
 											{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 										</th>
-										<th className='cursor-link text-nowrap text-end' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 										<th className='cursor-link text-nowrap text-end' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-center' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-center d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 										<th className='cursor-link text-nowrap text-center' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 									</tr>
 								</thead>
@@ -231,10 +233,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 																<div>{item.name}</div>
 														}
 													</td>
-													<td className='text-nowrap text-end text-muted'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
-													<td className='text-nowrap text-end text-muted'>{item.size ? formatBytes(Number(item.size)) : ''}</td>
-													<td className='text-nowrap text-end text-muted'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-													<td className='text-nowrap text-end text-muted'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+													<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+													<td className='text-nowrap text-end text-muted'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
+													<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+													<td className='text-nowrap text-center text-muted d-none d-md-table-cell d-xl-none'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime, 'short') : ''}</td>
+													<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
 												</tr>
 											)
 										})
