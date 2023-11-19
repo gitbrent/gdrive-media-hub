@@ -276,10 +276,10 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 											Name&nbsp;
 											{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 										</th>
-										<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-end' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-center d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-center' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-end d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-center d-none d-lg-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+										<th className='cursor-link text-nowrap text-center d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -302,7 +302,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 															} />
 														</div>
 													</td>
-													<td className='cursor-link'>
+													<td className='cursor-link' style={{ wordBreak: 'break-all' }}>
 														{isFolder ?
 															<div
 																className={`${mimeTextClass} fw-bold`}
@@ -317,11 +317,10 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 																<div>{item.name}</div>
 														}
 													</td>
-													<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
-													<td className='text-nowrap text-end text-muted'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
-													<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-													<td className='text-nowrap text-center text-muted d-none d-md-table-cell d-xl-none'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime, 'short') : ''}</td>
-													<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+													<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+													<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
+													<td className='text-nowrap text-center text-muted d-none d-lg-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+													<td className='text-nowrap text-center text-muted d-none d-md-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
 												</tr>
 											)
 										})
