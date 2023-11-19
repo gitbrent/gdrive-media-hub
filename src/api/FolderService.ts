@@ -1,5 +1,6 @@
 import { IDirectory, IGapiFile, IGapiFolder } from '../App.props'
 import { checkGapiInitialized } from './GapiClient'
+import { refreshToken } from './AuthService'
 
 export const getRootFolderId = async () => {
 	checkGapiInitialized()
@@ -17,6 +18,7 @@ export const getRootFolderId = async () => {
 	}
 }
 
+/* useful?
 async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 	try {
 		const folderMap = new Map<string, IGapiFolder>()
@@ -74,6 +76,7 @@ async function buildFolderHierarchy(): Promise<IGapiFolder[]> {
 		return []
 	}
 }
+*/
 
 export async function fetchFolderContents(folderId: string): Promise<IDirectory> {
 	checkGapiInitialized()
@@ -102,5 +105,22 @@ export async function fetchFolderContents(folderId: string): Promise<IDirectory>
 	} catch (error) {
 		console.error('Error fetching folder contents:', error)
 		throw error
+	}
+}
+
+// Utility function to fetch folder contents with automatic token refresh
+export const fetchWithTokenRefresh = async (folderId: string) => {
+	try {
+		return await fetchFolderContents(folderId)
+	} catch (err: any) {
+		if (err.status === 401) {
+			// Attempt to refresh the token
+			await refreshToken()
+			// Retry the request after token refresh
+			return await fetchFolderContents(folderId)
+		} else {
+			// Re-throw other errors to be handled by the caller
+			throw err
+		}
 	}
 }
