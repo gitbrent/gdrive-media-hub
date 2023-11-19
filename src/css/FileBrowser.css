@@ -40,6 +40,27 @@
 	/* Contain the video within the element bounds */
 }
 
+.btn-close-overlay {
+	position: absolute;
+	top: 10px;
+	/* Adjust as needed */
+	right: 10px;
+	/* Adjust as needed */
+	color: white;
+	/* For better visibility */
+	font-size: 1.5rem;
+	/* Adjust size as needed */
+	z-index: 1022;
+	/* Above the overlay content */
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+.btn-close-overlay i {
+	color: white;
+}
+
 /* ================================================================================ */
 
 .media-loading-indicator {
@@ -56,4 +77,10 @@
 	align-items: center;
 	justify-content: center;
 	/* You can add additional styling here */
+}
+
+/* ================================================================================ */
+
+.no-scroll {
+	overflow: hidden;
 }

@@ -26,6 +26,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
 	const [optSchWord, setOptSchWord] = useState('')
+	const [touchStart, setTouchStart] = useState<number | null>(null)
+	const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -168,7 +170,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [currFolderContents, selectedFile, handleFileClick])
+	}, [currFolderContents, selectedFile])
 
 	const navigateToNextFile = () => {
 		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
@@ -190,16 +192,92 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		}
 	}
 
+	const handleTouchStart = (e: React.TouchEvent) => {
+		e.preventDefault()
+		setTouchStart(e.targetTouches[0].clientX)
+	}
+
+	const handleTouchEnd = (e: React.TouchEvent) => {
+		e.preventDefault()
+		setTouchEnd(e.changedTouches[0].clientX)
+	}
+
+	useEffect(() => {
+		if (!touchStart || !touchEnd) return
+
+		const threshold = 50 // Minimum distance of the swipe
+		const swipeDistance = touchStart - touchEnd
+
+		if (swipeDistance > threshold) { // Swipe left
+			navigateToNextFile()
+		}
+
+		if (swipeDistance < -threshold) { // Swipe right
+			navigateToPrevFile()
+		}
+
+		// Reset
+		setTouchStart(null)
+		setTouchEnd(null)
+	}, [touchStart, touchEnd, navigateToNextFile, navigateToPrevFile])
+
+	const toggleBodyScroll = (shouldScroll: boolean) => {
+		document.body.style.overflow = shouldScroll ? '' : 'hidden'
+	}
+
+	useEffect(() => {
+		if (selectedFile) {
+			// Disable scrolling when overlay is active
+			toggleBodyScroll(false)
+		} else {
+			// Enable scrolling when overlay is inactive
+			toggleBodyScroll(true)
+		}
+	}, [selectedFile])
+
+	useEffect(() => {
+		const handleTouchStart = (e: TouchEvent) => {
+			e.preventDefault() // Prevent default touch behavior
+			setTouchStart(e.targetTouches[0].clientX)
+		}
+
+		const handleTouchEnd = (e: TouchEvent) => {
+			e.preventDefault() // Prevent default touch behavior
+			setTouchEnd(e.changedTouches[0].clientX)
+		}
+
+		const overlayElement = selectedFile ? document.querySelector('.image-viewer-overlay') || document.querySelector('.video-viewer-overlay') : null
+
+		if (overlayElement) {
+			overlayElement.addEventListener('touchstart', handleTouchStart as EventListener, { passive: false })
+			overlayElement.addEventListener('touchend', handleTouchEnd as EventListener, { passive: false })
+		}
+
+		return () => {
+			if (overlayElement) {
+				overlayElement.removeEventListener('touchstart', handleTouchStart as EventListener)
+				overlayElement.removeEventListener('touchend', handleTouchEnd as EventListener)
+			}
+		}
+	}, [selectedFile, setTouchStart, setTouchEnd])
+
 	// --------------------------------------------------------------------------------------------
 
 	const ImageViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
 		if (!selectedFile) return null
 
 		return (
-			<div className="image-viewer-overlay cursor-link" onClick={() => setSelectedFile(null)}>
+			<div
+				className="image-viewer-overlay cursor-link"
+				onTouchStart={handleTouchStart}
+				onTouchEnd={handleTouchEnd}
+			>
 				<div className="image-viewer-content">
 					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
 				</div>
+				<button className="btn-close-overlay" onClick={() => setSelectedFile(null)}>
+					<i className="bi bi-x-lg"></i>
+				</button>
 			</div>
 		)
 	}
@@ -208,13 +286,20 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		if (!selectedFile) return null
 
 		return (
-			<div className="video-viewer-overlay cursor-link" onClick={() => setSelectedFile(null)}>
+			<div
+				className="video-viewer-overlay"
+				onTouchStart={handleTouchStart}
+				onTouchEnd={handleTouchEnd}
+			>
 				<div className="video-viewer-content">
 					<video id="video-player" controls>
 						<source src={selectedFile.blobUrl} type={selectedFile.mimeType} />
 						Your browser does not support the video tag.
 					</video>
 				</div>
+				<button className="btn-close-overlay" onClick={() => setSelectedFile(null)}>
+					<i className="bi bi-x-lg"></i>
+				</button>
 			</div>
 		)
 	}
@@ -235,13 +320,80 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-auto">
+						<div className="col-auto text-muted">
 							{`${currFolderContents.filter(item => item.mimeType === 'application/vnd.google-apps.folder').length} Folders / ${currFolderContents.filter(item => item.mimeType !== 'application/vnd.google-apps.folder').length} Files`}
 						</div>
 					</div>
 				</div>
 			</nav>
 		)
+	}
+
+	function renderTable(): JSX.Element {
+		return (<table className='table align-middle mb-0'>
+			<thead>
+				<tr className='text-noselect'>
+					<th style={{ width: '1%' }}>&nbsp;</th>
+					<th className='cursor-link text-nowrap' title="click to sort" onClick={() => requestSort('name')}>
+						Name&nbsp;
+						{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					</th>
+					<th className='cursor-link text-nowrap text-end d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+					<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+					<th className='cursor-link text-nowrap text-center d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+					<th className='cursor-link text-nowrap text-center d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{currFolderContents.length > 0
+					? currFolderContents.map((item, index) => {
+						const isFolder = item.mimeType?.includes('folder')
+						const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
+						return (
+							<tr key={index}>
+								<td>
+									<div className={mimeTextClass}>
+										<i className={
+											item.mimeType?.indexOf('folder') > -1
+												? 'fs-4 bi-folder-fill'
+												: item.mimeType?.indexOf('image') > -1
+													? 'fs-4 bi-image-fill'
+													: item.mimeType?.indexOf('video') > -1
+														? 'fs-4 bi-camera-video-fill'
+														: 'fs-4 bi-file-x text-light'
+										} />
+									</div>
+								</td>
+								<td className='cursor-link' style={{ wordBreak: 'break-all' }}>
+									{isFolder ?
+										<div
+											className={`${mimeTextClass} fw-bold`}
+											onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
+											{item.name}
+										</div>
+										: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
+											<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
+												{item.name}
+											</div>
+											:
+											<div>{item.name}</div>
+									}
+								</td>
+								<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+								<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
+								<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+								<td className='text-nowrap text-center text-muted d-none d-md-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+							</tr>
+						)
+					})
+					: (
+						<tr>
+							<td colSpan={6} className='text-center text-muted p-3'>(no media files)</td>
+						</tr>
+					)
+				}
+			</tbody>
+		</table>)
 	}
 
 	function renderBrowser(): JSX.Element {
@@ -267,72 +419,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 				}
 				<section className='p-4'>
 					<div className='p-4 bg-black'>
-						<div className='table-responsive'>
-							<table className='table align-middle mb-0'>
-								<thead>
-									<tr className='text-noselect'>
-										<th style={{ width: '1%' }}>&nbsp;</th>
-										<th className='cursor-link text-nowrap' title="click to sort" onClick={() => requestSort('name')}>
-											Name&nbsp;
-											{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
-										</th>
-										<th className='cursor-link text-nowrap text-end d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-center d-none d-lg-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-										<th className='cursor-link text-nowrap text-center d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-									</tr>
-								</thead>
-								<tbody>
-									{currFolderContents.length > 0
-										? currFolderContents.map((item, index) => {
-											const isFolder = item.mimeType?.includes('folder')
-											const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
-											return (
-												<tr key={index}>
-													<td>
-														<div className={mimeTextClass}>
-															<i className={
-																item.mimeType?.indexOf('folder') > -1
-																	? 'fs-4 bi-folder-fill'
-																	: item.mimeType?.indexOf('image') > -1
-																		? 'fs-4 bi-image-fill'
-																		: item.mimeType?.indexOf('video') > -1
-																			? 'fs-4 bi-camera-video-fill'
-																			: 'fs-4 bi-file-x text-light'
-															} />
-														</div>
-													</td>
-													<td className='cursor-link' style={{ wordBreak: 'break-all' }}>
-														{isFolder ?
-															<div
-																className={`${mimeTextClass} fw-bold`}
-																onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
-																{item.name}
-															</div>
-															: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
-																<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
-																	{item.name}
-																</div>
-																:
-																<div>{item.name}</div>
-														}
-													</td>
-													<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
-													<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
-													<td className='text-nowrap text-center text-muted d-none d-lg-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-													<td className='text-nowrap text-center text-muted d-none d-md-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
-												</tr>
-											)
-										})
-										: (
-											<tr>
-												<td colSpan={6} className='text-center text-muted p-3'>(no media files)</td>
-											</tr>
-										)
-									}
-								</tbody>
-							</table>
-						</div>
+						<div className='table-responsive'>{renderTable()}</div>
 					</div>
 				</section>
 			</section>
