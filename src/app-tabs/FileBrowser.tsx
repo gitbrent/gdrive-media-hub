@@ -19,11 +19,13 @@ interface SortConfig {
 }
 
 const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
-	const [currentFolderContents, setCurrentFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
+	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
+	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
+	const [optSchWord, setOptSchWord] = useState('')
 
 	// --------------------------------------------------------------------------------------------
 
@@ -36,7 +38,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			const rootFolderId = await getRootFolderId() || ''
 			const rootContents = await fetchWithTokenRefresh(rootFolderId)
 			setCurrentFolderPath([{ folderName: 'My Drive', folderId: rootFolderId }])
-			setCurrentFolderContents(rootContents.items)
+			setCurrFolderContents(rootContents.items)
+			setOrigFolderContents(rootContents.items)
 
 			// B:
 			setSortConfig({ key: 'name', direction: 'ascending' })
@@ -45,7 +48,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	}, [])
 
 	/**
-	 * sort (setCurrentFolderContents)
+	 * FILTER and SORT folder contents
 	 */
 	useEffect(() => {
 		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
@@ -76,19 +79,23 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			}
 		}
 
+		const filterItems = (items: Array<IGapiFile | IGapiFolder>) => {
+			return items.filter((item) => {
+				return !optSchWord || item.name.toLowerCase().includes(optSchWord.toLowerCase())
+			})
+		}
+
 		const sortItems = (items: Array<IGapiFile | IGapiFolder>, key: SortKey | null, direction: SortDirection) => {
 			if (!key) return items // Exclude other non-common keys
 
-			const sortedItems = [...items].sort((a, b) => {
-				return compareValues(key, a, b, direction)
-			})
-
+			const filteredItems = filterItems(items)
+			const sortedItems = filteredItems.sort((a, b) => compareValues(key, a, b, direction))
 			return sortedItems
 		}
 
-		const sortedItems = sortItems([...currentFolderContents], sortConfig.key, sortConfig.direction)
-		setCurrentFolderContents(sortedItems)
-	}, [sortConfig, currentFolderPath])
+		const sortedFilteredItems = sortItems(origFolderContents, sortConfig.key, sortConfig.direction)
+		setCurrFolderContents(sortedFilteredItems)
+	}, [sortConfig, optSchWord, origFolderContents])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -105,7 +112,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const handleFolderClick = async (folderId: string, folderName: string) => {
 		try {
 			const contents = await fetchWithTokenRefresh(folderId)
-			setCurrentFolderContents(contents.items)
+			setOrigFolderContents(contents.items)
+			setCurrFolderContents(contents.items)
 			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
 		} catch (err: any) {
 			console.error('Error fetching folder contents:', err)
@@ -131,12 +139,16 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const handleBreadcrumbClick = async (pathIndex: number, folderId: string) => {
 		// A: Fetch the contents of the clicked folder
 		const contents = await fetchFolderContents(folderId)
-		setCurrentFolderContents(contents.items)
+		setOrigFolderContents(contents.items)
+		setCurrFolderContents(contents.items)
 
 		// B: Truncate the breadcrumb path
 		// NOTE: Do this second as new currFolderPath triggers re-sort and we want contents to be set prior to sorting
 		const newPath = currentFolderPath.slice(0, pathIndex + 1)
 		setCurrentFolderPath(newPath)
+
+		// C: Clear filter
+		setOptSchWord('')
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -156,12 +168,12 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [currentFolderContents, selectedFile, handleFileClick])
+	}, [currFolderContents, selectedFile, handleFileClick])
 
 	const navigateToNextFile = () => {
-		const currentIndex = currentFolderContents.findIndex(item => item.id === selectedFile?.id)
-		if (currentIndex >= 0 && currentIndex < currentFolderContents.length - 1) {
-			const nextFile = currentFolderContents[currentIndex + 1]
+		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
+		if (currentIndex >= 0 && currentIndex < currFolderContents.length - 1) {
+			const nextFile = currFolderContents[currentIndex + 1]
 			if (nextFile.mimeType.includes('image/') || nextFile.mimeType.includes('video/')) {
 				handleFileClick(nextFile)
 			}
@@ -169,9 +181,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	}
 
 	const navigateToPrevFile = () => {
-		const currentIndex = currentFolderContents.findIndex(item => item.id === selectedFile?.id)
+		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
 		if (currentIndex > 0) {
-			const prevFile = currentFolderContents[currentIndex - 1]
+			const prevFile = currFolderContents[currentIndex - 1]
 			if (prevFile.mimeType.includes('image/') || prevFile.mimeType.includes('video/')) {
 				handleFileClick(prevFile)
 			}
@@ -217,8 +229,14 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="col-auto d-none d-lg-block">
 							<a className="navbar-brand me-0 text-white">File Browser</a>
 						</div>
-						<div className="col text-end">
-							{`${currentFolderContents.filter(item => item.mimeType === 'application/vnd.google-apps.folder').length} Folders / ${currentFolderContents.filter(item => item.mimeType !== 'application/vnd.google-apps.folder').length} Files`}
+						<div className="col">
+							<div className="input-group">
+								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+							</div>
+						</div>
+						<div className="col-auto">
+							{`${currFolderContents.filter(item => item.mimeType === 'application/vnd.google-apps.folder').length} Folders / ${currFolderContents.filter(item => item.mimeType !== 'application/vnd.google-apps.folder').length} Files`}
 						</div>
 					</div>
 				</div>
@@ -265,8 +283,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 									</tr>
 								</thead>
 								<tbody>
-									{currentFolderContents.length > 0
-										? currentFolderContents.map((item, index) => {
+									{currFolderContents.length > 0
+										? currFolderContents.map((item, index) => {
 											const isFolder = item.mimeType?.includes('folder')
 											const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
 											return (
