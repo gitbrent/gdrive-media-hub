@@ -205,12 +205,15 @@ async function tokenFlow() {
 				tokenResp.expiresTime = Date.now() + tokenResp.expires_in * 1000
 				log(3, `- tokenResponse.expires_in = ${tokenResp?.expires_in}`)
 
-				// B: store the token data in session storage
+				// B: Reset authorization status
+				isAuthorized = false
+
+				// C: store the token data in session storage
 				sessionStorage.setItem('googleTokenData', JSON.stringify(tokenResp))
 
 				// Done
 				resolve(true)
-			},
+			}
 		})
 		client.requestAccessToken()
 	})
@@ -240,6 +243,16 @@ export const initGoogleApi = (onAuthChange: () => void) => {
 
 export const getAccessToken = () => {
 	return tokenResponse.access_token
+}
+
+export const refreshToken = async () => {
+	try {
+		await tokenFlow()
+	} catch (error) {
+		console.error('Failed to refresh token:', error)
+		// Handle token refresh failure (e.g., redirect to login or show error message)
+		throw error
+	}
 }
 
 export const doAuthSignIn = async () => {
