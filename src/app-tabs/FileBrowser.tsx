@@ -253,6 +253,25 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	// --------------------------------------------------------------------------------------------
 
+	const OverlayButtons: React.FC = () => {
+		return (
+			<>
+				<button className="chevron-button chevron-left" onClick={navigateToPrevFile}>
+					<i className="bi bi-chevron-left h3"></i>
+				</button>
+				<button className="chevron-button chevron-right" onClick={navigateToNextFile}>
+					<i className="bi bi-chevron-right h3"></i>
+				</button>
+				<button className="btn-close-overlay" onClick={(e) => {
+					e.stopPropagation()
+					setSelectedFile(null)
+				}}>
+					<i className="bi bi-x-lg h3"></i>
+				</button>
+			</>
+		)
+	}
+
 	const ImageViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
 		if (!selectedFile) return null
 
@@ -261,12 +280,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 				<div className="image-viewer-content">
 					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
 				</div>
-				<button className="btn-close-overlay" onClick={(e) => {
-					e.stopPropagation()
-					setSelectedFile(null)
-				}}>
-					<i className="bi bi-x-lg h3"></i>
-				</button>
+				<OverlayButtons />
 			</div>
 		)
 	}
@@ -282,9 +296,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						Your browser does not support the video tag.
 					</video>
 				</div>
-				<button className="btn-close-overlay" onClick={() => setSelectedFile(null)}>
-					<i className="bi bi-x-lg h3"></i>
-				</button>
+				<OverlayButtons />
 			</div>
 		)
 	}

@@ -40,6 +40,8 @@
 	/* Contain the video within the element bounds */
 }
 
+/* ================================================================================ */
+
 .btn-close-overlay {
 	position: absolute;
 	top: 10px;
@@ -51,14 +53,37 @@
 	font-size: 1.5rem;
 	/* Adjust size as needed */
 	z-index: 1022;
-	/* Above the overlay content */
-	background: none;
+	/* Ensure it's above the overlay content */
+	background: rgba(0, 0, 0, 0.5);
 	border: none;
 	cursor: pointer;
 }
 
 .btn-close-overlay i {
 	color: white;
+}
+
+.chevron-button {
+	position: absolute;
+	top: 50%;
+	z-index: 1022;
+	/* Ensure it's above the overlay content */
+	background: rgba(0, 0, 0, 0.5);
+	/* Semi-transparent background */
+	border: none;
+	color: white;
+	cursor: pointer;
+	padding: 10px;
+}
+
+.chevron-left {
+	left: 10px;
+	/* Adjust as needed */
+}
+
+.chevron-right {
+	right: 10px;
+	/* Adjust as needed */
 }
 
 /* ================================================================================ */
