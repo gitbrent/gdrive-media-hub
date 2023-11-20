@@ -192,16 +192,6 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		}
 	}
 
-	const handleTouchStart = (e: React.TouchEvent) => {
-		e.preventDefault()
-		setTouchStart(e.targetTouches[0].clientX)
-	}
-
-	const handleTouchEnd = (e: React.TouchEvent) => {
-		e.preventDefault()
-		setTouchEnd(e.changedTouches[0].clientX)
-	}
-
 	useEffect(() => {
 		if (!touchStart || !touchEnd) return
 
@@ -237,16 +227,16 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	useEffect(() => {
 		const handleTouchStart = (e: TouchEvent) => {
-			e.preventDefault() // Prevent default touch behavior
+			e.preventDefault()
 			setTouchStart(e.targetTouches[0].clientX)
 		}
 
 		const handleTouchEnd = (e: TouchEvent) => {
-			e.preventDefault() // Prevent default touch behavior
+			e.preventDefault()
 			setTouchEnd(e.changedTouches[0].clientX)
 		}
 
-		const overlayElement = selectedFile ? document.querySelector('.image-viewer-overlay') || document.querySelector('.video-viewer-overlay') : null
+		const overlayElement = selectedFile ? document.querySelector('.image-viewer-content') || document.querySelector('.video-viewer-content') : null
 
 		if (overlayElement) {
 			overlayElement.addEventListener('touchstart', handleTouchStart as EventListener, { passive: false })
@@ -259,7 +249,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 				overlayElement.removeEventListener('touchend', handleTouchEnd as EventListener)
 			}
 		}
-	}, [selectedFile, setTouchStart, setTouchEnd])
+	}, [selectedFile])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -267,16 +257,15 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		if (!selectedFile) return null
 
 		return (
-			<div
-				className="image-viewer-overlay cursor-link"
-				onTouchStart={handleTouchStart}
-				onTouchEnd={handleTouchEnd}
-			>
+			<div className="image-viewer-overlay cursor-link">
 				<div className="image-viewer-content">
 					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
 				</div>
-				<button className="btn-close-overlay" onClick={() => setSelectedFile(null)}>
-					<i className="bi bi-x-lg"></i>
+				<button className="btn-close-overlay" onClick={(e) => {
+					e.stopPropagation()
+					setSelectedFile(null)
+				}}>
+					<i className="bi bi-x-lg h3"></i>
 				</button>
 			</div>
 		)
@@ -286,11 +275,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		if (!selectedFile) return null
 
 		return (
-			<div
-				className="video-viewer-overlay"
-				onTouchStart={handleTouchStart}
-				onTouchEnd={handleTouchEnd}
-			>
+			<div className="video-viewer-overlay">
 				<div className="video-viewer-content">
 					<video id="video-player" controls>
 						<source src={selectedFile.blobUrl} type={selectedFile.mimeType} />
@@ -298,7 +283,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</video>
 				</div>
 				<button className="btn-close-overlay" onClick={() => setSelectedFile(null)}>
-					<i className="bi bi-x-lg"></i>
+					<i className="bi bi-x-lg h3"></i>
 				</button>
 			</div>
 		)
