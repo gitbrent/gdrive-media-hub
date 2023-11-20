@@ -317,8 +317,19 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-auto text-muted">
-							{`${currFolderContents.filter(item => item.mimeType === 'application/vnd.google-apps.folder').length} Folders / ${currFolderContents.filter(item => item.mimeType !== 'application/vnd.google-apps.folder').length} Files`}
+						<div className="col-auto">
+							<span className='text-success'>
+								{currFolderContents.filter(item => item.mimeType.indexOf('folder') > -1).length}
+								<i className="bi-folder-fill ms-1" />
+							</span>
+							<span className='text-info ms-3'>
+								{currFolderContents.filter(item => item.mimeType.indexOf('image') > -1).length}
+								<i className="bi-image-fill ms-1" />
+							</span>
+							<span className='text-warning ms-3'>
+								{currFolderContents.filter(item => item.mimeType.indexOf('video') > -1).length}
+								<i className="bi-camera-video-fill ms-1" />
+							</span>
 						</div>
 					</div>
 				</div>
