@@ -85,6 +85,7 @@ export async function fetchFolderContents(folderId: string): Promise<IDirectory>
 		const response = await gapi.client.drive.files.list({
 			q: `'${folderId}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/' or mimeType contains 'video/')`,
 			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, webContentLink)',
+			pageSize: 1000,
 		})
 
 		const files: IGapiFile[] = []
