@@ -18,8 +18,10 @@
 }
 
 .image-viewer-content img {
-	max-width: 95%;
 	max-height: 95vh;
+	max-width: 90vw;
+	margin: auto;
+	object-fit: contain;
 }
 
 .video-viewer-content {
@@ -108,4 +110,23 @@
 
 .no-scroll {
 	overflow: hidden;
+}
+
+.busy-cursor {
+	cursor: wait;
+}
+
+/* make bootstrap spinner animated! */
+.bi-arrow-repeat {
+	animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
