@@ -62,6 +62,19 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 				return 1
 			}
 
+			// Special handling for file names starting with '_'
+			if (key === 'name') {
+				const startsWithUnderscoreA = a.name.startsWith('_')
+				const startsWithUnderscoreB = b.name.startsWith('_')
+
+				if (startsWithUnderscoreA && !startsWithUnderscoreB) {
+					return direction === 'ascending' ? -1 : 1
+				}
+				if (!startsWithUnderscoreA && startsWithUnderscoreB) {
+					return direction === 'ascending' ? 1 : -1
+				}
+			}
+
 			// Handle null size
 			if (key === 'size') {
 				const aValue = a.size ? parseInt(a.size) : 0
