@@ -256,17 +256,17 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const OverlayButtons: React.FC = () => {
 		return (
 			<>
-				<button className="chevron-button chevron-left" onClick={navigateToPrevFile}>
-					<i className="bi bi-chevron-left h3"></i>
+				<button className="h3 chevron-button chevron-left" onClick={navigateToPrevFile}>
+					<i className="bi bi-chevron-left"></i>
 				</button>
-				<button className="chevron-button chevron-right" onClick={navigateToNextFile}>
-					<i className="bi bi-chevron-right h3"></i>
+				<button className="h3 chevron-button chevron-right" onClick={navigateToNextFile}>
+					<i className="bi bi-chevron-right"></i>
 				</button>
-				<button className="btn-close-overlay" onClick={(e) => {
+				<button className="h3 btn-close-overlay" onClick={(e) => {
 					e.stopPropagation()
 					setSelectedFile(null)
 				}}>
-					<i className="bi bi-x-lg h3"></i>
+					<i className="bi bi-x-lg"></i>
 				</button>
 			</>
 		)
@@ -276,7 +276,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		if (!selectedFile) return null
 
 		return (
-			<div className="image-viewer-overlay cursor-link">
+			<div className="image-viewer-overlay">
 				<div className="image-viewer-content">
 					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
 				</div>
@@ -342,14 +342,21 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			<thead>
 				<tr className='text-noselect'>
 					<th style={{ width: '1%' }}>&nbsp;</th>
-					<th className='cursor-link text-nowrap' title="click to sort" onClick={() => requestSort('name')}>
-						Name&nbsp;
-						{sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th className='cursor-link text-nowrap text-left' title="click to sort" onClick={() => requestSort('name')}>
+						Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th className='cursor-link text-nowrap text-end d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>Mime Type {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-					<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>File Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-					<th className='cursor-link text-nowrap text-center d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>Date Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
-					<th className='cursor-link text-nowrap text-center d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>Date Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}</th>
+					<th className='cursor-link text-nowrap text-end d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>
+						Type {sortConfig.key === 'mimeType' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					</th>
+					<th className='cursor-link text-nowrap text-end d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>
+						Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					</th>
+					<th className='cursor-link text-nowrap text-start d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>
+						Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					</th>
+					<th className='cursor-link text-nowrap text-start d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>
+						Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					</th>
 				</tr>
 			</thead>
 			<tbody>
