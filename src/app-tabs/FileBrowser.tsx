@@ -327,7 +327,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<div className="row align-items-center w-100">
-						<div className="col-auto d-none d-lg-block">
+						<div className="col d-none d-lg-block">
 							<a className="navbar-brand me-0 text-white">File Browser</a>
 						</div>
 						<div className="col">
