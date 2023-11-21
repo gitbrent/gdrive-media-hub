@@ -23,6 +23,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
+	const [isFolderLoading, setIsFolderLoading] = useState(false)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'ascending' })
 	const [optSchWord, setOptSchWord] = useState('')
@@ -125,6 +126,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	}
 
 	const handleFolderClick = async (folderId: string, folderName: string) => {
+		if (isFolderLoading) return // Prevent further clicks if already loading a folder
+		setIsFolderLoading(true)
+
 		try {
 			const contents = await fetchWithTokenRefresh(folderId)
 			setOrigFolderContents(contents.items)
@@ -134,6 +138,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			console.error('Error fetching folder contents:', err)
 			console.error(err.status)
 		}
+
+		setIsFolderLoading(false)
 	}
 
 	const handleFileClick = async (file: IGapiFile) => {
@@ -382,13 +388,15 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<td>
 									<div className={mimeTextClass}>
 										<i className={
-											item.mimeType?.indexOf('folder') > -1
-												? 'fs-4 bi-folder-fill'
-												: item.mimeType?.indexOf('image') > -1
-													? 'fs-4 bi-image-fill'
-													: item.mimeType?.indexOf('video') > -1
-														? 'fs-4 bi-camera-video-fill'
-														: 'fs-4 bi-file-x text-light'
+											isFolder && isFolderLoading
+												? 'fs-4 bi-arrow-repeat'
+												: item.mimeType?.indexOf('folder') > -1
+													? 'fs-4 bi-folder-fill'
+													: item.mimeType?.indexOf('image') > -1
+														? 'fs-4 bi-image-fill'
+														: item.mimeType?.indexOf('video') > -1
+															? 'fs-4 bi-camera-video-fill'
+															: 'fs-4 bi-file-x text-light'
 										} />
 									</div>
 								</td>
@@ -396,7 +404,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 									{isFolder ?
 										<div
 											className={`${mimeTextClass} fw-bold`}
-											onClick={() => isFolder && handleFolderClick(item.id, item.name)}>
+											onClick={() => isFolder && !isFolderLoading && handleFolderClick(item.id, item.name)}>
 											{item.name}
 										</div>
 										: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
@@ -446,7 +454,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div />
 				}
 				<section className='p-4'>
-					<div className='p-4 bg-black'>
+					<div className={`p-4 bg-black ${isFolderLoading ? 'busy-cursor' : ''}`}>
 						<div className='table-responsive'>{renderTable()}</div>
 					</div>
 				</section>
