@@ -25,6 +25,8 @@ $pagination-active-bg: $primary;
 	$nav-pills-link-active-color: #333;
 */
 $nav-pills-link-active-bg: $gray-800;
+$breadcrumb-bg: null;
+$breadcrumb-font-size: 1.25rem; // "fs-5"
 
 // This way we dont have to add `mb-0` to every <h5> in .card-title
 $card-title-spacer-y: 0;
