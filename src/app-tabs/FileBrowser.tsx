@@ -330,24 +330,24 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="col d-none d-lg-block">
 							<a className="navbar-brand me-0 text-white">File Browser</a>
 						</div>
-						<div className="col">
+						<div className="col-12 col-md">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-auto">
-							<span className='text-success'>
+						<div className="col-12 col-md-auto h4 mb-0 mt-2 mt-md-0 text-center">
+							<span className='text-nowrap text-success'>
 								{currFolderContents.filter(item => item.mimeType.indexOf('folder') > -1).length}
-								<i className="bi-folder-fill ms-1" />
+								<i className="bi-folder-fill ms-2" />
 							</span>
-							<span className='text-info ms-3'>
+							<span className='text-nowrap text-info ms-3'>
 								{currFolderContents.filter(item => item.mimeType.indexOf('image') > -1).length}
-								<i className="bi-image-fill ms-1" />
+								<i className="bi-image-fill ms-2" />
 							</span>
-							<span className='text-warning ms-3'>
+							<span className='text-nowrap text-warning ms-3'>
 								{currFolderContents.filter(item => item.mimeType.indexOf('video') > -1).length}
-								<i className="bi-camera-video-fill ms-1" />
+								<i className="bi-camera-video-fill ms-2" />
 							</span>
 						</div>
 					</div>

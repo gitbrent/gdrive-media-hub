@@ -18,8 +18,8 @@
 }
 
 .image-viewer-content img {
-	max-height: 95vh;
-	max-width: 90vw;
+	max-height: 98vh;
+	max-width: 98vw;
 	margin: auto;
 	object-fit: contain;
 }
