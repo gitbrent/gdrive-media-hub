@@ -4,11 +4,14 @@ import { BreadcrumbSegment } from '../App.props'
 interface BreadcrumbProps {
 	path: BreadcrumbSegment[]
 	onNavigate: (pathIndex: number, folderId: string) => void
+	className?: string
 }
 
-const Breadcrumbs: React.FC<BreadcrumbProps> = ({ path, onNavigate }) => {
+const Breadcrumbs: React.FC<BreadcrumbProps> = ({ path, onNavigate, className }) => {
+	const navClassName = `text-noselect ${className || ''}`
+
 	return (
-		<nav className="text-noselect" aria-label="breadcrumb">
+		<nav className={navClassName} aria-label="breadcrumb">
 			<ol className="breadcrumb mb-0">
 				{path.map((segment, index) => (
 					<li
