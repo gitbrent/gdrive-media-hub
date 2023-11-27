@@ -1,36 +1,26 @@
 import React, { useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder, IGapiItem, formatBytesToMB, formatDate } from '../App.props'
-import { fetchWithTokenRefresh, getBlobForFile } from '../api'
+import { IGapiFile, IGapiFolder, formatBytesToMB, formatDate } from '../App.props'
+import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
+import { getBlobForFile } from '../api'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
-	setOrigFolderContents: (res: Array<IGapiFile | IGapiFolder>) => void
+	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
+	isFolderLoading: boolean
 	currFolderContents: Array<IGapiFile | IGapiFolder>
 	setCurrFolderContents: (res: Array<IGapiFile | IGapiFolder>) => void
-	currentFolderPath: BreadcrumbSegment[]
-	setCurrentFolderPath: (path: BreadcrumbSegment[]) => void
 	optSchWord?: string
-}
-
-type SortKey = keyof IGapiItem
-type SortDirection = 'ascending' | 'descending'
-
-interface SortConfig {
-	key: SortKey | null; // Include 'null' to handle no sorting case
-	direction: SortDirection;
 }
 
 const FileBrowserListView: React.FC<Props> = ({
 	origFolderContents,
-	setOrigFolderContents,
+	handleFolderClick,
+	isFolderLoading,
 	currFolderContents,
 	setCurrFolderContents,
-	currentFolderPath,
-	setCurrentFolderPath,
 	optSchWord
 }) => {
 	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
-	const [isFolderLoading, setIsFolderLoading] = useState(false)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
 	const [touchEnd, setTouchEnd] = useState<number | null>(null)
@@ -109,23 +99,6 @@ const FileBrowserListView: React.FC<Props> = ({
 		}
 
 		setSortConfig({ key, direction })
-	}
-
-	const handleFolderClick = async (folderId: string, folderName: string) => {
-		if (isFolderLoading) return // Prevent further clicks if already loading a folder
-		setIsFolderLoading(true)
-
-		try {
-			const contents = await fetchWithTokenRefresh(folderId)
-			setOrigFolderContents(contents.items)
-			setCurrFolderContents(contents.items)
-			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
-		} catch (err: any) {
-			console.error('Error fetching folder contents:', err)
-			console.error(err.status)
-		}
-
-		setIsFolderLoading(false)
 	}
 
 	const handleFileClick = async (file: IGapiFile) => {

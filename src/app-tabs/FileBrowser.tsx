@@ -19,6 +19,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [optSchWord, setOptSchWord] = useState('')
 	const [viewMode, setViewMode] = useState<ViewMode>('list')
+	const [isFolderLoading, setIsFolderLoading] = useState(false)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -51,6 +52,23 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 		// C: Clear filter
 		setOptSchWord('')
+	}
+
+	const handleFolderClick = async (folderId: string, folderName: string) => {
+		if (isFolderLoading) return // Prevent further clicks if already loading a folder
+		setIsFolderLoading(true)
+
+		try {
+			const contents = await fetchWithTokenRefresh(folderId)
+			setOrigFolderContents(contents.items)
+			setCurrFolderContents(contents.items)
+			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
+		} catch (err: any) {
+			console.error('Error fetching folder contents:', err)
+			console.error(err.status)
+		}
+
+		setIsFolderLoading(false)
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -118,14 +136,20 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</div>
 				</div>
 				{viewMode === 'grid'
-					? <FileBrowserGridView allFiles={[]} />
+					? <FileBrowserGridView
+						origFolderContents={origFolderContents}
+						currFolderContents={currFolderContents}
+						isFolderLoading={isFolderLoading}
+						setCurrFolderContents={setCurrFolderContents}
+						handleFolderClick={handleFolderClick}
+						optSchWord={optSchWord}
+					/>
 					: <FileBrowserListView
 						origFolderContents={origFolderContents}
-						setOrigFolderContents={setOrigFolderContents}
 						currFolderContents={currFolderContents}
+						isFolderLoading={isFolderLoading}
+						handleFolderClick={handleFolderClick}
 						setCurrFolderContents={setCurrFolderContents}
-						currentFolderPath={currentFolderPath}
-						setCurrentFolderPath={setCurrentFolderPath}
 						optSchWord={optSchWord}
 					/>
 				}
