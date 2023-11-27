@@ -38,9 +38,11 @@
 }
 
 /* by default, captions are shown in the grid and shadowbox, this hides the grid caption! */
+/*
 .gallery figure figcaption {
 	display: none;
 }
+*/
 
 /* make bootstrap spinner animated! */
 .bi-arrow-repeat {
