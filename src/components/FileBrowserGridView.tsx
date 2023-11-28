@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
+import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
-import { fetchFileBlobUrl } from '../AppMainLogic'
+//import '../css/ImageGrid.css'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -22,16 +23,16 @@ const FileBrowserGridView: React.FC<Props> = ({
 	setCurrFolderContents,
 	optSchWord,
 }) => {
-	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
+	const ITEMS_PER_PAGE = 6 * 2 // current style sets 6 items per row
 	//
+	const loadingRef = useRef(new Set<string>())
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
-	const [lastLoadDate, setLastLoadDate] = useState('')
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 
 	const gridShowFiles = useMemo(() => {
 		return currFolderContents
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-	}, [currFolderContents, optSchWord, lastLoadDate])
+	}, [currFolderContents, optSchWord])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -41,8 +42,12 @@ const FileBrowserGridView: React.FC<Props> = ({
 	const handleScroll = () => {
 		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
 		setDisplayedItems(currentItems => {
-			const maxItems = Math.min(currentItems.length + ITEMS_PER_PAGE, gridShowFiles.length)
-			return gridShowFiles.slice(0, maxItems)
+			// Calculate the number of new items to add
+			const nextItemsEndIndex = Math.min(currentItems.length + ITEMS_PER_PAGE, gridShowFiles.length)
+			const newItems = gridShowFiles.slice(currentItems.length, nextItemsEndIndex)
+
+			// Append new items to the current list
+			return [...currentItems, ...newItems]
 		})
 	}
 
@@ -63,19 +68,35 @@ const FileBrowserGridView: React.FC<Props> = ({
 	 */
 	useEffect(() => {
 		const loadBlobs = async () => {
-			const itemsToUpdate = displayedItems
-				.filter((item) => 'imageBlobUrl' in item && !item.imageBlobUrl)
+			let itemsUpdated = false
+			const updatedItems = [...displayedItems]
 
-			for (const item of itemsToUpdate) {
-				const blobUrl = await fetchFileBlobUrl(item.id)
-				if (blobUrl && 'imageBlobUrl' in item) {
-					item.imageBlobUrl = blobUrl
+			for (let i = 0; i < displayedItems.length; i++) {
+				const item = displayedItems[i]
+				if ('imageBlobUrl' in item && !item.imageBlobUrl && !item.blobUrlError && !loadingRef.current.has(item.id)) {
+					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
+					loadingRef.current.add(item.id)
+					try {
+						const blobUrl = await fetchFileBlobUrl(item.id)
+						if (blobUrl) {
+							updatedItems[i] = { ...item, imageBlobUrl: blobUrl }
+							itemsUpdated = true
+						} else {
+							throw new Error('Blob URL not found')
+						}
+					} catch (error: any) {
+						console.error(`Error loading blob for item ${item.id}:`, error)
+						updatedItems[i] = { ...item, blobUrlError: error.toString() }
+						itemsUpdated = true
+					} finally {
+						loadingRef.current.delete(item.id) // Mark as not loading
+					}
 				}
 			}
 
-			// Update the displayed items state to reflect the new blob URLs
-			setDisplayedItems([...displayedItems])
-			setLastLoadDate(new Date().toISOString()) // TODO: we dont need this anymore right?
+			if (itemsUpdated) {
+				setDisplayedItems(updatedItems)
+			}
 		}
 
 		loadBlobs()
@@ -151,20 +172,28 @@ const FileBrowserGridView: React.FC<Props> = ({
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('imageBlobUrl' in item) {
+		} else if ('blobUrlError' in item && item.blobUrlError) {
+			return (
+				<figure key={index} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
+					<i className="bi-warning" />
+					<figcaption>{item.name}</figcaption>
+				</figure>
+			)
+		} else if ('imageBlobUrl' in item && !item.imageBlobUrl) {
+			return (
+				<figure key={index} title={item.name} className="text-info figure-icon">
+					<i className="bi-arrow-repeat" />
+					<figcaption>{item.name}</figcaption>
+				</figure>
+			)
+		} else if ('imageBlobUrl' in item && item.imageBlobUrl) {
 			return (
 				<Item {...item} key={item.id}>
 					{({ ref, open }) => (
-						item?.imageBlobUrl ?
-							(<figure>
-								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.imageBlobUrl} title={item.name} />
-								<figcaption>{item.name}</figcaption>
-							</figure>)
-							:
-							(<figure title={item.name} className="text-info figure-icon">
-								<i className="bi-arrow-repeat" />
-								<figcaption>{item.name}</figcaption>
-							</figure>)
+						(<figure>
+							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.imageBlobUrl} title={item.name} />
+							<figcaption>{item.name}</figcaption>
+						</figure>)
 					)}
 				</Item>
 			)

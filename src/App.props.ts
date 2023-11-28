@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20231118-1320'
+export const APP_BLD = '20231127-2140'
 export const APP_VER = '2.0.0-WIP'
 
 // ============================================================================
@@ -153,11 +153,11 @@ export interface IGapiFile extends IGapiItem {
 }
 
 export interface IMediaFile extends IGapiFile {
-	imageBlobUrl?: string;
-	imageW?: number;
-	imageH?: number;
-	videoBlobUrl?: string;
-	// Other media-specific properties...
+	imageBlobUrl?: string
+	imageW?: number
+	imageH?: number
+	videoBlobUrl?: string
+	blobUrlError?: string
 }
 
 export interface IGapiFolder extends IGapiItem {
