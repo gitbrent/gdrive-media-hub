@@ -166,7 +166,7 @@ export interface IGapiFolder extends IGapiItem {
 
 export interface IDirectory {
 	currentFolder: IGapiFolder
-	items: Array<IGapiFile | IGapiFolder>
+	items: Array<IMediaFile | IGapiFolder>
 }
 
 export interface BreadcrumbSegment {

@@ -55,7 +55,7 @@
 	font-size: 1.5rem;
 	/* Adjust size as needed */
 	z-index: 1022;
-	/* Ensure it's above the overlay content */
+	/* Ensure its above the overlay content */
 	background: rgba(0, 0, 0, 0.5);
 	border: none;
 	cursor: pointer;
@@ -116,17 +116,27 @@
 	cursor: wait;
 }
 
-/* make bootstrap spinner animated! */
-.bi-arrow-repeat {
-	animation: spin 2s linear infinite;
+figure.figure-icon {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	/* Distributes space evenly between items */
+	align-items: center;
+	height: 100%;
+	/* Ensures figure takes full height of its container */
+	padding: 1rem;
+	/* Adds some padding inside the figure */
+	background-color: rgba(10, 10, 10, 0.7);
 }
 
-@keyframes spin {
-	0% {
-		transform: rotate(0deg);
-	}
+figure.figure-icon figcaption {
+	text-align: center;
+	max-width: 100%;
+	word-wrap: break-word;
+	margin-top: auto;
+	/* Pushes the caption to the bottom */
+}
 
-	100% {
-		transform: rotate(360deg);
-	}
+figure.figure-icon i {
+	font-size: 5rem;
 }

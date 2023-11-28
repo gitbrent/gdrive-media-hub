@@ -45,6 +45,7 @@
 */
 
 /* make bootstrap spinner animated! */
+/*
 .bi-arrow-repeat {
 	animation: spin 2s linear infinite;
 }
@@ -58,6 +59,7 @@
 		transform: rotate(360deg);
 	}
 }
+*/
 
 /* ----------------------------------------------------- */
 /* columns */

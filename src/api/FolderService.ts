@@ -1,4 +1,4 @@
-import { IDirectory, IGapiFile, IGapiFolder } from '../App.props'
+import { IDirectory, IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
 import { checkGapiInitialized } from './GapiClient'
 import { refreshToken } from './AuthService'
 
@@ -95,7 +95,7 @@ export async function fetchFolderContents(folderId: string): Promise<IDirectory>
 			if (file.mimeType === 'application/vnd.google-apps.folder') {
 				folders.push(file as IGapiFolder)
 			} else {
-				files.push(file as IGapiFile)
+				files.push({ ...file, imageBlobUrl: '' } as IMediaFile)
 			}
 		})
 

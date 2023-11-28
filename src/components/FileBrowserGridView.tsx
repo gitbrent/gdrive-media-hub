@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { IGapiFile, IGapiFolder } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
+import { fetchFileBlobUrl } from '../AppMainLogic'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	isFolderLoading: boolean
-	currFolderContents: Array<IGapiFile | IGapiFolder>
+	currFolderContents: Array<IMediaFile | IGapiFolder>
 	setCurrFolderContents: (res: Array<IGapiFile | IGapiFolder>) => void
 	optSchWord?: string
 }
@@ -19,9 +20,66 @@ const FileBrowserGridView: React.FC<Props> = ({
 	isFolderLoading,
 	currFolderContents,
 	setCurrFolderContents,
-	optSchWord
+	optSchWord,
 }) => {
+	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
+	//
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
+	const [lastLoadDate, setLastLoadDate] = useState('')
+	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
+
+	const gridShowFiles = useMemo(() => {
+		return currFolderContents
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+	}, [currFolderContents, optSchWord, lastLoadDate])
+
+	// --------------------------------------------------------------------------------------------
+
+	/**
+	 * Handle scroll event to load more items
+	 */
+	const handleScroll = () => {
+		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
+		setDisplayedItems(currentItems => {
+			const maxItems = Math.min(currentItems.length + ITEMS_PER_PAGE, gridShowFiles.length)
+			return gridShowFiles.slice(0, maxItems)
+		})
+	}
+
+	useEffect(() => {
+		window.addEventListener('scroll', handleScroll)
+		return () => window.removeEventListener('scroll', handleScroll)
+	}, [gridShowFiles])
+
+	/**
+	 * Load initial set of items
+	 */
+	useEffect(() => {
+		setDisplayedItems(gridShowFiles.slice(0, ITEMS_PER_PAGE))
+	}, [gridShowFiles])
+
+	/**
+	 * Load blobs for the displayed items
+	 */
+	useEffect(() => {
+		const loadBlobs = async () => {
+			const itemsToUpdate = displayedItems
+				.filter((item) => 'imageBlobUrl' in item && !item.imageBlobUrl)
+
+			for (const item of itemsToUpdate) {
+				const blobUrl = await fetchFileBlobUrl(item.id)
+				if (blobUrl && 'imageBlobUrl' in item) {
+					item.imageBlobUrl = blobUrl
+				}
+			}
+
+			// Update the displayed items state to reflect the new blob URLs
+			setDisplayedItems([...displayedItems])
+			setLastLoadDate(new Date().toISOString()) // TODO: we dont need this anymore right?
+		}
+
+		loadBlobs()
+	}, [displayedItems])
 
 	useEffect(() => {
 		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
@@ -85,41 +143,28 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 	// --------------------------------------------------------------------------------------------
 
-	// TODO: Show folders first
-	const filteredSortedContents = useMemo(() => {
-		// TODO: Implement filtering and sorting logic here, similar to FileBrowserListView
-		// Return the sorted and filtered contents
-		return currFolderContents
-	}, [currFolderContents, optSchWord])
-
-	const renderGridItem = (item: IGapiFile | IGapiFolder, index: number) => {
+	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
 		if (item.mimeType === 'application/vnd.google-apps.folder') {
 			return (
-				<figure
-					key={index}
-					title={item.name}
-					onClick={() => handleFolderClick(item.id, item.name)}
-					style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
-					className='text-success'
-				>
-					<i className="bi-folder-fill" style={{ fontSize: '6rem' }} />
-					<figcaption style={{ textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}>{item.name}</figcaption>
+				<figure key={index} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
+					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder-fill'} />
+					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('blobUrl' in item) {
+		} else if ('imageBlobUrl' in item) {
 			return (
-				<Item
-					key={index}
-					original={item.blobUrl}
-					thumbnail={item.blobUrl}
-					width="1024"
-					height="768"
-				>
+				<Item {...item} key={item.id}>
 					{({ ref, open }) => (
-						<figure>
-							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.blobUrl} alt={item.name} />
-							<figcaption>{item.name}</figcaption>
-						</figure>
+						item?.imageBlobUrl ?
+							(<figure>
+								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.imageBlobUrl} title={item.name} />
+								<figcaption>{item.name}</figcaption>
+							</figure>)
+							:
+							(<figure title={item.name} className="text-info figure-icon">
+								<i className="bi-arrow-repeat" />
+								<figcaption>{item.name}</figcaption>
+							</figure>)
 					)}
 				</Item>
 			)
@@ -130,14 +175,14 @@ const FileBrowserGridView: React.FC<Props> = ({
 		return (
 			<Gallery id="contImageGrid" withCaption={false}>
 				<div id="gallery-container" className="gallery">
-					{filteredSortedContents.map((item, index) => renderGridItem(item, index))}
+					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
 			</Gallery>
 		)
 	}
 
 	return (
-		<section>
+		<section className="bg-black">
 			{renderGrid()}
 		</section>
 	)

@@ -93,9 +93,33 @@ export const getCacheStatus = async (): Promise<IFileListCache | null> => {
 	}
 }
 
+//
+
 /**
- * load image file blob from google drive api
- * @param fileId
+ * Fetch the blob for a file and return the object URL.
+ * @param fileId The ID of the file to fetch.
+ * @returns The object URL of the file blob.
+ */
+export const fetchFileBlobUrl = async (fileId: string): Promise<string | null> => {
+	try {
+		const response = await fetchFileImgBlob(fileId)
+		if (!response) {
+			console.warn('fetchFileImgBlob() failed')
+			return null
+		}
+
+		const blob = await response.blob()
+		return URL.createObjectURL(blob)
+	} catch (error) {
+		console.error(`Failed to fetch blob for file with ID ${fileId}:`, error)
+		return null
+	}
+}
+
+/**
+ * Download a file, update _gapiFiles collection, and return success status.
+ * @param fileId The ID of the file to download.
+ * @returns A boolean indicating the success of the operation.
  */
 export const downloadFile = async (fileId: string): Promise<boolean> => {
 	try {
@@ -105,49 +129,43 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 			return false
 		}
 
-		const response = await fetchFileImgBlob(file.id)
-		if (response) {
-			const blob = await response.blob()
-			const objectUrl = URL.createObjectURL(blob)
+		const objectUrl = await fetchFileBlobUrl(file.id)
+		if (!objectUrl) return false
 
-			if (blob.type.startsWith('image/')) {
-				return new Promise((resolve) => {
-					const img = new Image()
-					img.src = objectUrl
-					img.onload = () => {
-						const updFiles = [..._gapiFiles]
-						const imgFile = updFiles.find((file) => file.id === fileId)
-						if (imgFile) {
-							imgFile.imageBlobUrl = objectUrl
-							imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-							imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
-						}
-						_gapiFiles = updFiles
-						resolve(true)
+		if (file.mimeType.startsWith('image/')) {
+			return new Promise((resolve) => {
+				const img = new Image()
+				img.src = objectUrl
+				img.onload = () => {
+					const updFiles = [..._gapiFiles]
+					const imgFile = updFiles.find((file) => file.id === fileId)
+					if (imgFile) {
+						imgFile.imageBlobUrl = objectUrl
+						imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
+						imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
 					}
-					img.onerror = () => {
-						console.error('Error loading image')
-						resolve(false)
-					}
-				})
-			} else if (blob.type.startsWith('video/')) {
-				const updFiles = [..._gapiFiles]
-				const videoFile = updFiles.find((file) => file.id === fileId)
-				if (videoFile) {
-					videoFile.videoBlobUrl = objectUrl // Store the URL for the video
-					// For video, you might not need width and height beforehand,
-					// but you could set some default values or try to read the metadata
-					// using a hidden video element (more complex and usually not necessary).
+					_gapiFiles = updFiles
+					resolve(true)
 				}
-				_gapiFiles = updFiles
-				return true
-			} else {
-				console.warn(`Unknown blob.type: ${blob.type}`)
-				console.warn(`....... file.name: ${file.name}`)
-				return false
+				img.onerror = () => {
+					console.error('Error loading image')
+					resolve(false)
+				}
+			})
+		} else if (file.mimeType.startsWith('video/')) {
+			const updFiles = [..._gapiFiles]
+			const videoFile = updFiles.find((file) => file.id === fileId)
+			if (videoFile) {
+				videoFile.videoBlobUrl = objectUrl // Store the URL for the video
+				// For video, you might not need width and height beforehand,
+				// but you could set some default values or try to read the metadata
+				// using a hidden video element (more complex and usually not necessary).
 			}
+			_gapiFiles = updFiles
+			return true
 		} else {
-			console.warn('fetchFileContent() failed')
+			console.warn(`Unknown mimeType: ${file.mimeType}`)
+			console.warn(`.......file.name: ${file.name}`)
 			return false
 		}
 	} catch (error) {
