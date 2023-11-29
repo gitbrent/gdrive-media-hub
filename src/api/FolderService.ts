@@ -95,7 +95,7 @@ export async function fetchFolderContents(folderId: string): Promise<IDirectory>
 			if (file.mimeType === 'application/vnd.google-apps.folder') {
 				folders.push(file as IGapiFolder)
 			} else {
-				files.push({ ...file, imageBlobUrl: '' } as IMediaFile)
+				files.push({ ...file, original: '' } as IMediaFile)
 			}
 		})
 

@@ -42,13 +42,13 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	}, [allImages, optSchWord])
 
 	useEffect(() => {
-		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.imageBlobUrl) {
+		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.original) {
 			downloadFile(shfImages[currIndex].id).then(() => {
-				setCurrentImageUrl(shfImages[currIndex].imageBlobUrl || '')
+				setCurrentImageUrl(shfImages[currIndex].original || '')
 			})
 		}
 		else {
-			setCurrentImageUrl(shfImages[currIndex]?.imageBlobUrl || '')
+			setCurrentImageUrl(shfImages[currIndex]?.original || '')
 		}
 	}, [currIndex, shfImages])
 
@@ -56,7 +56,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	useEffect(() => {
 		for (let i = 1; i <= 3; i++) {
 			const nextIndex = (currIndex + i) % shfImages.length
-			if (shfImages[nextIndex] && !shfImages[nextIndex].imageBlobUrl) {
+			if (shfImages[nextIndex] && !shfImages[nextIndex].original) {
 				downloadFile(shfImages[nextIndex].id)
 			}
 		}
@@ -127,7 +127,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	// TODO: 20231029: use `downloadFile` on first init, then use UpdateDate like gird so we GUARANTEE the image shows/is loaded
 	/* 20231029 - not working, seems like a closure issue in `AppMainLogic.ts`
 	useEffect(() => {
-		if (currentImage && currentImage.id && !currentImage.imageBlobUrl) {
+		if (currentImage && currentImage.id && !currentImage.original) {
 			downloadFile(currentImage.id)
 				.then(() => {
 					//setLastLoadDate(new Date().toISOString())

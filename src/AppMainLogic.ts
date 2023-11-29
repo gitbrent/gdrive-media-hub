@@ -140,9 +140,9 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 					const updFiles = [..._gapiFiles]
 					const imgFile = updFiles.find((file) => file.id === fileId)
 					if (imgFile) {
-						imgFile.imageBlobUrl = objectUrl
-						imgFile.imageW = img.width && !isNaN(img.width) ? img.width : 100
-						imgFile.imageH = img.height && !isNaN(img.height) ? img.height : 100
+						imgFile.original = objectUrl
+						imgFile.width = img.width && !isNaN(img.width) ? img.width : 100
+						imgFile.height = img.height && !isNaN(img.height) ? img.height : 100
 					}
 					_gapiFiles = updFiles
 					resolve(true)
@@ -156,7 +156,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 			const updFiles = [..._gapiFiles]
 			const videoFile = updFiles.find((file) => file.id === fileId)
 			if (videoFile) {
-				videoFile.videoBlobUrl = objectUrl // Store the URL for the video
+				videoFile.original = objectUrl // Store the URL for the video
 				// For video, you might not need width and height beforehand,
 				// but you could set some default values or try to read the metadata
 				// using a hidden video element (more complex and usually not necessary).

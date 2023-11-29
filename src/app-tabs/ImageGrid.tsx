@@ -52,10 +52,10 @@ export default function ImageGrid(props: IProps) {
 				showImages.push({
 					id: item.id,
 					caption: item.name || '(loading)',
-					original: item.imageBlobUrl || '',
-					thumbnail: item.imageBlobUrl || '',
-					width: item.imageW || 0,
-					height: item.imageH || 0,
+					original: item.original || '',
+					thumbnail: item.original || '',
+					width: item.width || 0,
+					height: item.height || 0,
 				})
 			})
 

@@ -36,13 +36,13 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	}, [allVideos, optSchWord])
 
 	useEffect(() => {
-		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.videoBlobUrl) {
+		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.original) {
 			downloadFile(shfImages[currIndex].id).then(() => {
-				setCurrentImageUrl(shfImages[currIndex].videoBlobUrl || '')
+				setCurrentImageUrl(shfImages[currIndex].original || '')
 			})
 		}
 		else {
-			setCurrentImageUrl(shfImages[currIndex]?.videoBlobUrl || '')
+			setCurrentImageUrl(shfImages[currIndex]?.original || '')
 		}
 	}, [currIndex, shfImages])
 

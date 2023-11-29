@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20231127-2140'
+export const APP_BLD = '20231128-1940'
 export const APP_VER = '2.0.0-WIP'
 
 // ============================================================================
@@ -152,11 +152,17 @@ export interface IGapiFile extends IGapiItem {
 	blobUrl?: string
 }
 
+// NOTE: prop names follow [PhotoswipeGalleryItems] **DO NOT RENAME**
 export interface IMediaFile extends IGapiFile {
-	imageBlobUrl?: string
-	imageW?: number
-	imageH?: number
-	videoBlobUrl?: string
+	/**
+	 * Url of image
+	 * - use `blobUrl` from "fetchFileBlobUrl()" app service method
+	 */
+	original?: string
+	width?: string | number
+	height?: string | number
+	caption?: string
+	thumbnail?: string
 	blobUrlError?: string
 }
 
