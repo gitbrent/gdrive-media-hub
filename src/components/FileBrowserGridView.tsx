@@ -4,7 +4,7 @@ import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
-//import '../css/ImageGrid.css'
+import '../css/ImageGrid.css'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -23,7 +23,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 	setCurrFolderContents,
 	optSchWord,
 }) => {
-	const ITEMS_PER_PAGE = 6 * 2 // current style sets 6 items per row
+	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
@@ -62,45 +62,6 @@ const FileBrowserGridView: React.FC<Props> = ({
 	useEffect(() => {
 		setDisplayedItems(gridShowFiles.slice(0, ITEMS_PER_PAGE))
 	}, [gridShowFiles])
-
-	/**
-	 * Load blobs for the displayed items
-	 */
-	useEffect(() => {
-		const loadBlobs = async () => {
-			let itemsUpdated = false
-			const updatedItems = [...displayedItems]
-
-			for (let i = 0; i < displayedItems.length; i++) {
-				const item = displayedItems[i]
-				if ('imageBlobUrl' in item && !item.imageBlobUrl && !item.blobUrlError && !loadingRef.current.has(item.id)) {
-					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
-					loadingRef.current.add(item.id)
-					try {
-						const blobUrl = await fetchFileBlobUrl(item.id)
-						if (blobUrl) {
-							updatedItems[i] = { ...item, imageBlobUrl: blobUrl }
-							itemsUpdated = true
-						} else {
-							throw new Error('Blob URL not found')
-						}
-					} catch (error: any) {
-						console.error(`Error loading blob for item ${item.id}:`, error)
-						updatedItems[i] = { ...item, blobUrlError: error.toString() }
-						itemsUpdated = true
-					} finally {
-						loadingRef.current.delete(item.id) // Mark as not loading
-					}
-				}
-			}
-
-			if (itemsUpdated) {
-				setDisplayedItems(updatedItems)
-			}
-		}
-
-		loadBlobs()
-	}, [displayedItems])
 
 	useEffect(() => {
 		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
@@ -164,34 +125,113 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 	// --------------------------------------------------------------------------------------------
 
+	/**
+	 * Load blobs for the displayed items
+	 */
+	useEffect(() => {
+		const loadBlobs = async () => {
+			let itemsUpdated = false
+			const updatedItems = [...displayedItems]
+			const blobFetchPromises: Promise<any>[] = []
+
+			updatedItems.forEach((item) => {
+				if ('original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
+					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
+					loadingRef.current.add(item.id)
+
+					const fetchPromise = fetchFileBlobUrl(item.id).then(blobUrl => {
+						if (blobUrl) {
+							if (item.mimeType.startsWith('image/')) {
+								return loadImage(blobUrl).then(({ width, height }) => {
+									item.original = blobUrl
+									item.width = width
+									item.height = height
+									item.blobUrlError = ''
+									itemsUpdated = true
+								}).catch(() => {
+									console.error('Error loading image')
+									item.blobUrlError = 'Error loading image'
+									itemsUpdated = true
+								})
+							} else if (item.mimeType.startsWith('video/')) {
+								item.original = blobUrl
+								itemsUpdated = true
+							}
+						} else {
+							item.blobUrlError = 'Blob URL not found'
+							itemsUpdated = true
+						}
+					}).catch(error => {
+						console.error(`Error loading blob for item ${item.id}:`, error)
+						item.blobUrlError = error.toString()
+						itemsUpdated = true
+					}).finally(() => {
+						loadingRef.current.delete(item.id)
+					})
+
+					blobFetchPromises.push(fetchPromise)
+				}
+			})
+
+			await Promise.all(blobFetchPromises)
+
+			if (itemsUpdated) {
+				setDisplayedItems(updatedItems)
+			}
+		}
+
+		loadBlobs()
+	}, [displayedItems])
+
+	/**
+	 * Helper function to load an image and return its dimensions
+	 */
+	const loadImage = (src: string): Promise<{ width: number, height: number }> => {
+		return new Promise((resolve, reject) => {
+			const img = new Image()
+			img.src = src
+			img.onload = () => resolve({ width: img.width, height: img.height })
+			img.onerror = () => reject(new Error('Image load error'))
+		})
+	}
+
+	// --------------------------------------------------------------------------------------------
+
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
 		if (item.mimeType === 'application/vnd.google-apps.folder') {
 			return (
-				<figure key={index} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
 					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder-fill'} />
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
 		} else if ('blobUrlError' in item && item.blobUrlError) {
 			return (
-				<figure key={index} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
+				<figure key={`${index}${item.id}`} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
 					<i className="bi-warning" />
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('imageBlobUrl' in item && !item.imageBlobUrl) {
+		} else if ('original' in item && !item.original) {
 			return (
-				<figure key={index} title={item.name} className="text-info figure-icon">
+				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
 					<i className="bi-arrow-repeat" />
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('imageBlobUrl' in item && item.imageBlobUrl) {
+		} else if ('original' in item && item.original && item.mimeType.startsWith('video/')) {
 			return (
-				<Item {...item} key={item.id}>
+				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+					<i className="bi-camera-video" />
+					<figcaption>{item.name}</figcaption>
+				</figure>
+			)
+		} else if ('original' in item && item.original) {
+			return (
+				<Item {...item} key={`${index}${item.id}`}>
 					{({ ref, open }) => (
 						(<figure>
-							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.imageBlobUrl} title={item.name} />
+							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
 							<figcaption>{item.name}</figcaption>
 						</figure>)
 					)}
