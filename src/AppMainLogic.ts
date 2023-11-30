@@ -1,4 +1,5 @@
 import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, log } from './App.props'
+import { isImage, isVideo } from './utils/mimeTypes'
 import {
 	doAuthSignIn,
 	doAuthSignOut,
@@ -132,7 +133,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 		const objectUrl = await fetchFileBlobUrl(file.id)
 		if (!objectUrl) return false
 
-		if (file.mimeType.startsWith('image/')) {
+		if (isImage(file)) {
 			return new Promise((resolve) => {
 				const img = new Image()
 				img.src = objectUrl
@@ -152,7 +153,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 					resolve(false)
 				}
 			})
-		} else if (file.mimeType.startsWith('video/')) {
+		} else if (isVideo(file)) {
 			const updFiles = [..._gapiFiles]
 			const videoFile = updFiles.find((file) => file.id === fileId)
 			if (videoFile) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
+import { isImage, isVideo } from '../utils/mimeTypes'
 import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
@@ -143,7 +144,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 					const fetchPromise = fetchFileBlobUrl(item.id).then(blobUrl => {
 						if (blobUrl) {
-							if (item.mimeType.startsWith('image/')) {
+							if (isImage(item)) {
 								return loadImage(blobUrl).then(({ width, height }) => {
 									item.original = blobUrl
 									item.width = width
@@ -155,7 +156,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 									item.blobUrlError = 'Error loading image'
 									itemsUpdated = true
 								})
-							} else if (item.mimeType.startsWith('video/')) {
+							} else if (isVideo(item)) {
 								item.original = blobUrl
 								itemsUpdated = true
 							}
