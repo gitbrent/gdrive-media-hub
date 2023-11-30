@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, formatBytesToMB, formatDate } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
-import { getBlobForFile } from '../api'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
+import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { getBlobForFile } from '../api'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -240,20 +241,19 @@ const FileBrowserListView: React.FC<Props> = ({
 			<tbody>
 				{currFolderContents.length > 0
 					? currFolderContents.map((item, index) => {
-						const isFolder = item.mimeType?.includes('folder')
-						const mimeTextClass = isFolder ? 'text-success' : item.mimeType?.includes('image') ? 'text-info' : 'text-warning'
+						const mimeTextClass = isFolder(item) ? 'text-success' : isImage(item) ? 'text-info' : 'text-warning'
 						return (
 							<tr key={index}>
 								<td>
 									<div className={mimeTextClass}>
 										<i className={
-											isFolder && isFolderLoading
+											isFolder(item) && isFolderLoading
 												? 'fs-4 bi-arrow-repeat'
-												: item.mimeType?.indexOf('folder') > -1
+												: isFolder(item)
 													? 'fs-4 bi-folder-fill'
-													: item.mimeType?.indexOf('image') > -1
+													: isImage(item)
 														? 'fs-4 bi-image-fill'
-														: item.mimeType?.indexOf('video') > -1
+														: isVideo(item)
 															? 'fs-4 bi-camera-video-fill'
 															: 'fs-4 bi-file-x text-light'
 										} />
@@ -263,10 +263,10 @@ const FileBrowserListView: React.FC<Props> = ({
 									{isFolder ?
 										<div
 											className={`${mimeTextClass} fw-bold`}
-											onClick={() => isFolder && !isFolderLoading && handleFolderClick(item.id, item.name)}>
+											onClick={() => isFolder(item) && !isFolderLoading && handleFolderClick(item.id, item.name)}>
 											{item.name}
 										</div>
-										: item.mimeType.includes('image/') || item.mimeType.includes('video/') ?
+										: isImage(item) || isVideo(item) ?
 											<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
 												{item.name}
 											</div>
@@ -274,7 +274,7 @@ const FileBrowserListView: React.FC<Props> = ({
 											<div>{item.name}</div>
 									}
 								</td>
-								<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+								<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder(item) && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
 								<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
 								<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
 								<td className='text-nowrap text-center text-muted d-none d-md-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>

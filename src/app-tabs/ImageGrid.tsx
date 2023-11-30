@@ -6,6 +6,7 @@ import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
+import { isImage } from '../utils/mimeTypes'
 
 interface IProps {
 	allFiles: IMediaFile[]
@@ -45,7 +46,7 @@ export default function ImageGrid(props: IProps) {
 
 		// B: filter, sort, populate image array
 		props.allFiles
-			.filter((item) => item.mimeType.indexOf('image') > -1)
+			.filter((item) => isImage(item))
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {

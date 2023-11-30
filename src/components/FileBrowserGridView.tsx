@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
-import { isImage, isVideo } from '../utils/mimeTypes'
+import { VideoViewerOverlay } from './FileBrowOverlays'
+import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
-import { VideoViewerOverlay } from './FileBrowOverlays'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -138,7 +138,8 @@ const FileBrowserGridView: React.FC<Props> = ({
 			const blobFetchPromises: Promise<any>[] = []
 
 			updatedItems.forEach((item) => {
-				if ('original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
+				// NOTE: only download images
+				if (isImage(item) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
@@ -198,10 +199,34 @@ const FileBrowserGridView: React.FC<Props> = ({
 		})
 	}
 
+	// -----
+
+	/**
+	 * download videos when they're clicked
+	 * - (they are not preloaded for perf reasons)
+	 */
+	useEffect(() => {
+		if (selectedFile && !selectedFile.original) {
+			const item = { ...selectedFile }
+			fetchFileBlobUrl(selectedFile.id).then(blobUrl => {
+				if (blobUrl) {
+					if (isVideo(item)) {
+						item.original = blobUrl
+					}
+				} else {
+					item.blobUrlError = 'Blob URL not found'
+				}
+			}).catch(error => {
+				console.error(`Error loading blob for item ${item.id}:`, error)
+				item.blobUrlError = error.toString()
+			})
+		}
+	}, [selectedFile])
+
 	// --------------------------------------------------------------------------------------------
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
-		if (item.mimeType === 'application/vnd.google-apps.folder') {
+		if (isFolder(item)) {
 			return (
 				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
 					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder-fill'} />
@@ -215,21 +240,21 @@ const FileBrowserGridView: React.FC<Props> = ({
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('original' in item && !item.original) {
-			return (
-				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-					<i className="bi-arrow-repeat" />
-					<figcaption>{item.name}</figcaption>
-				</figure>
-			)
-		} else if ('original' in item && item.original && item.mimeType.startsWith('video/')) {
+		} else if (isVideo(item)) {
 			return (
 				<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
 					<i className="bi-camera-video" />
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
-		} else if ('original' in item && item.original) {
+		} else if (isImage(item) && 'original' in item && !item.original) {
+			return (
+				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+					<i className="bi-arrow-repeat" />
+					<figcaption>{item.name}</figcaption>
+				</figure>
+			)
+		} else if (isImage(item) && 'original' in item && item.original) {
 			return (
 				<Item {...item} key={`${index}${item.id}`}>
 					{({ ref, open }) => (

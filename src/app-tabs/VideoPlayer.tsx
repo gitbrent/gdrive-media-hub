@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { IMediaFile } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
+import { isVideo } from '../utils/mimeTypes'
 import '../css/VideoPlayer.css'
 
 export interface Props {
@@ -22,7 +23,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	 */
 	useEffect(() => {
 		setAllVideos([...allFiles]
-			.filter((item) => item.mimeType.toLowerCase().indexOf('video/mp4') > -1)
+			.filter((item) => isVideo(item))
 			.sort(() => Math.random() - 0.5))
 	}, [allFiles])
 

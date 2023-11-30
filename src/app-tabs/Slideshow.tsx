@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { IMediaFile } from '../App.props'
+import { isImage } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import '../css/Slideshow.css'
 
@@ -31,7 +32,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	 */
 	useEffect(() => {
 		setAllImages([...allFiles]
-			.filter((item) => item.mimeType.toLowerCase().indexOf('image') > -1)
+			.filter((item) => isImage(item))
 			.sort(() => Math.random() - 0.5))
 	}, [allFiles])
 

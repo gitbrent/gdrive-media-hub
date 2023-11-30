@@ -5,6 +5,7 @@ import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import FileBrowserListView from '../components/FileBrowserListView'
 import FileBrowserGridView from '../components/FileBrowserGridView'
+import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import '../css/FileBrowser.css'
 
 interface Props {
@@ -89,15 +90,15 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						</div>
 						<div className="col-12 col-md-auto h4 mb-0 mt-2 mt-md-0 text-center">
 							<span className='text-nowrap text-success'>
-								{currFolderContents.filter(item => item.mimeType.indexOf('folder') > -1).length}
+								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
 							</span>
 							<span className='text-nowrap text-info ms-3'>
-								{currFolderContents.filter(item => item.mimeType.indexOf('image') > -1).length}
+								{currFolderContents.filter(item => isImage(item)).length}
 								<i className="bi-image-fill ms-2" />
 							</span>
 							<span className='text-nowrap text-warning ms-3'>
-								{currFolderContents.filter(item => item.mimeType.indexOf('video') > -1).length}
+								{currFolderContents.filter(item => isVideo(item)).length}
 								<i className="bi-camera-video-fill ms-2" />
 							</span>
 						</div>
