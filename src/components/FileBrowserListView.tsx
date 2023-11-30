@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, formatBytesToMB, formatDate } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { getBlobForFile } from '../api'
+import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -214,54 +215,6 @@ const FileBrowserListView: React.FC<Props> = ({
 
 	// --------------------------------------------------------------------------------------------
 
-	const OverlayButtons: React.FC = () => {
-		return (
-			<>
-				<button className="h3 chevron-button chevron-left" onClick={navigateToPrevFile}>
-					<i className="bi bi-chevron-left"></i>
-				</button>
-				<button className="h3 chevron-button chevron-right" onClick={navigateToNextFile}>
-					<i className="bi bi-chevron-right"></i>
-				</button>
-				<button className="h3 btn-close-overlay" onClick={(e) => {
-					e.stopPropagation()
-					setSelectedFile(null)
-				}}>
-					<i className="bi bi-x-lg"></i>
-				</button>
-			</>
-		)
-	}
-
-	const ImageViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
-		if (!selectedFile) return null
-
-		return (
-			<div className="image-viewer-overlay">
-				<div className="image-viewer-content">
-					<img src={selectedFile.blobUrl} alt={selectedFile.name} />
-				</div>
-				<OverlayButtons />
-			</div>
-		)
-	}
-
-	const VideoViewerOverlay: React.FC<{ selectedFile: IGapiFile }> = ({ selectedFile }) => {
-		if (!selectedFile) return null
-
-		return (
-			<div className="video-viewer-overlay">
-				<div className="video-viewer-content">
-					<video id="video-player" controls>
-						<source src={selectedFile.blobUrl} type={selectedFile.mimeType} />
-						Your browser does not support the video tag.
-					</video>
-				</div>
-				<OverlayButtons />
-			</div>
-		)
-	}
-
 	function renderTable(): JSX.Element {
 		return (<table className='table align-middle mb-0'>
 			<thead>
@@ -354,8 +307,18 @@ const FileBrowserListView: React.FC<Props> = ({
 				: selectedFile ? (
 					// eslint-disable-next-line react/prop-types
 					selectedFile.mimeType.includes('video/') ?
-						<VideoViewerOverlay selectedFile={selectedFile} /> :
-						<ImageViewerOverlay selectedFile={selectedFile} />
+						<VideoViewerOverlay
+							selectedFile={selectedFile}
+							navigateToNextFile={navigateToNextFile}
+							navigateToPrevFile={navigateToPrevFile}
+							setSelectedFile={setSelectedFile}
+						/> :
+						<ImageViewerOverlay
+							selectedFile={selectedFile}
+							navigateToNextFile={navigateToNextFile}
+							navigateToPrevFile={navigateToPrevFile}
+							setSelectedFile={setSelectedFile}
+						/>
 				) :
 					<div />
 			}

@@ -5,6 +5,7 @@ import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
+import { VideoViewerOverlay } from './FileBrowOverlays'
 
 interface Props {
 	origFolderContents: Array<IGapiFile | IGapiFolder>
@@ -28,6 +29,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 	const loadingRef = useRef(new Set<string>())
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
+	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 
 	const gridShowFiles = useMemo(() => {
 		return currFolderContents
@@ -221,7 +223,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 			)
 		} else if ('original' in item && item.original && item.mimeType.startsWith('video/')) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
 					<i className="bi-camera-video" />
 					<figcaption>{item.name}</figcaption>
 				</figure>
@@ -252,6 +254,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 	return (
 		<section className="bg-black">
+			<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
 			{renderGrid()}
 		</section>
 	)
