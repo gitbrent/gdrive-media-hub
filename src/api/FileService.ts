@@ -1,62 +1,46 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
-import { CACHE_EXPIRY_TIME, loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
+import { loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
 import { getAccessToken } from './AuthService'
 
 export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
-	let cachedFiles: IGapiFile[] = []
-	let mergedFiles: IGapiFile[] = []
-	let isFullRefresh = true
-
+	// STEP 1:
 	const objCache = await loadCacheFromIndexedDB().catch(() => {
 		log(2, '[FileService]: loadCacheFromIndexedDB failed')
 	})
 
-	if (objCache?.timeStamp && objCache?.gapiFiles?.length > 0) {
-		if (Date.now() - objCache.timeStamp < CACHE_EXPIRY_TIME) {
-			log(2, '[FileService] FYI: fetchDriveFiles = using cachedData')
-			cachedFiles = objCache.gapiFiles
-		}
-	}
-	isFullRefresh = !cachedFiles || cachedFiles.length === 0
-	log(2, `[FileService]: FYI: isFullRefresh = ${isFullRefresh}`)
+	// STEP 2:
+	const cachedFiles = objCache?.gapiFiles || []
+	const lastLoadDate = objCache?.timeStamp ? new Date(objCache.timeStamp).toISOString() : ''
+	log(2, `[FileService] FYI: cachedFiles.length = ${cachedFiles?.length}`)
+	log(2, `[FileService] FYI: lastLoadDate = ${lastLoadDate}`)
 
-	// Cache is stale or not present, so fetch new data using fetchDriveFilesAll
-	const newFiles = await fetchDriveFilesAll(isFullRefresh)
+	// STEP 3: Cache is stale or not present, so fetch new data using fetchDriveFilesAll
+	const newFiles = await fetchDriveFilesAll(lastLoadDate)
 
-	if (!isFullRefresh) {
-		const cachedFilesMap = new Map(cachedFiles.map(file => [file.id, file]))
+	// STEP 4: File collection
+	const mergedFiles = [...new Set([...cachedFiles, ...newFiles])]
 
-		// Iterate over new files and update or add to the map
-		newFiles.forEach(file => {
-			cachedFilesMap.set(file.id, file)
-		})
-
-		mergedFiles = Array.from(cachedFilesMap.values())
-	}
-	else {
-		mergedFiles = newFiles
-	}
-
-	// Store the new list in the cache with a timestamp
+	// STEP 5: Store the new list in the cache with a timestamp
 	saveCacheToIndexedDB({ timeStamp: Date.now(), gapiFiles: mergedFiles } as IFileListCache)
 
-	// Done
+	// LAST: Done
 	return mergedFiles
 }
 
-export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile[]> => {
-	const oneDayAgo = new Date(new Date().getTime() - (24 * 60 * 60 * 1000)).toISOString()
+export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFile[]> => {
 	let allFiles: IGapiFile[] = []
 	let pageToken: string | undefined
 
 	// A: update UI loading status
 	const loginCont = document.getElementById('loginCont')
+	const loginHide = document.getElementById('loginContClick')
 	let badgeElement = document.getElementById('file-load-badge')
 	if (!badgeElement) {
 		badgeElement = document.createElement('div')
 		badgeElement.className = 'alert alert-primary'
 		badgeElement.id = 'file-load-badge'
 		loginCont?.appendChild(badgeElement)
+		loginHide?.classList.add('d-none')
 	}
 	badgeElement.textContent = 'Loading files...'
 
@@ -64,7 +48,10 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 	do {
 		// eslint-disable-next-line quotes
 		let query = "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')"
-		if (!isFullSync) query = `modifiedTime > '${oneDayAgo}' and ${query}`
+		if (lastLoadDate) {
+			query = `modifiedTime > '${lastLoadDate}' and ${query}`
+			log(2, '[fetchDriveFilesAll] FYI: query is using modifiedTime > lastLoadDate')
+		}
 		const response = await gapi.client.drive.files.list({
 			q: query,
 			fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
@@ -79,7 +66,7 @@ export const fetchDriveFilesAll = async (isFullSync: boolean): Promise<IGapiFile
 		badgeElement.textContent = `Loading files... (${allFiles?.length})`
 	} while (pageToken)
 
-	log(2, `[fetchDriveFiles] allFiles.length = ${allFiles.length}`)
+	log(2, `[fetchDriveFilesAll] allFiles.length = ${allFiles.length}`)
 
 	// C: update UI loading status
 	document.getElementById('file-load-badge')?.remove()

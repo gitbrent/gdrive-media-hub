@@ -1,7 +1,6 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
 import { authUserName } from '../AppMainLogic'
 
-export const CACHE_EXPIRY_TIME = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 const CACHE_DBASE_VER = 6
 const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence we break into 10k chunks
 
