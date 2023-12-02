@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId } from '../api/FolderService'
+import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import FileBrowserListView from '../components/FileBrowViewList'
+import FileBrowserGridView from '../components/FileBrowViewGrid'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
-import FileBrowserListView from '../components/FileBrowserListView'
-import FileBrowserGridView from '../components/FileBrowserGridView'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import '../css/FileBrowser.css'
 
 interface Props {
