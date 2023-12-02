@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IGapiFile, IGapiFolder, formatBytesToMB, formatDate } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
 import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
@@ -22,7 +22,7 @@ const FileBrowserListView: React.FC<Props> = ({
 	setCurrFolderContents,
 	optSchWord
 }) => {
-	const [selectedFile, setSelectedFile] = useState<IGapiFile | null>(null)
+	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
 	const [touchEnd, setTouchEnd] = useState<number | null>(null)
@@ -107,9 +107,9 @@ const FileBrowserListView: React.FC<Props> = ({
 		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
 			setIsMediaLoading(true)
 
-			const blobUrl = await getBlobForFile(file.id)
-			if (blobUrl) {
-				setSelectedFile({ ...file, blobUrl: blobUrl })
+			const original = await getBlobForFile(file.id)
+			if (original) {
+				setSelectedFile({ ...file, original: original })
 			}
 
 			setIsMediaLoading(false)

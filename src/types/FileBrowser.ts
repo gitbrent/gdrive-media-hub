@@ -1,6 +1,6 @@
-import { IGapiItem } from '../App.props'
+import { IGapiFile } from '../App.props'
 
-export type SortKey = keyof IGapiItem
+export type SortKey = keyof IGapiFile
 export type SortDirection = 'ascending' | 'descending'
 
 export interface SortConfig {

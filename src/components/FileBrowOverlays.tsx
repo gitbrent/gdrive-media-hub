@@ -3,7 +3,7 @@ import { IGapiFile, IMediaFile } from '../App.props'
 import '../css/FileBrowser.css'
 
 interface OverlayButtonsProps {
-	selectedFile: IGapiFile | IMediaFile | null
+	selectedFile: IMediaFile | null
 	navigateToPrevFile?: () => void
 	navigateToNextFile?: () => void
 	setSelectedFile: (arg: IGapiFile | null) => void
@@ -40,7 +40,7 @@ export const ImageViewerOverlay: React.FC<OverlayButtonsProps> = (
 	return (
 		<div className="image-viewer-overlay">
 			<div className="image-viewer-content">
-				<img src={selectedFile.blobUrl} alt={selectedFile.name} />
+				<img src={selectedFile.original} alt={selectedFile.name} />
 			</div>
 			<OverlayButtons
 				selectedFile={selectedFile}
@@ -61,7 +61,7 @@ export const VideoViewerOverlay: React.FC<OverlayButtonsProps> = (
 		<div className="video-viewer-overlay">
 			<div className="video-viewer-content">
 				<video id="video-player" controls>
-					<source src={selectedFile.blobUrl} type={selectedFile.mimeType} />
+					<source src={selectedFile.original} type={selectedFile.mimeType} />
 					Your browser does not support the video tag.
 				</video>
 			</div>
