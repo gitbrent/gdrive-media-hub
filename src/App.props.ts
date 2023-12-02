@@ -114,7 +114,7 @@ export interface IAuthState {
 
 // ----------------------------------------------------------------------------
 
-export interface IGapiItem extends gapi.client.drive.File {
+export interface IGapiFile extends gapi.client.drive.File {
 	/**
 	 * id
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
@@ -148,15 +148,10 @@ export interface IGapiItem extends gapi.client.drive.File {
 	parents: string[]
 }
 
-export interface IGapiFile extends IGapiItem {
-	blobUrl?: string
-}
-
 // NOTE: prop names follow [PhotoswipeGalleryItems] **DO NOT RENAME**
 export interface IMediaFile extends IGapiFile {
 	/**
 	 * Url of image
-	 * - use `blobUrl` from "fetchFileBlobUrl()" app service method
 	 */
 	original?: string
 	width?: string | number
@@ -166,7 +161,7 @@ export interface IMediaFile extends IGapiFile {
 	blobUrlError?: string
 }
 
-export interface IGapiFolder extends IGapiItem {
+export interface IGapiFolder extends IGapiFile {
 	children: IGapiFolder[]
 }
 

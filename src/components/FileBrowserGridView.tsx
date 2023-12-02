@@ -144,11 +144,11 @@ const FileBrowserGridView: React.FC<Props> = ({
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
-					const fetchPromise = fetchFileBlobUrl(item.id).then(blobUrl => {
-						if (blobUrl) {
+					const fetchPromise = fetchFileBlobUrl(item.id).then(original => {
+						if (original) {
 							if (isImage(item)) {
-								return loadImage(blobUrl).then(({ width, height }) => {
-									item.original = blobUrl
+								return loadImage(original).then(({ width, height }) => {
+									item.original = original
 									item.width = width
 									item.height = height
 									item.blobUrlError = ''
@@ -159,7 +159,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 									itemsUpdated = true
 								})
 							} else if (isVideo(item)) {
-								item.original = blobUrl
+								item.original = original
 								itemsUpdated = true
 							}
 						} else {
@@ -211,9 +211,9 @@ const FileBrowserGridView: React.FC<Props> = ({
 			log(2, `[useEffect] loading video selectedFile.id "${selectedFile.id}"...`)
 			setIsLoadingFile(true)
 			const item = { ...selectedFile }
-			fetchFileBlobUrl(selectedFile.id).then(blobUrl => {
-				if (blobUrl) {
-					item.original = blobUrl
+			fetchFileBlobUrl(selectedFile.id).then(original => {
+				if (original) {
+					item.original = original
 					item.blobUrlError = ''
 				} else {
 					item.original = ''
