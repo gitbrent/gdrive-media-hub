@@ -29,16 +29,16 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	function renderLogin(): JSX.Element {
 		return (
-			<section id="contHome" className='m-5'>
+			<section id="contHome" className="m-5">
 				<div id="loginCont" className="text-center cursor-link bg-secondary p-4 rounded" onClick={handleAuthClick}>
-					<img src="/google-drive.png" alt="GoogleDriveLogo" className='w-25' />
-					<div className='my-3'>
+					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
+					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
 					{isBusyGapiLoad
 						? <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-						: <div className="text-muted mt-3">click to connect</div>
+						: <div id="loginContClick" className="text-muted mt-3">click to connect</div>
 					}
 				</div>
 			</section>
