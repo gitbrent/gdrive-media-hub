@@ -133,6 +133,15 @@ const FileBrowserGridView: React.FC<Props> = ({
 	 * Load blobs for the displayed items
 	 */
 	useEffect(() => {
+		const loadImage = (src: string): Promise<{ width: number, height: number }> => {
+			return new Promise((resolve, reject) => {
+				const img = new Image()
+				img.src = src
+				img.onload = () => resolve({ width: img.width, height: img.height })
+				img.onerror = () => reject(new Error('Image load error'))
+			})
+		}
+
 		const loadBlobs = async () => {
 			let itemsUpdated = false
 			const updatedItems = [...displayedItems]
@@ -187,20 +196,6 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 		loadBlobs()
 	}, [displayedItems])
-
-	/**
-	 * Helper function to load an image and return its dimensions
-	 */
-	const loadImage = (src: string): Promise<{ width: number, height: number }> => {
-		return new Promise((resolve, reject) => {
-			const img = new Image()
-			img.src = src
-			img.onload = () => resolve({ width: img.width, height: img.height })
-			img.onerror = () => reject(new Error('Image load error'))
-		})
-	}
-
-	// -----
 
 	/**
 	 * download videos when they're clicked
