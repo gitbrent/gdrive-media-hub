@@ -31,6 +31,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
+	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
 
 	const gridShowFiles = useMemo(() => {
 		return currFolderContents
@@ -206,19 +207,25 @@ const FileBrowserGridView: React.FC<Props> = ({
 	 * - (they are not preloaded for perf reasons)
 	 */
 	useEffect(() => {
-		if (selectedFile && !selectedFile.original) {
+		if (selectedFile && isVideo(selectedFile) && !selectedFile.original && !selectedFile.blobUrlError) {
+			log(2, `[useEffect] loading video selectedFile.id "${selectedFile.id}"...`)
+			setIsLoadingFile(true)
 			const item = { ...selectedFile }
 			fetchFileBlobUrl(selectedFile.id).then(blobUrl => {
 				if (blobUrl) {
-					if (isVideo(item)) {
-						item.original = blobUrl
-					}
+					item.original = blobUrl
+					item.blobUrlError = ''
 				} else {
+					item.original = ''
 					item.blobUrlError = 'Blob URL not found'
 				}
+				log(2, `[useEffect] ...done loading video (length = ${selectedFile.original?.length})`)
+				setSelectedFile(item)
+				setIsLoadingFile(false)
 			}).catch(error => {
 				console.error(`Error loading blob for item ${item.id}:`, error)
 				item.blobUrlError = error.toString()
+				setIsLoadingFile(false)
 			})
 		}
 	}, [selectedFile])
@@ -241,12 +248,21 @@ const FileBrowserGridView: React.FC<Props> = ({
 				</figure>
 			)
 		} else if (isVideo(item)) {
-			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
-					<i className="bi-camera-video" />
-					<figcaption>{item.name}</figcaption>
-				</figure>
-			)
+			if (isLoadingFile) {
+				return (
+					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+						{item.id === selectedFile?.id ? <i className="bi-arrow-repeat" /> : <i className="bi-camera-video" />}
+						<figcaption>{item.name}</figcaption>
+					</figure>
+				)
+			} else {
+				return (
+					<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
+						<i className="bi-camera-video" />
+						<figcaption>{item.name}</figcaption>
+					</figure>
+				)
+			}
 		} else if (isImage(item) && 'original' in item && !item.original) {
 			return (
 				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
@@ -280,7 +296,9 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 	return (
 		<section className="bg-black">
-			<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
+				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+			}
 			{renderGrid()}
 		</section>
 	)
