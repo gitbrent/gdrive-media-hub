@@ -154,11 +154,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	function renderBrowser(): JSX.Element {
 		return (
 			<section className="p-4">
-				<div className='row align-items-center fs-5 mb-2'>
+				<div className="row align-items-center fs-5 mb-2">
 					<div className='col'>
 						<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
 					</div>
-					<div className='col-auto'>
+					<div className='col-12 col-md-auto'>
 						<div className="btn-group" role="group" aria-label="sort options">
 							<button
 								type="button"
@@ -186,7 +186,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 							</button>
 						</div>
 					</div>
-					<div className='col-auto'>
+					<div className='col-12 col-md-auto'>
 						<div className="btn-group" role="group" aria-label="view switcher">
 							<button
 								type="button"
@@ -220,8 +220,6 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
 						handleFolderClick={handleFolderClick}
-						sortField={sortField}
-						sortOrder={sortOrder}
 					/>
 				}
 			</section>
