@@ -148,16 +148,16 @@ const FileBrowserListView: React.FC<Props> = ({
 					<th>
 						Name {sortField === 'name' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th style={{ width: '4%' }}>
+					<th className='text-nowrap d-none d-lg-table-cell' style={{ width: '4%' }}>
 						Type {sortField === 'mimeType' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th style={{ width: '4%' }}>
+					<th className='text-nowrap d-none d-md-table-cell' style={{ width: '4%' }}>
 						Size {sortField === 'size' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th style={{ width: '10%' }}>
+					<th className='text-nowrap d-none d-xl-table-cell' style={{ width: '10%' }}>
 						Created
 					</th>
-					<th style={{ width: '10%' }}>
+					<th className='text-nowrap d-none d-md-table-cell' style={{ width: '10%' }}>
 						Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
 				</tr>
