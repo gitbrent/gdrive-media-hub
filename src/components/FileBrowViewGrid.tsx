@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
-import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { fetchFileBlobUrl } from '../AppMainLogic'
@@ -28,7 +27,6 @@ const FileBrowserGridView: React.FC<Props> = ({
 	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	//
 	const loadingRef = useRef(new Set<string>())
-	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
@@ -68,64 +66,8 @@ const FileBrowserGridView: React.FC<Props> = ({
 	}, [gridShowFiles])
 
 	useEffect(() => {
-		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
-			// Place folders before files
-			if (a.mimeType === 'application/vnd.google-apps.folder' && b.mimeType !== 'application/vnd.google-apps.folder') {
-				return -1
-			}
-			if (b.mimeType === 'application/vnd.google-apps.folder' && a.mimeType !== 'application/vnd.google-apps.folder') {
-				return 1
-			}
-
-			// Special handling for file names starting with '_'
-			if (key === 'name') {
-				const startsWithUnderscoreA = a.name.startsWith('_')
-				const startsWithUnderscoreB = b.name.startsWith('_')
-
-				if (startsWithUnderscoreA && !startsWithUnderscoreB) {
-					return direction === 'ascending' ? -1 : 1
-				}
-				if (!startsWithUnderscoreA && startsWithUnderscoreB) {
-					return direction === 'ascending' ? 1 : -1
-				}
-			}
-
-			// Handle null size
-			if (key === 'size') {
-				const aValue = a.size ? parseInt(a.size) : 0
-				const bValue = b.size ? parseInt(b.size) : 0
-				return direction === 'ascending' ? aValue - bValue : bValue - aValue
-			}
-
-			// For other properties
-			if (!(key in a) || !(key in b)) return 0
-			const aValue = a[key] as string | number
-			const bValue = b[key] as string | number
-
-			if (direction === 'ascending') {
-				return aValue < bValue ? -1 : 1
-			} else {
-				return aValue > bValue ? -1 : 1
-			}
-		}
-
-		const filterItems = (items: Array<IGapiFile | IGapiFolder>) => {
-			return items.filter((item) => {
-				return !optSchWord || item.name.toLowerCase().includes(optSchWord.toLowerCase())
-			})
-		}
-
-		const sortItems = (items: Array<IGapiFile | IGapiFolder>, key: SortKey | null, direction: SortDirection) => {
-			if (!key) return items // Exclude other non-common keys
-
-			const filteredItems = filterItems(items)
-			const sortedItems = filteredItems.sort((a, b) => compareValues(key, a, b, direction))
-			return sortedItems
-		}
-
-		const sortedFilteredItems = sortItems(origFolderContents, sortConfig.key, sortConfig.direction)
-		setCurrFolderContents(sortedFilteredItems)
-	}, [sortConfig, optSchWord, origFolderContents])
+		setCurrFolderContents(origFolderContents.filter((item) => !optSchWord || item.name.toLowerCase().includes(optSchWord.toLowerCase())))
+	}, [optSchWord, origFolderContents])
 
 	// --------------------------------------------------------------------------------------------
 

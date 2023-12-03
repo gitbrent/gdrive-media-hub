@@ -13,14 +13,18 @@ interface Props {
 }
 
 type ViewMode = 'grid' | 'list'
+type SortField = 'name' | 'size' | 'modifiedByMeTime';
+type SortOrder = 'asc' | 'desc';
 
 const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [optSchWord, setOptSchWord] = useState('')
-	const [viewMode, setViewMode] = useState<ViewMode>('list')
 	const [isFolderLoading, setIsFolderLoading] = useState(false)
+	const [viewMode, setViewMode] = useState<ViewMode>('list')
+	const [sortField, setSortField] = useState<SortField>('name')
+	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 
 	// --------------------------------------------------------------------------------------------
 
@@ -72,6 +76,45 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		setIsFolderLoading(false)
 	}
 
+	useEffect(() => {
+		interface ICommonFileFolderProperties {
+			name: string;
+			size?: string;
+			modifiedByMeTime: string;
+			mimeType: string;
+		}
+
+		const sortedContents = [...origFolderContents].sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
+			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
+			const isFolderB = b.mimeType === 'application/vnd.google-apps.folder'
+			if (isFolderA && !isFolderB) {
+				return -1
+			}
+			if (!isFolderA && isFolderB) {
+				return 1
+			}
+			// If both are folders or both are not folders, then sort based on the sortField and sortOrder
+			if (sortField === 'name' || sortField === 'modifiedByMeTime') {
+				const fieldA = a[sortField] || ''
+				const fieldB = b[sortField] || ''
+				return sortOrder === 'asc' ? fieldA.localeCompare(fieldB) : fieldB.localeCompare(fieldA)
+			}
+			if (sortField === 'size') {
+				const sizeA = Number(a[sortField] || 0)
+				const sizeB = Number(b[sortField] || 0)
+				return sortOrder === 'asc' ? sizeA - sizeB : sizeB - sizeA
+			}
+			return 0
+		})
+
+		setCurrFolderContents(sortedContents)
+	}, [origFolderContents, sortField, sortOrder])
+
+	const toggleSortOrder = (field: SortField) => {
+		setSortField(field)
+		setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'))
+	}
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderTopBar(): JSX.Element {
@@ -116,6 +159,34 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
 					</div>
 					<div className='col-auto'>
+						<div className="btn-group" role="group" aria-label="sort options">
+							<button
+								type="button"
+								className={`btn ${sortField === 'name' ? 'btn-secondary' : 'btn-gray'}`}
+								aria-label="list view"
+								onClick={() => toggleSortOrder('name')}
+							>
+								Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+							</button>
+							<button
+								type="button"
+								className={`btn ${sortField === 'size' ? 'btn-secondary' : 'btn-gray'}`}
+								aria-label="list view"
+								onClick={() => toggleSortOrder('size')}
+							>
+								Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
+							</button>
+							<button
+								type="button"
+								className={`btn ${sortField === 'modifiedByMeTime' ? 'btn-secondary' : 'btn-gray'}`}
+								aria-label="list view"
+								onClick={() => toggleSortOrder('modifiedByMeTime')}
+							>
+								Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
+							</button>
+						</div>
+					</div>
+					<div className='col-auto'>
 						<div className="btn-group" role="group" aria-label="view switcher">
 							<button
 								type="button"
@@ -146,12 +217,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						optSchWord={optSchWord}
 					/>
 					: <FileBrowserListView
-						origFolderContents={origFolderContents}
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
 						handleFolderClick={handleFolderClick}
-						setCurrFolderContents={setCurrFolderContents}
-						optSchWord={optSchWord}
+						sortField={sortField}
+						sortOrder={sortOrder}
 					/>
 				}
 			</section>

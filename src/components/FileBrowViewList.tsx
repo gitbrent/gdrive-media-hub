@@ -1,107 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
-import { SortConfig, SortDirection, SortKey } from '../types/FileBrowser'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { getBlobForFile } from '../api'
 
 interface Props {
-	origFolderContents: Array<IGapiFile | IGapiFolder>
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	isFolderLoading: boolean
 	currFolderContents: Array<IGapiFile | IGapiFolder>
-	setCurrFolderContents: (res: Array<IGapiFile | IGapiFolder>) => void
-	optSchWord?: string
+	sortField: string
+	sortOrder: 'asc' | 'desc'
 }
 
 const FileBrowserListView: React.FC<Props> = ({
-	origFolderContents,
 	handleFolderClick,
 	isFolderLoading,
 	currFolderContents,
-	setCurrFolderContents,
-	optSchWord
+	sortField,
+	sortOrder,
 }) => {
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
 	const [touchEnd, setTouchEnd] = useState<number | null>(null)
-	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'name', direction: 'ascending' })
-
-	/**
-	 * FILTER and SORT folder contents
-	 */
-	useEffect(() => {
-		function compareValues<T extends IGapiFile | IGapiFolder>(key: keyof T, a: T, b: T, direction: SortDirection) {
-			// Place folders before files
-			if (a.mimeType === 'application/vnd.google-apps.folder' && b.mimeType !== 'application/vnd.google-apps.folder') {
-				return -1
-			}
-			if (b.mimeType === 'application/vnd.google-apps.folder' && a.mimeType !== 'application/vnd.google-apps.folder') {
-				return 1
-			}
-
-			// Special handling for file names starting with '_'
-			if (key === 'name') {
-				const startsWithUnderscoreA = a.name.startsWith('_')
-				const startsWithUnderscoreB = b.name.startsWith('_')
-
-				if (startsWithUnderscoreA && !startsWithUnderscoreB) {
-					return direction === 'ascending' ? -1 : 1
-				}
-				if (!startsWithUnderscoreA && startsWithUnderscoreB) {
-					return direction === 'ascending' ? 1 : -1
-				}
-			}
-
-			// Handle null size
-			if (key === 'size') {
-				const aValue = a.size ? parseInt(a.size) : 0
-				const bValue = b.size ? parseInt(b.size) : 0
-				return direction === 'ascending' ? aValue - bValue : bValue - aValue
-			}
-
-			// For other properties
-			if (!(key in a) || !(key in b)) return 0
-			const aValue = a[key] as string | number
-			const bValue = b[key] as string | number
-
-			if (direction === 'ascending') {
-				return aValue < bValue ? -1 : 1
-			} else {
-				return aValue > bValue ? -1 : 1
-			}
-		}
-
-		const filterItems = (items: Array<IGapiFile | IGapiFolder>) => {
-			return items.filter((item) => {
-				return !optSchWord || item.name.toLowerCase().includes(optSchWord.toLowerCase())
-			})
-		}
-
-		const sortItems = (items: Array<IGapiFile | IGapiFolder>, key: SortKey | null, direction: SortDirection) => {
-			if (!key) return items // Exclude other non-common keys
-
-			const filteredItems = filterItems(items)
-			const sortedItems = filteredItems.sort((a, b) => compareValues(key, a, b, direction))
-			return sortedItems
-		}
-
-		const sortedFilteredItems = sortItems(origFolderContents, sortConfig.key, sortConfig.direction)
-		setCurrFolderContents(sortedFilteredItems)
-	}, [sortConfig, optSchWord, origFolderContents])
-
-	// --------------------------------------------------------------------------------------------
-
-	const requestSort = (key: SortKey) => {
-		let direction: SortDirection = 'ascending'
-
-		if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-			direction = 'descending'
-		}
-
-		setSortConfig({ key, direction })
-	}
 
 	const handleFileClick = async (file: IGapiFile) => {
 		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
@@ -221,20 +142,20 @@ const FileBrowserListView: React.FC<Props> = ({
 			<thead>
 				<tr className='text-noselect'>
 					<th style={{ width: '1%' }}>&nbsp;</th>
-					<th className='cursor-link text-nowrap' title="click to sort" onClick={() => requestSort('name')}>
-						Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th>
+						Name {sortField === 'name' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th className='cursor-link text-nowrap d-none d-lg-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('mimeType')}>
-						Type {sortConfig.key === 'mimeType' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th style={{ width: '4%' }}>
+						Type {sortField === 'mimeType' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th className='cursor-link text-nowrap d-none d-md-table-cell' title="click to sort" style={{ width: '4%' }} onClick={() => requestSort('size')}>
-						Size {sortConfig.key === 'size' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th style={{ width: '4%' }}>
+						Size {sortField === 'size' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
-					<th className='cursor-link text-nowrap d-none d-xl-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('createdTime')}>
-						Created {sortConfig.key === 'createdTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th style={{ width: '10%' }}>
+						Created
 					</th>
-					<th className='cursor-link text-nowrap d-none d-md-table-cell' title="click to sort" style={{ width: '10%' }} onClick={() => requestSort('modifiedByMeTime')}>
-						Modified {sortConfig.key === 'modifiedByMeTime' && (sortConfig.direction === 'ascending' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th style={{ width: '10%' }}>
+						Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
 					</th>
 				</tr>
 			</thead>
@@ -291,8 +212,6 @@ const FileBrowserListView: React.FC<Props> = ({
 		</table>)
 	}
 
-
-
 	return (
 		<section className={`p-4 bg-black ${isFolderLoading ? 'busy-cursor' : ''}`}>
 			{isMediaLoading
@@ -305,15 +224,14 @@ const FileBrowserListView: React.FC<Props> = ({
 					</div>
 				)
 				: selectedFile ? (
-					// eslint-disable-next-line react/prop-types
-					selectedFile.mimeType.includes('video/') ?
-						<VideoViewerOverlay
+					isVideo(selectedFile)
+						? <VideoViewerOverlay
 							selectedFile={selectedFile}
 							navigateToNextFile={navigateToNextFile}
 							navigateToPrevFile={navigateToPrevFile}
 							setSelectedFile={setSelectedFile}
-						/> :
-						<ImageViewerOverlay
+						/>
+						: <ImageViewerOverlay
 							selectedFile={selectedFile}
 							navigateToNextFile={navigateToNextFile}
 							navigateToPrevFile={navigateToPrevFile}
