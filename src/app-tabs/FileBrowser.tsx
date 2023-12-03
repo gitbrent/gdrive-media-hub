@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId } from '../api/FolderService'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
-import FileBrowserListView from '../components/FileBrowViewList'
-import FileBrowserGridView from '../components/FileBrowViewGrid'
+import FileBrowViewList from '../components/FileBrowViewList'
+import FileBrowViewGrid from '../components/FileBrowViewGrid'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import '../css/FileBrowser.css'
@@ -208,7 +208,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</div>
 				</div>
 				{viewMode === 'grid'
-					? <FileBrowserGridView
+					? <FileBrowViewGrid
 						origFolderContents={origFolderContents}
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
@@ -216,7 +216,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						handleFolderClick={handleFolderClick}
 						optSchWord={optSchWord}
 					/>
-					: <FileBrowserListView
+					: <FileBrowViewList
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
 						handleFolderClick={handleFolderClick}
