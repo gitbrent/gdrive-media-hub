@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import { getBlobForFile } from '../api'
 
 interface Props {
@@ -31,6 +31,9 @@ const FileBrowserListView: React.FC<Props> = ({
 			const original = await getBlobForFile(file.id)
 			if (original) {
 				setSelectedFile({ ...file, original: original })
+			}
+			else {
+				console.error('unable to getBlobForFile() for file!')
 			}
 
 			setIsMediaLoading(false)
@@ -181,18 +184,18 @@ const FileBrowserListView: React.FC<Props> = ({
 									</div>
 								</td>
 								<td className='cursor-link' style={{ wordBreak: 'break-all' }}>
-									{isFolder ?
-										<div
+									{isFolder(item)
+										? <div
 											className={`${mimeTextClass} fw-bold`}
-											onClick={() => isFolder(item) && !isFolderLoading && handleFolderClick(item.id, item.name)}>
+											onClick={() => !isFolderLoading && handleFolderClick(item.id, item.name)}>
 											{item.name}
 										</div>
-										: isImage(item) || isVideo(item) ?
+										: isMedia(item) ?
 											<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
 												{item.name}
 											</div>
 											:
-											<div>{item.name}</div>
+											<div className='text-muted'>{item.name}</div>
 									}
 								</td>
 								<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder(item) && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
