@@ -52,6 +52,11 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 			query = `modifiedTime > '${lastLoadDate}' and ${query}`
 			log(2, '[fetchDriveFilesAll] FYI: query is using modifiedTime > lastLoadDate')
 		}
+
+		const debugElement = document.createElement('div')
+		debugElement.textContent = `lastLoadDate = ${lastLoadDate}`
+		badgeElement.append(debugElement)
+
 		const response = await gapi.client.drive.files.list({
 			q: query,
 			fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
