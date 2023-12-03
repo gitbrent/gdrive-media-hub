@@ -8,17 +8,9 @@ interface Props {
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	isFolderLoading: boolean
 	currFolderContents: Array<IGapiFile | IGapiFolder>
-	sortField: string
-	sortOrder: 'asc' | 'desc'
 }
 
-const FileBrowserListView: React.FC<Props> = ({
-	handleFolderClick,
-	isFolderLoading,
-	currFolderContents,
-	sortField,
-	sortOrder,
-}) => {
+const FileBrowserListView: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -146,19 +138,19 @@ const FileBrowserListView: React.FC<Props> = ({
 				<tr className='text-noselect'>
 					<th style={{ width: '1%' }}>&nbsp;</th>
 					<th>
-						Name {sortField === 'name' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+						Name
 					</th>
-					<th className='text-nowrap d-none d-lg-table-cell' style={{ width: '4%' }}>
-						Type {sortField === 'mimeType' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th className='d-none d-lg-table-cell' style={{ width: '4%' }}>
+						Type
 					</th>
-					<th className='text-nowrap d-none d-md-table-cell' style={{ width: '4%' }}>
-						Size {sortField === 'size' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th className='d-none d-md-table-cell' style={{ width: '5%' }}>
+						Size
 					</th>
-					<th className='text-nowrap d-none d-xl-table-cell' style={{ width: '10%' }}>
+					<th className='d-none d-xl-table-cell' style={{ width: '10%' }}>
 						Created
 					</th>
-					<th className='text-nowrap d-none d-md-table-cell' style={{ width: '10%' }}>
-						Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? <i className="bi bi-arrow-up"></i> : <i className="bi bi-arrow-down"></i>)}
+					<th className='d-none d-md-table-cell' style={{ width: '10%' }}>
+						Modified
 					</th>
 				</tr>
 			</thead>
@@ -198,10 +190,10 @@ const FileBrowserListView: React.FC<Props> = ({
 											<div className='text-muted'>{item.name}</div>
 									}
 								</td>
-								<td className='text-nowrap text-end text-muted d-none d-lg-table-cell'>{!isFolder(item) && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
-								<td className='text-nowrap text-end text-muted d-none d-md-table-cell'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
-								<td className='text-nowrap text-center text-muted d-none d-xl-table-cell'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
-								<td className='text-nowrap text-center text-muted d-none d-md-table-cell'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
+								<td className='text-nowrap d-none d-lg-table-cell text-end text-muted'>{!isFolder(item) && item.mimeType ? item.mimeType.split('/').pop() : ''}</td>
+								<td className='text-nowrap d-none d-md-table-cell text-end text-muted'>{item.size ? formatBytesToMB(Number(item.size)) : ''}</td>
+								<td className='text-nowrap d-none d-xl-table-cell text-center text-muted'>{item.createdTime ? formatDate(item.createdTime) : ''}</td>
+								<td className='text-nowrap d-none d-md-table-cell text-center text-muted'>{item.modifiedByMeTime ? formatDate(item.modifiedByMeTime) : ''}</td>
 							</tr>
 						)
 					})
