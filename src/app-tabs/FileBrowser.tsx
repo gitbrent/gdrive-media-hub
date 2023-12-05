@@ -107,8 +107,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			return 0
 		})
 
-		setCurrFolderContents(sortedContents)
-	}, [origFolderContents, sortField, sortOrder])
+		// Filter results
+		setCurrFolderContents(
+			sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		)
+	}, [origFolderContents, optSchWord, sortField, sortOrder])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -209,12 +212,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 				</div>
 				{viewMode === 'grid'
 					? <FileBrowViewGrid
-						origFolderContents={origFolderContents}
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
-						setCurrFolderContents={setCurrFolderContents}
 						handleFolderClick={handleFolderClick}
-						optSchWord={optSchWord}
 					/>
 					: <FileBrowViewList
 						currFolderContents={currFolderContents}

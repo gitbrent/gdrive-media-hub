@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
+import React, { useEffect, useRef, useState } from 'react'
+import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { fetchFileBlobUrl } from '../AppMainLogic'
@@ -8,33 +8,18 @@ import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
 interface Props {
-	origFolderContents: Array<IGapiFile | IGapiFolder>
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	isFolderLoading: boolean
 	currFolderContents: Array<IMediaFile | IGapiFolder>
-	setCurrFolderContents: (res: Array<IGapiFile | IGapiFolder>) => void
-	optSchWord?: string
 }
 
-const FileBrowserGridView: React.FC<Props> = ({
-	origFolderContents,
-	handleFolderClick,
-	isFolderLoading,
-	currFolderContents,
-	setCurrFolderContents,
-	optSchWord,
-}) => {
+const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
 	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
-
-	const gridShowFiles = useMemo(() => {
-		return currFolderContents
-			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-	}, [currFolderContents, optSchWord])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -45,8 +30,8 @@ const FileBrowserGridView: React.FC<Props> = ({
 		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
-			const nextItemsEndIndex = Math.min(currentItems.length + ITEMS_PER_PAGE, gridShowFiles.length)
-			const newItems = gridShowFiles.slice(currentItems.length, nextItemsEndIndex)
+			const nextItemsEndIndex = Math.min(currentItems.length + ITEMS_PER_PAGE, currFolderContents.length)
+			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
 
 			// Append new items to the current list
 			return [...currentItems, ...newItems]
@@ -56,18 +41,14 @@ const FileBrowserGridView: React.FC<Props> = ({
 	useEffect(() => {
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
-	}, [gridShowFiles])
+	}, [currFolderContents])
 
 	/**
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(gridShowFiles.slice(0, ITEMS_PER_PAGE))
-	}, [gridShowFiles])
-
-	useEffect(() => {
-		setCurrFolderContents(origFolderContents.filter((item) => !optSchWord || item.name.toLowerCase().includes(optSchWord.toLowerCase())))
-	}, [optSchWord, origFolderContents])
+		setDisplayedItems(currFolderContents.slice(0, ITEMS_PER_PAGE))
+	}, [currFolderContents])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -223,7 +204,7 @@ const FileBrowserGridView: React.FC<Props> = ({
 
 	const renderGrid = () => {
 		return (
-			<Gallery id="contImageGrid" withCaption={false}>
+			<Gallery id="contImageGrid" withCaption={true}>
 				<div id="gallery-container" className="gallery">
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
