@@ -192,10 +192,10 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 			return (
 				<Item {...item} key={`${index}${item.id}`}>
 					{({ ref, open }) => (
-						(<figure>
+						<figure>
 							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
 							<figcaption>{item.name}</figcaption>
-						</figure>)
+						</figure>
 					)}
 				</Item>
 			)
