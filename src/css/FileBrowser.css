@@ -126,17 +126,21 @@ figure.figure-icon {
 	/* Ensures figure takes full height of its container */
 	padding: 1rem;
 	/* Adds some padding inside the figure */
-	background-color: rgba(10, 10, 10, 0.7);
+	background-color: rgba(0, 188, 140, 0.1);
+	color: rgba(0, 188, 140, 0.6);
 }
 
 figure.figure-icon figcaption {
 	text-align: center;
 	max-width: 100%;
 	word-wrap: break-word;
-	margin-top: auto;
 	/* Pushes the caption to the bottom */
+	margin-top: auto;
+	font-size: 1rem;
+	color: rgba(0, 188, 140, 0.9);
 }
 
 figure.figure-icon i {
-	font-size: 5rem;
+	font-size: 10rem;
+	line-height: 5rem;
 }

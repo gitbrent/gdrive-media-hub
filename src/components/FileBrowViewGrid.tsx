@@ -153,8 +153,8 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
 		if (isFolder(item)) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
-					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder-fill'} />
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='figure-icon'>
+					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder'} />
 					<figcaption>{item.name}</figcaption>
 				</figure>
 			)

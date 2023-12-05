@@ -41,7 +41,7 @@ export default function AppMainUI() {
 	//
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
-	const [optIsShowCap, setOptIsShowCap] = useState(true)
+	const [optIsShowCap, setOptIsShowCap] = useState(false)
 	//
 	const toggleSidebar = () => {
 		setSidebarOpen(!isSidebarOpen)
