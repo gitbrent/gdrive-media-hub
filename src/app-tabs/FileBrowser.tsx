@@ -163,28 +163,19 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</div>
 					<div className='col-12 col-md-auto'>
 						<div className="btn-group" role="group" aria-label="sort options">
-							<button
-								type="button"
-								className={`btn ${sortField === 'name' ? 'btn-secondary' : 'btn-gray'}`}
-								aria-label="list view"
-								onClick={() => toggleSortOrder('name')}
-							>
+							<button type="button" aria-label="sort by name"
+								className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
+								onClick={() => toggleSortOrder('name')}>
 								Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
 							</button>
-							<button
-								type="button"
-								className={`btn ${sortField === 'size' ? 'btn-secondary' : 'btn-gray'}`}
-								aria-label="list view"
-								onClick={() => toggleSortOrder('size')}
-							>
+							<button type="button" aria-label="sort by size"
+								className={`btn btn-outline-secondary ${sortField === 'size' ? 'active' : ''}`}
+								onClick={() => toggleSortOrder('size')}>
 								Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
 							</button>
-							<button
-								type="button"
-								className={`btn ${sortField === 'modifiedByMeTime' ? 'btn-secondary' : 'btn-gray'}`}
-								aria-label="list view"
-								onClick={() => toggleSortOrder('modifiedByMeTime')}
-							>
+							<button type="button" aria-label="sort by modified"
+								className={`btn btn-outline-secondary ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
+								onClick={() => toggleSortOrder('modifiedByMeTime')}>
 								Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
 							</button>
 						</div>
@@ -193,7 +184,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="btn-group" role="group" aria-label="view switcher">
 							<button
 								type="button"
-								className={`btn ${viewMode === 'list' ? 'btn-secondary' : 'btn-gray'}`}
+								className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
 								aria-label="list view"
 								onClick={() => setViewMode('list')}
 							>
@@ -201,7 +192,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 							</button>
 							<button
 								type="button"
-								className={`btn ${viewMode === 'grid' ? 'btn-secondary' : 'btn-gray'}`}
+								className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
 								aria-label="grid view"
 								onClick={() => setViewMode('grid')}
 							>

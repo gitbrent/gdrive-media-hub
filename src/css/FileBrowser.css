@@ -120,13 +120,11 @@ figure.figure-icon {
 	display: flex;
 	flex-direction: column;
 	/* Distributes space evenly between items */
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
 	/* Ensures figure takes full height of its container */
 	height: 100%;
-	/* Adds some padding inside the figure */
-	padding: 1rem;
-	background-color: rgba(40, 40, 40, 0.8);
+	/* background-color: rgba(40, 40, 40, 0.8); */
 }
 
 figure.figure-icon figcaption {
@@ -139,6 +137,7 @@ figure.figure-icon figcaption {
 }
 
 figure.figure-icon i {
-	font-size: 10rem;
-	line-height: 5rem;
+	font-size: 8rem;
+	line-height: 4rem;
+	margin-bottom: 1.5rem;
 }
