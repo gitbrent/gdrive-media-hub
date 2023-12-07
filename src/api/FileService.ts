@@ -2,6 +2,8 @@ import { IFileListCache, IGapiFile, log } from '../App.props'
 import { loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
 import { getAccessToken } from './AuthService'
 
+const blobUrlCache: Record<string, string> = {}
+
 export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
 	// STEP 1:
 	const objCache = await loadCacheFromIndexedDB().catch(() => {
@@ -97,12 +99,31 @@ export const fetchFileImgBlob = async (fileId: IGapiFile['id']) => {
 }
 
 export const getBlobForFile = async (fileId: IGapiFile['id']): Promise<string | null> => {
-	const response = await fetchFileImgBlob(fileId)
-	if (response) {
-		const blob = await response.blob()
-		return URL.createObjectURL(blob)
+	if (blobUrlCache[fileId]) {
+		return blobUrlCache[fileId]
 	}
 	else {
-		return null
+		const response = await fetchFileImgBlob(fileId)
+		if (response) {
+			const blob = await response.blob()
+			const blobUrl = URL.createObjectURL(blob)
+			blobUrlCache[fileId] = blobUrl
+			return blobUrl
+		}
+		else {
+			return null
+		}
 	}
+}
+
+export function releaseAllBlobUrls() {
+	function releaseBlobUrl(fileId: string) {
+		const blobUrl = blobUrlCache[fileId]
+		if (blobUrl) {
+			URL.revokeObjectURL(blobUrl)
+			delete blobUrlCache[fileId]
+		}
+	}
+
+	Object.keys(blobUrlCache).forEach(releaseBlobUrl)
 }

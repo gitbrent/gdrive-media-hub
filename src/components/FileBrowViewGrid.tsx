@@ -129,22 +129,24 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 			log(2, `[useEffect] loading video selectedFile.id "${selectedFile.id}"...`)
 			setIsLoadingFile(true)
 			const item = { ...selectedFile }
-			fetchFileBlobUrl(selectedFile.id).then(original => {
-				if (original) {
-					item.original = original
-					item.blobUrlError = ''
-				} else {
-					item.original = ''
-					item.blobUrlError = 'Blob URL not found'
-				}
-				log(2, `[useEffect] ...done loading video (length = ${selectedFile.original?.length})`)
-				setSelectedFile(item)
-				setIsLoadingFile(false)
-			}).catch(error => {
-				console.error(`Error loading blob for item ${item.id}:`, error)
-				item.blobUrlError = error.toString()
-				setIsLoadingFile(false)
-			})
+			fetchFileBlobUrl(selectedFile.id)
+				.then(original => {
+					if (original) {
+						item.original = original
+						item.blobUrlError = ''
+					} else {
+						item.original = ''
+						item.blobUrlError = 'Blob URL not found'
+					}
+					log(2, `[useEffect] ...done loading video (length = ${selectedFile.original?.length})`)
+					setSelectedFile(item)
+					setIsLoadingFile(false)
+				})
+				.catch(error => {
+					console.error(`Error loading blob for item ${item.id}:`, error)
+					item.blobUrlError = error.toString()
+					setIsLoadingFile(false)
+				})
 		}
 	}, [selectedFile])
 

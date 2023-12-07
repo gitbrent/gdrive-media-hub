@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
-import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId } from '../api/FolderService'
+import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
 import FileBrowViewGrid from '../components/FileBrowViewGrid'
@@ -40,6 +40,29 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			setOrigFolderContents(rootContents.items)
 		}
 		loadRootFolder()
+	}, [])
+
+	/**
+	 * Prevent memory leaks by freeing the contentUrls
+	 */
+	useEffect(() => {
+		// Define a function that handles the visibility change event
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === 'hidden') {
+				releaseAllBlobUrls()
+			}
+		}
+
+		// Add event listeners when the component mounts
+		window.addEventListener('pagehide', releaseAllBlobUrls)
+		window.addEventListener('visibilitychange', handleVisibilityChange)
+
+		// Return a cleanup function from the useEffect hook
+		return () => {
+			// Remove event listeners when the component unmounts or before re-running the effect
+			window.removeEventListener('pagehide', releaseAllBlobUrls)
+			window.removeEventListener('visibilitychange', handleVisibilityChange)
+		}
 	}, [])
 
 	// --------------------------------------------------------------------------------------------
