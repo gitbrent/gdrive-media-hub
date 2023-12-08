@@ -10,7 +10,7 @@ interface Props {
 	currFolderContents: Array<IGapiFile | IGapiFolder>
 }
 
-const FileBrowserListView: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
+const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -241,4 +241,4 @@ const FileBrowserListView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 	)
 }
 
-export default FileBrowserListView
+export default FileBrowViewList

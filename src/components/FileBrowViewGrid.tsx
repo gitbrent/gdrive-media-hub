@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
-import { fetchFileBlobUrl } from '../AppMainLogic'
 import { Gallery, Item } from 'react-photoswipe-gallery'
+import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
@@ -13,7 +13,7 @@ interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
 }
 
-const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
+const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
 	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	const SHOW_CAPTIONS = false
 	//
@@ -77,7 +77,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
-					const fetchPromise = fetchFileBlobUrl(item.id).then(original => {
+					const fetchPromise = getBlobForFile(item.id).then(original => {
 						if (original) {
 							if (isImage(item)) {
 								return loadImage(original).then(({ width, height }) => {
@@ -130,7 +130,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 			log(2, `[useEffect] loading video selectedFile.id "${selectedFile.id}"...`)
 			setIsLoadingFile(true)
 			const item = { ...selectedFile }
-			fetchFileBlobUrl(selectedFile.id)
+			getBlobForFile(selectedFile.id)
 				.then(original => {
 					if (original) {
 						item.original = original
@@ -227,4 +227,4 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 	)
 }
 
-export default FileBrowserGridView
+export default FileBrowViewGrid

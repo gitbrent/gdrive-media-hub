@@ -5,7 +5,7 @@ import {
 	doAuthSignOut,
 	doClearFileCache,
 	fetchDriveFiles,
-	fetchFileImgBlob,
+	getBlobForFile,
 	initGapiClient,
 	loadCacheFromIndexedDB,
 	userAuthState,
@@ -97,27 +97,6 @@ export const getCacheStatus = async (): Promise<IFileListCache | null> => {
 //
 
 /**
- * Fetch the blob for a file and return the object URL.
- * @param fileId The ID of the file to fetch.
- * @returns The object URL of the file blob.
- */
-export const fetchFileBlobUrl = async (fileId: string): Promise<string | null> => {
-	try {
-		const response = await fetchFileImgBlob(fileId)
-		if (!response) {
-			console.warn('fetchFileImgBlob() failed')
-			return null
-		}
-
-		const blob = await response.blob()
-		return URL.createObjectURL(blob)
-	} catch (error) {
-		console.error(`Failed to fetch blob for file with ID ${fileId}:`, error)
-		return null
-	}
-}
-
-/**
  * Download a file, update _gapiFiles collection, and return success status.
  * @param fileId The ID of the file to download.
  * @returns A boolean indicating the success of the operation.
@@ -130,7 +109,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 			return false
 		}
 
-		const objectUrl = await fetchFileBlobUrl(file.id)
+		const objectUrl = await getBlobForFile(file.id)
 		if (!objectUrl) return false
 
 		if (isImage(file)) {
