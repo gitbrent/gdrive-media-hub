@@ -15,6 +15,7 @@ interface Props {
 
 const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
 	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
+	const SHOW_CAPTIONS = false
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
@@ -153,6 +154,8 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 	// --------------------------------------------------------------------------------------------
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
+		const figCaption = SHOW_CAPTIONS ? <figcaption>{item.name}</figcaption> : <span />
+
 		if (isFolder(item)) {
 			return (
 				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
@@ -164,7 +167,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 			return (
 				<figure key={`${index}${item.id}`} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
 					<i className="bi-warning" />
-					<figcaption>{item.name}</figcaption>
+					{figCaption}
 				</figure>
 			)
 		} else if (isVideo(item)) {
@@ -172,14 +175,14 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
 						{item.id === selectedFile?.id ? <i className="bi-arrow-repeat" /> : <i className="bi-camera-video" />}
-						<figcaption>{item.name}</figcaption>
+						{figCaption}
 					</figure>
 				)
 			} else {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
 						<i className="bi-camera-video" />
-						<figcaption>{item.name}</figcaption>
+						{figCaption}
 					</figure>
 				)
 			}
@@ -187,7 +190,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 			return (
 				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
 					<i className="bi-arrow-repeat" />
-					<figcaption>{item.name}</figcaption>
+					{figCaption}
 				</figure>
 			)
 		} else if (isImage(item) && 'original' in item && item.original) {
@@ -196,7 +199,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 					{({ ref, open }) => (
 						<figure>
 							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
-							<figcaption>{item.name}</figcaption>
+							{figCaption}
 						</figure>
 					)}
 				</Item>
@@ -206,7 +209,7 @@ const FileBrowserGridView: React.FC<Props> = ({ handleFolderClick, isFolderLoadi
 
 	const renderGrid = () => {
 		return (
-			<Gallery id="contImageGrid" withCaption={true}>
+			<Gallery id="contImageGrid">
 				<div id="gallery-container" className="gallery">
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
