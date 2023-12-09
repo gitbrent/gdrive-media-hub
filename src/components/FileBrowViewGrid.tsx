@@ -175,14 +175,14 @@ const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
 						{item.id === selectedFile?.id ? <i className="bi-arrow-repeat" /> : <i className="bi-camera-video" />}
-						{figCaption}
+						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} onClick={() => setSelectedFile(item)} className="text-info figure-icon">
+					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon" onClick={() => setSelectedFile(item)}>
 						<i className="bi-camera-video" />
-						{figCaption}
+						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			}
