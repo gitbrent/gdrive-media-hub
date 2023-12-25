@@ -239,9 +239,9 @@ export default function ImageGrid(props: IProps) {
 						{gridShowFiles.map((item) => (
 							<Item {...item} key={item.id}>
 								{({ ref, open }) => (
-									item?.thumbnail ?
+									item?.original ?
 										(<figure>
-											<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.thumbnail} title={item.caption} alt={item.alt} />
+											<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} title={item.caption} alt={item.alt} />
 											{props.isShowCap && <figcaption>{item.caption}</figcaption>}
 										</figure>)
 										:
