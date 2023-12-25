@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
-import { FixedItemProps } from '../types/ImageGrid.props'
-import { Gallery, Item } from 'react-photoswipe-gallery'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
+import GridView from '../components/GridView'
+import { isMedia } from '../utils/mimeTypes'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
-import { isImage } from '../utils/mimeTypes'
 
 interface IProps {
 	allFiles: IMediaFile[]
@@ -26,7 +25,7 @@ export default function ImageGrid(props: IProps) {
 	// --------------------------------------------------------------------------------------------
 
 	const filtdSortdFiles = useMemo(() => {
-		const showImages: FixedItemProps[] = []
+		const showImages: IMediaFile[] = []
 
 		// A: define sorter
 		const sorter = (a: IMediaFile, b: IMediaFile) => {
@@ -46,18 +45,11 @@ export default function ImageGrid(props: IProps) {
 
 		// B: filter, sort, populate image array
 		props.allFiles
-			.filter((item) => isImage(item))
+			.filter((item) => isMedia(item))
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {
-				showImages.push({
-					id: item.id,
-					caption: item.name || '(loading)',
-					original: item.original || '',
-					thumbnail: item.original || '',
-					width: item.width || 0,
-					height: item.height || 0,
-				})
+				showImages.push(item)
 			})
 
 		setIsSearching(false)
@@ -233,32 +225,12 @@ export default function ImageGrid(props: IProps) {
 		<section>
 			{renderMainContBody_TopBar()}
 			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0
-				?
-				<Gallery id="contImageGrid" withCaption={props.isShowCap}>
-					<div id="gallery-container" className="gallery">
-						{gridShowFiles.map((item) => (
-							<Item {...item} key={item.id}>
-								{({ ref, open }) => (
-									item?.original ?
-										(<figure>
-											<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} title={item.caption} alt={item.alt} />
-											{props.isShowCap && <figcaption>{item.caption}</figcaption>}
-										</figure>)
-										:
-										(<figure
-											title={item.caption}
-											onClick={() => props.loadPageImages([item?.id?.toString() || ''])}
-											className="text-muted"
-											style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-											<i className="h1 mb-0 bi-arrow-repeat" />
-										</figure>)
-								)}
-							</Item>
-						))}
-					</div>
-				</Gallery>
-				:
-				props.allFiles?.length > 0 ? (
+				? <GridView
+					currFolderContents={gridShowFiles as IMediaFile[]}
+					isFolderLoading={isSearching}
+					handleFolderClick={() => Promise.resolve()}
+				/>
+				: props.allFiles?.length > 0 ? (
 					<AlertLoading />
 				) : (
 					<AlertNoImages />

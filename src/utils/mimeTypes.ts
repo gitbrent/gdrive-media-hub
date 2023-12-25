@@ -1,8 +1,8 @@
 import { IGapiFile } from '../App.props'
 
-export const isVideo = (item: IGapiFile): boolean => item.mimeType.startsWith('video/')
+export const isVideo = (item: IGapiFile): boolean => item.mimeType?.startsWith('video/')
 
-export const isImage = (item: IGapiFile): boolean => item.mimeType.startsWith('image/')
+export const isImage = (item: IGapiFile): boolean => item.mimeType?.startsWith('image/')
 
 /**
  * isVideo || isImage
@@ -11,4 +11,4 @@ export const isImage = (item: IGapiFile): boolean => item.mimeType.startsWith('i
  */
 export const isMedia = (item: IGapiFile): boolean => isVideo(item) || isImage(item)
 
-export const isFolder = (item: IGapiFile): boolean => item.mimeType === 'application/vnd.google-apps.folder'
+export const isFolder = (item: IGapiFile): boolean => item.mimeType?.startsWith('application/vnd.google-apps.folder')
