@@ -3,7 +3,7 @@ import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
-import FileBrowViewGrid from '../components/FileBrowViewGrid'
+import GridView from '../components/GridView'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import '../css/FileBrowser.css'
@@ -225,11 +225,13 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 					</div>
 				</div>
 				{viewMode === 'grid'
-					? <FileBrowViewGrid
-						currFolderContents={currFolderContents}
-						isFolderLoading={isFolderLoading}
-						handleFolderClick={handleFolderClick}
-					/>
+					? <section className="bg-black h-100">
+						<GridView
+							currFolderContents={currFolderContents}
+							isFolderLoading={isFolderLoading}
+							handleFolderClick={handleFolderClick}
+						/>
+					</section>
 					: <FileBrowViewList
 						currFolderContents={currFolderContents}
 						isFolderLoading={isFolderLoading}
