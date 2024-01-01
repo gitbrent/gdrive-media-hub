@@ -8,12 +8,12 @@ import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
 interface Props {
-	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
-	isFolderLoading: boolean
 	currFolderContents: Array<IMediaFile | IGapiFolder>
+	isFolderLoading: boolean
+	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 }
 
-const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading, currFolderContents }) => {
+const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
 	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	const SHOW_CAPTIONS = false
 	//
@@ -156,18 +156,18 @@ const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
 		const figCaption = SHOW_CAPTIONS ? <figcaption>{item.name}</figcaption> : <span />
 
-		if (isFolder(item)) {
-			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
-					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder'} />
-					<figcaption>{item.name}</figcaption>
-				</figure>
-			)
-		} else if ('blobUrlError' in item && item.blobUrlError) {
+		if ('blobUrlError' in item && item.blobUrlError) {
 			return (
 				<figure key={`${index}${item.id}`} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
 					<i className="bi-warning" />
 					{figCaption}
+				</figure>
+			)
+		} else if (isFolder(item)) {
+			return (
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
+					<i className={isFolderLoading ? 'bi-arrow-repeat' : 'bi-folder'} />
+					<figcaption>{item.name}</figcaption>
 				</figure>
 			)
 		} else if (isVideo(item)) {
@@ -186,24 +186,26 @@ const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 					</figure>
 				)
 			}
-		} else if (isImage(item) && 'original' in item && !item.original) {
-			return (
-				<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-					<i className="bi-arrow-repeat" />
-					{figCaption}
-				</figure>
-			)
-		} else if (isImage(item) && 'original' in item && item.original) {
-			return (
-				<Item {...item} key={`${index}${item.id}`}>
-					{({ ref, open }) => (
-						<figure>
-							<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
-							{figCaption}
-						</figure>
-					)}
-				</Item>
-			)
+		} else if (isImage(item)) {
+			if ('original' in item && item.original) {
+				return (
+					<Item {...item} key={`${index}${item.id}`}>
+						{({ ref, open }) => (
+							<figure>
+								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
+								{figCaption}
+							</figure>
+						)}
+					</Item>
+				)
+			} else {
+				return (
+					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+						<i className="bi-arrow-repeat" />
+						<figcaption>{item.name}</figcaption>
+					</figure>
+				)
+			}
 		}
 	}
 
@@ -218,7 +220,7 @@ const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 	}
 
 	return (
-		<section className="bg-black">
+		<section>
 			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
 				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
 			}
@@ -227,4 +229,4 @@ const FileBrowViewGrid: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 	)
 }
 
-export default FileBrowViewGrid
+export default GridView
