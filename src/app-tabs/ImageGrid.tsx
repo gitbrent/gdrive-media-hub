@@ -222,7 +222,7 @@ export default function ImageGrid(props: IProps) {
 	// --------------------------------------------------------------------------------------------
 
 	return (
-		<section>
+		<section className="bg-black h-100">
 			{renderMainContBody_TopBar()}
 			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0
 				? <GridView
