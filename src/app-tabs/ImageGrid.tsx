@@ -3,7 +3,7 @@ import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import GridView from '../components/GridView'
-import { isMedia } from '../utils/mimeTypes'
+import { isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
@@ -15,12 +15,15 @@ interface IProps {
 	optSortDir: OPT_SORTDIR
 }
 
+type MediaType = 'all' | 'image' | 'video'
+
 export default function ImageGrid(props: IProps) {
 	const [pagingSize, setPagingSize] = useState(0)
 	const [pagingPage, setPagingPage] = useState(0)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
 	const [lastLoadDate, setLastLoadDate] = useState('')
+	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
 
 	// --------------------------------------------------------------------------------------------
 
@@ -45,7 +48,7 @@ export default function ImageGrid(props: IProps) {
 
 		// B: filter, sort, populate image array
 		props.allFiles
-			.filter((item) => isMedia(item))
+			.filter((item) => mediaTypeFilter === 'all' ? isMedia(item) : mediaTypeFilter === 'image' ? isImage(item) : mediaTypeFilter === 'video' ? isVideo(item) : false)
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {
@@ -54,7 +57,7 @@ export default function ImageGrid(props: IProps) {
 
 		setIsSearching(false)
 		return showImages
-	}, [props.allFiles, optSchWord, lastLoadDate])
+	}, [props.allFiles, optSchWord, lastLoadDate, mediaTypeFilter])
 
 	const gridShowFiles = useMemo(() => {
 		return filtdSortdFiles.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
@@ -189,8 +192,33 @@ export default function ImageGrid(props: IProps) {
 			<nav className="navbar sticky-top bg-dark" id="topGridBar">
 				<form className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
-						<div className='col-auto d-none d-lg-block'>
-							<a className="navbar-brand me-0 text-white">Image Grid</a>
+						<div className="col-12 col-md-auto">
+							<div className="btn-group" role="group" aria-label="item type switcher">
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'all' ? 'active' : ''}`}
+									title="show all"
+									aria-label="show all"
+									onClick={() => setMediaTypeFilter('all')}>
+									<i className="bi-collection-play" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'image' ? 'active' : ''}`}
+									title="show images"
+									aria-label="show images"
+									onClick={() => setMediaTypeFilter('image')}>
+									<i className="bi-file-image" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'video' ? 'active' : ''}`}
+									title="show videos"
+									aria-label="show videos"
+									onClick={() => setMediaTypeFilter('video')}>
+									<i className="bi-file-play" />
+								</button>
+							</div>
 						</div>
 						<div className="col-12 col-md-auto mb-2 mb-md-0">
 							{renderMainContBody_TopBar_Paging()}
