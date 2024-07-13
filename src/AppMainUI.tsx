@@ -136,9 +136,11 @@ export default function AppMainUI() {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-primary">
+			<nav className="navbar navbar-expand bg-body-tertiary sticky-top">
 				<div className="container-fluid">
-					<a className="navbar-brand" href="#">Navbar</a>
+					<a className="navbar-brand" href="#">
+						<img src="/google-drive.png" alt="Drive" width="30" height="26" />
+					</a>
 					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span className="navbar-toggler-icon"></span>
 					</button>
@@ -225,14 +227,14 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<main>{returnJsx}</main>
+			<main className="container-fluid">{returnJsx}</main>
 		)
 	}
 
 	return (
-		<div className="container-fluid">
+		<>
 			{renderTopBar()}
 			{renderBody()}
-		</div>
+		</>
 	)
 }

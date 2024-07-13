@@ -15,7 +15,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark">
+			<nav className="navbar">
 				<div className="container-fluid">
 					<div className="row align-items-center">
 						<div className="col-auto d-none d-lg-block">
