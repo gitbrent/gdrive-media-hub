@@ -1,5 +1,5 @@
-// First, import variables from Bootswatch
-@import "~bootswatch/dist/darkly/variables";
+// First import Bootstrap's main SCSS
+@import "~bootstrap/scss/bootstrap";
 
 // Override the pagination variables here
 /* @see: https://getbootstrap.com/docs/5.3/customize/color/#using-the-new-colors */
@@ -14,17 +14,6 @@ $pagination-bg: $gray-600;
 $pagination-disabled-bg: $gray-700;
 $pagination-active-bg: $primary;
 
-/*
-	orig:
-	--bs-nav-pills-li nk-active-color: #fff;
-	--bs-nav-pills-link-active-bg: #375a7f;
-*/
-/*
-	no affect - had to override in style below
-	$nav-tabs-link-active-color: #990011;
-	$nav-pills-link-active-color: #333;
-*/
-$nav-pills-link-active-bg: $gray-800;
 $breadcrumb-bg: null;
 //$breadcrumb-font-size: 1.25rem; // "fs-5"
 
@@ -34,22 +23,7 @@ $card-title-spacer-y: 0;
 $breadcrumb-divider: quote(">");
 //$breadcrumb-active-color: var(--bs-white);
 
-// Then, import Bootstrap's main SCSS
-@import "~bootstrap/scss/bootstrap";
-
-// Finally, import Bootswatch theme
-@import "~bootswatch/dist/darkly/bootswatch";
-
 // Your other styles
 .ReactGridGallery_tile {
 	background: transparent !important;
-}
-
-// Custom leftNav button colors
-#leftNav .nav-pills .nav-link {
-	color: $gray-600 !important;
-}
-
-#leftNav .nav-pills .nav-link.active {
-	color: $gray-100 !important;
 }

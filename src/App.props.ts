@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20240101-1430'
+export const APP_BLD = '20240713-1140'
 export const APP_VER = '2.0.0-WIP'
 
 // ============================================================================
