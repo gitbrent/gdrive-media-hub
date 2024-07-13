@@ -154,7 +154,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-12 col-md-auto h4 text-center">
+						<div className="col-12 col-md-auto text-center">
 							<span className='text-nowrap text-success'>
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
@@ -168,7 +168,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<i className="bi-camera-video-fill ms-2" />
 							</span>
 						</div>
-						<div className="col-12 col-md-auto">
+						<div className="col-8 col-md-auto">
 							<div className="btn-group" role="group" aria-label="sort options">
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
@@ -187,7 +187,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								</button>
 							</div>
 						</div>
-						<div className="col-12 col-md-auto">
+						<div className="col-4 col-md-auto">
 							<div className="btn-group" role="group" aria-label="view switcher">
 								<button
 									type="button"
@@ -215,8 +215,8 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderBrowser(): JSX.Element {
 		return (
-			<section className="p-4">
-				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className='pb-3' />
+			<section className="p-3 pt-0">
+				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />
 				{viewMode === 'grid' ?
 					<section className="bg-black h-100">
 						<GridView

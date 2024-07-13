@@ -136,7 +136,7 @@ export default function AppMainUI() {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar navbar-expand bg-body-tertiary sticky-top">
+			<nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
 				<div className="container-fluid">
 					<a className="navbar-brand" href="#">
 						<img src="/google-drive.png" alt="Drive" width="30" height="26" />
@@ -158,25 +158,59 @@ export default function AppMainUI() {
 									</a>
 								</li>
 							}
-							<li className="nav-item">
-								<a className="nav-link" href="#">Link</a>
-							</li>
-							<li className="nav-item dropdown">
-								<a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-									Dropdown
-								</a>
-								<ul className="dropdown-menu">
-									<li><a className="dropdown-item" href="#">Action</a></li>
-									<li><a className="dropdown-item" href="#">Another action</a></li>
-									<li><hr className="dropdown-divider" /></li>
-									<li><a className="dropdown-item" href="#">Something else here</a></li>
-								</ul>
-							</li>
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
+										Image Grid
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
+										Slide Show
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.VideoPlayer)} className={`nav-link ${currentTab === AppTabs.VideoPlayer ? 'active' : ''}`} title="video grid" aria-label="video grid">
+										Video Grid
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link ${currentTab === AppTabs.Settings ? 'active' : ''}`} title="settings" aria-label="settings">
+										Settings
+									</a>
+								</li>
+							}
+
 						</ul>
-						<form className="d-flex" role="search">
-							<input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-							<button className="btn btn-outline-success" type="submit">Search</button>
-						</form>
+						<div className="dropdown">
+							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+								{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill" />}
+								<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
+							</a>
+							{authUserName ?
+								<ul className="dropdown-menu dropdown-menu-end">
+									<li>
+										<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.UserProfile)}>Profile</a>
+									</li>
+									<li><hr className="dropdown-divider" /></li>
+									<li>
+										<button className="dropdown-item" onClick={handleSignOutClick}>Sign Out</button>
+									</li>
+								</ul>
+								:
+								<ul className="dropdown-menu dropdown-menu-end">
+									<li>
+										<a className="dropdown-item" href="#" onClick={handleClearFileCache}>Clear Cache</a>
+									</li>
+								</ul>
+							}
+						</div>
 					</div>
 				</div>
 			</nav>)

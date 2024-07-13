@@ -147,9 +147,6 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			<nav className="navbar sticky-top bg-dark">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center">
-						<div className='col-auto d-none d-xl-block'>
-							<a className="navbar-brand me-0 text-white">Slide Show</a>
-						</div>
 						<div className="col col-md">
 							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause (space)">
 								{isPaused

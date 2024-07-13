@@ -189,7 +189,7 @@ export default function ImageGrid(props: IProps) {
 
 	function renderMainContBody_TopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark" id="topGridBar">
+			<nav className="navbar" id="topGridBar">
 				<form className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-12 col-md-auto">

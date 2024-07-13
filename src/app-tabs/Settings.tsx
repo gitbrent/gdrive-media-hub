@@ -105,21 +105,10 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 	}
 
 	return (
-		<>
-			<nav className="navbar sticky-top bg-dark">
-				<div className="container-fluid">
-					<div className="row align-items-center">
-						<div className="col-auto d-none d-lg-block">
-							<a className="navbar-brand me-0 text-white">Settings</a>
-						</div>
-					</div>
-				</div>
-			</nav>
-			<section className='p-4'>
-				{renderOptionsImageGrid()}
-				{/*renderOptionsSlideShow()*/}
-			</section>
-		</>
+		<section className='p-4'>
+			{renderOptionsImageGrid()}
+			{/*renderOptionsSlideShow()*/}
+		</section>
 	)
 }
 
