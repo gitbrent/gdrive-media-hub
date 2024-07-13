@@ -1,14 +1,8 @@
-// First import Bootstrap's main SCSS
-@import "~bootstrap/scss/bootstrap";
+// STEP 1: import these
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
 
-// Override the pagination variables here
-/* @see: https://getbootstrap.com/docs/5.3/customize/color/#using-the-new-colors */
-/* FYI: WORKS
-	$pagination-color: var(--bs-light);
-	$pagination-hover-bg: var(--bs-secondary);
-	$pagination-active-bg: $primary;
-	$pagination-hover-bg: $gray-300;
-*/
 $pagination-hover-bg: $gray-500;
 $pagination-bg: $gray-600;
 $pagination-disabled-bg: $gray-700;
@@ -22,6 +16,11 @@ $card-title-spacer-y: 0;
 
 $breadcrumb-divider: quote(">");
 //$breadcrumb-active-color: var(--bs-white);
+
+$table-bg: var(--bs-black);
+
+// STEP 2: After customizations above
+@import "bootstrap";
 
 // Your other styles
 .ReactGridGallery_tile {
