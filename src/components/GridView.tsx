@@ -5,7 +5,6 @@ import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
-import '../css/ImageGrid.css'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -180,7 +179,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon" onClick={() => setSelectedFile(item)}>
+					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
 						<i className="bi-file-play" />
 						<figcaption>{item.name}</figcaption>
 					</figure>

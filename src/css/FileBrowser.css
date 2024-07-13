@@ -5,7 +5,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(10, 10, 10, 0.7);
+	background-color: rgba(10, 10, 10, 0.8);
 	z-index: 1021;
 	/* High z-index to cover other content (bs-navbar is z=1020 */
 	display: flex;
