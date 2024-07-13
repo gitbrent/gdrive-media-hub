@@ -13,20 +13,6 @@ interface Props {
 const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusyGapiLoad, handleAuthClick }) => {
 	const fileAnalysis = useMemo(() => { return getFileAnalysis() }, [allFiles])
 
-	function renderTopBar(): JSX.Element {
-		return (
-			<nav className="navbar">
-				<div className="container-fluid">
-					<div className="row align-items-center">
-						<div className="col-auto d-none d-lg-block">
-							<a className="navbar-brand me-0 text-white">Home</a>
-						</div>
-					</div>
-				</div>
-			</nav>
-		)
-	}
-
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
@@ -264,7 +250,6 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	return (
 		<section>
-			{renderTopBar()}
 			{authUserName ? renderHome() : renderLogin()}
 		</section>
 	)

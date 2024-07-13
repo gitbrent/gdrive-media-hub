@@ -147,8 +147,17 @@ export default function AppMainUI() {
 					<div className="collapse navbar-collapse" id="navbarSupportedContent">
 						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
 							<li className="nav-item">
-								<a className="nav-link active" aria-current="page" href="#">Home</a>
+								<a href="#" onClick={() => setCurrentTab(AppTabs.Home)} className={`nav-link ${currentTab === AppTabs.Home ? 'active' : ''}`} title="home" aria-label="home">
+									Home
+								</a>
 							</li>
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.FileBrowser)} className={`nav-link ${currentTab === AppTabs.FileBrowser ? 'active' : ''}`} title="file browser" aria-label="file browser">
+										File Browser
+									</a>
+								</li>
+							}
 							<li className="nav-item">
 								<a className="nav-link" href="#">Link</a>
 							</li>
@@ -162,9 +171,6 @@ export default function AppMainUI() {
 									<li><hr className="dropdown-divider" /></li>
 									<li><a className="dropdown-item" href="#">Something else here</a></li>
 								</ul>
-							</li>
-							<li className="nav-item">
-								<a className="nav-link disabled" aria-disabled="true">Disabled</a>
 							</li>
 						</ul>
 						<form className="d-flex" role="search">
