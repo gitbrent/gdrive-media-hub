@@ -147,7 +147,7 @@ export default function ImageGrid(props: IProps) {
 		}
 
 		return (
-			<nav className='text-center' aria-label="page navigation">
+			<nav className="text-center" aria-label="page navigation">
 				<ul className="pagination mb-0">
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
 						<button type="button" className="page-link text-nowrap" onClick={() => setPagingPage(1)}>
