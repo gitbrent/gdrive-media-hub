@@ -72,31 +72,3 @@
 	}
 }
 */
-
-/* ----------------------------------------------------- */
-/* columns */
-/* ----------------------------------------------------- */
-
-@media (min-width: 768px) {
-	.gallery {
-		--num-columns: 4;
-	}
-}
-
-@media (min-width: 992px) {
-	.gallery {
-		--num-columns: 6;
-	}
-}
-
-@media (min-width: 1200px) {
-	.gallery {
-		--num-columns: 8;
-	}
-}
-
-@media (min-width: 1400px) {
-	.gallery {
-		--num-columns: 10;
-	}
-}

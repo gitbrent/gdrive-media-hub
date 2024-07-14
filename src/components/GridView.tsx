@@ -13,41 +13,20 @@ interface Props {
 }
 
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
-	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	const SHOW_CAPTIONS = false
 	//
 	const loadingRef = useRef(new Set<string>())
-	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
+	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Handle scroll event to load more items
-	 */
-	const handleScroll = () => {
-		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
-		setDisplayedItems(currentItems => {
-			// Calculate the number of new items to add
-			const nextItemsEndIndex = Math.min(currentItems.length + ITEMS_PER_PAGE, currFolderContents.length)
-			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
-
-			// Append new items to the current list
-			return [...currentItems, ...newItems]
-		})
-	}
-
-	useEffect(() => {
-		window.addEventListener('scroll', handleScroll)
-		return () => window.removeEventListener('scroll', handleScroll)
-	}, [currFolderContents])
-
-	/**
-	 * Load initial set of items
+	 * * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents.slice(0, ITEMS_PER_PAGE))
+		setDisplayedItems(currFolderContents)
 	}, [currFolderContents])
 
 	// --------------------------------------------------------------------------------------------

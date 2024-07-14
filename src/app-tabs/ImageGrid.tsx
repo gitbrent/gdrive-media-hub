@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
+import { IMediaFile, OPT_SORTBY, OPT_SORTDIR, log } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import GridView from '../components/GridView'
@@ -78,24 +78,29 @@ export default function ImageGrid(props: IProps) {
 	useEffect(() => {
 		const calculatePageSize = () => {
 			// Get the height of a single figure element inside #gallery-container
-			const galleryContainer = document.getElementById('contImageGrid')
-			const galleryTopBar = document.getElementById('topGridBar')
+			const galleryContainer = document.getElementById('gallery-container')
 			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
 			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
-			const marginTop = figureStyles ? parseFloat(figureStyles.marginTop) : 0
-			const marginBottom = figureStyles ? parseFloat(figureStyles.marginBottom) : 0
-			const rowHeight = figureElement ? figureElement.offsetHeight + marginTop + marginBottom : 199 + 8  // fallback to 198 if not found
+			const figureMargin = figureStyles ? parseFloat(figureStyles.marginTop) : 8
+			const itemSize = figureElement ? figureElement.offsetHeight + figureMargin + figureMargin : 200 + 8 + 8
+			const navbars = document.querySelectorAll('.navbar')
+			let navbarHeight = 0
+			navbars.forEach((navbar) => navbarHeight += navbar.clientHeight)
 
-			// Calculate the available height and width for the gallery.
-			const availableHeight = galleryContainer ? galleryContainer.clientHeight - (galleryTopBar ? galleryTopBar.clientHeight : 0) : window.innerHeight
-			const availableWidth = galleryContainer ? galleryContainer.clientWidth : window.innerWidth
+			const containerWidth = window.innerWidth
+			const containerHeight = window.innerHeight - navbarHeight
 
-			// Calculate the number of rows and columns that can fit.
-			const numRows = Math.floor(availableHeight / rowHeight)
-			const numColumns = Math.floor(availableWidth / rowHeight)
+			const itemsPerRow = Math.floor(containerWidth / itemSize)
+			const rowsPerPage = Math.floor(containerHeight / itemSize)
+
+			// DEBUG: WIP:
+			console.log('availableHeight', containerHeight)
+			console.log('itemSize', itemSize)
+			console.log('itemsPerRow', itemsPerRow)
+			console.log('rowsPerPage', rowsPerPage)
 
 			// Calculate pageSize.
-			const newPagingSize = numRows * numColumns
+			const newPagingSize = (itemsPerRow * rowsPerPage)
 
 			// Set pageSize
 			setPagingSize(newPagingSize)
