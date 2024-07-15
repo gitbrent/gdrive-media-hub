@@ -198,7 +198,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	}
 
 	return (
-		<section>
+		<section className="bg-black">
 			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
 				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
 			}

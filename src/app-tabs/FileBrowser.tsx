@@ -145,28 +145,28 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar">
+			<nav className="navbar my-3">
 				<div className="container-fluid">
 					<div className="row align-items-center w-100">
-						<div className="col-12 col-md">
-							<div className="input-group">
-								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+						<div className="col-4 col-md-auto">
+							<div className="btn-group" role="group" aria-label="view switcher">
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
+									aria-label="list view"
+									onClick={() => setViewMode('list')}
+								>
+									<i className="bi-card-list" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
+									aria-label="grid view"
+									onClick={() => setViewMode('grid')}
+								>
+									<i className="bi-grid" />
+								</button>
 							</div>
-						</div>
-						<div className="col-12 col-md-auto text-center">
-							<span className='text-nowrap text-success'>
-								{currFolderContents.filter(item => isFolder(item)).length}
-								<i className="bi-folder-fill ms-2" />
-							</span>
-							<span className='text-nowrap text-info ms-3'>
-								{currFolderContents.filter(item => isImage(item)).length}
-								<i className="bi-image-fill ms-2" />
-							</span>
-							<span className='text-nowrap text-warning ms-3'>
-								{currFolderContents.filter(item => isVideo(item)).length}
-								<i className="bi-camera-video-fill ms-2" />
-							</span>
 						</div>
 						<div className="col-8 col-md-auto">
 							<div className="btn-group" role="group" aria-label="sort options">
@@ -187,25 +187,25 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								</button>
 							</div>
 						</div>
-						<div className="col-4 col-md-auto">
-							<div className="btn-group" role="group" aria-label="view switcher">
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
-									aria-label="list view"
-									onClick={() => setViewMode('list')}
-								>
-									<i className="bi-card-list" />
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
-									aria-label="grid view"
-									onClick={() => setViewMode('grid')}
-								>
-									<i className="bi-grid" />
-								</button>
+						<div className="col-12 col-md">
+							<div className="input-group">
+								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
+						</div>
+						<div className="col-12 col-md-auto text-center">
+							<span className='text-nowrap text-success'>
+								{currFolderContents.filter(item => isFolder(item)).length}
+								<i className="bi-folder-fill ms-2" />
+							</span>
+							<span className='text-nowrap text-info ms-3'>
+								{currFolderContents.filter(item => isImage(item)).length}
+								<i className="bi-image-fill ms-2" />
+							</span>
+							<span className='text-nowrap text-warning ms-3'>
+								{currFolderContents.filter(item => isVideo(item)).length}
+								<i className="bi-camera-video-fill ms-2" />
+							</span>
 						</div>
 					</div>
 				</div>

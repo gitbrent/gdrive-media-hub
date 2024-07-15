@@ -87,17 +87,21 @@ export default function ImageGrid(props: IProps) {
 			let navbarHeight = 0
 			navbars.forEach((navbar) => navbarHeight += navbar.clientHeight)
 
-			const containerWidth = window.innerWidth
+			const containerWidth = galleryContainer ? galleryContainer.offsetWidth : window.innerWidth
 			const containerHeight = window.innerHeight - navbarHeight
 
 			const itemsPerRow = Math.floor(containerWidth / itemSize)
-			const rowsPerPage = Math.floor(containerHeight / itemSize)
+			const rowsPerPage = Math.round(containerHeight / itemSize)
 
 			// DEBUG: WIP:
-			console.log('availableHeight', containerHeight)
+			/*
+			console.log('containerWidth', containerWidth)
+			console.log('containerHeight', containerHeight)
 			console.log('itemSize', itemSize)
+			console.log('containerWidth/itemSize =', (containerWidth/itemSize))
 			console.log('itemsPerRow', itemsPerRow)
 			console.log('rowsPerPage', rowsPerPage)
+			*/
 
 			// Calculate pageSize.
 			const newPagingSize = (itemsPerRow * rowsPerPage)
@@ -194,7 +198,7 @@ export default function ImageGrid(props: IProps) {
 
 	function renderMainContBody_TopBar(): JSX.Element {
 		return (
-			<nav className="navbar" id="topGridBar">
+			<nav className="navbar my-3">
 				<form className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-12 col-md-auto">
@@ -255,7 +259,7 @@ export default function ImageGrid(props: IProps) {
 	// --------------------------------------------------------------------------------------------
 
 	return (
-		<section className="bg-black h-100">
+		<section>
 			{renderMainContBody_TopBar()}
 			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0
 				? <GridView

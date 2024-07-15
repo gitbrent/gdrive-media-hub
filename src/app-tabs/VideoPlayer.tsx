@@ -74,7 +74,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark">
+			<nav className="navbar my-3">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col">

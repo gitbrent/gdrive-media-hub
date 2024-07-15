@@ -13,7 +13,7 @@ interface Props {
 const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOptSortBy, setOptSortDir, setOptIsShowCap }) => {
 	function renderOptionsImageGrid(): JSX.Element {
 		return (
-			<section>
+			<section className="bg-black">
 				<h3>Image Grid Options</h3>
 				<div className="row mt-4">
 					<div className="col" data-desc="sort-by">
@@ -86,15 +86,15 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 
 	function renderOptionsSlideShow(): JSX.Element {
 		return (
-			<section className='mt-4'>
+			<section className="mt-4">
 				<h3>Slide Show Options</h3>
-				<div className='row row-cols-3 mt-4'>
-					<div className='col'>
+				<div className="row row-cols-3 mt-4">
+					<div className="col">
 						<div className="card">
 							<div className="card-header">
 								<h5 className="card-title">Sort By</h5>
 							</div>
-							<div className='card-body py-4 px-3'>
+							<div className="card-body bg-black py-4 px-3">
 								TODO:
 							</div>
 						</div>
@@ -105,9 +105,9 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 	}
 
 	return (
-		<section className='p-4'>
+		<section className="p-4">
 			{renderOptionsImageGrid()}
-			{/*renderOptionsSlideShow()*/}
+			{renderOptionsSlideShow()}
 		</section>
 	)
 }
