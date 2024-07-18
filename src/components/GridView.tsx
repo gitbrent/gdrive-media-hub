@@ -5,6 +5,7 @@ import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
+import useCalcMaxGridItems from './useCalcMaxGridItems'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -19,15 +20,39 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
+	const [pagingSize, setPagingSize] = useState(0)
 
 	// --------------------------------------------------------------------------------------------
 
+	useCalcMaxGridItems(setPagingSize)
+
 	/**
-	 * * Load initial set of items
+	 * @summary Handle scroll event to load more items
+	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
+	 */
+	const handleScroll = () => {
+		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
+		setDisplayedItems(currentItems => {
+			// Calculate the number of new items to add
+			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
+			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
+
+			// Append new items to the current list
+			return [...currentItems, ...newItems]
+		})
+	}
+
+	useEffect(() => {
+		window.addEventListener('scroll', handleScroll)
+		return () => window.removeEventListener('scroll', handleScroll)
+	}, [currFolderContents])
+
+	/**
+	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents)
-	}, [currFolderContents])
+		setDisplayedItems(currFolderContents.slice(0, pagingSize))
+	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
 

@@ -4,6 +4,7 @@ import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import GridView from '../components/GridView'
 import { isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import useCalcMaxGridItems from '../components/useCalcMaxGridItems'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
@@ -18,8 +19,8 @@ interface IProps {
 type MediaType = 'all' | 'image' | 'video'
 
 export default function ImageGrid(props: IProps) {
-	const [pagingSize, setPagingSize] = useState(0)
 	const [pagingPage, setPagingPage] = useState(0)
+	const [pagingSize, setPagingSize] = useState<number>(0)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
 	const [lastLoadDate, setLastLoadDate] = useState('')
@@ -63,6 +64,8 @@ export default function ImageGrid(props: IProps) {
 		return filtdSortdFiles.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [filtdSortdFiles, pagingPage, pagingSize, props.optSortBy, props.optSortDir])
 
+	useCalcMaxGridItems(setPagingSize)
+
 	// --------------------------------------------------------------------------------------------
 
 	// Fix issue with initial images all showing loading images
@@ -70,55 +73,6 @@ export default function ImageGrid(props: IProps) {
 		const noBlobIds = gridShowFiles.filter((file) => !file.original).map((file) => file.id as string)
 		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds).then(() => setLastLoadDate((new Date).toISOString()))
 	}, [gridShowFiles])
-
-	/**
-	 * Set `pageSize` based upon current container size
-	 * - also creates up a window.resize event listener!
-	 */
-	useEffect(() => {
-		const calculatePageSize = () => {
-			// Get the height of a single figure element inside #gallery-container
-			const galleryContainer = document.getElementById('gallery-container')
-			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
-			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
-			const figureMargin = figureStyles ? parseFloat(figureStyles.marginTop) : 8
-			const itemSize = figureElement ? figureElement.offsetHeight + figureMargin + figureMargin : 200 + 8 + 8
-			const navbars = document.querySelectorAll('.navbar')
-			let navbarHeight = 0
-			navbars.forEach((navbar) => navbarHeight += navbar.clientHeight)
-
-			const containerWidth = galleryContainer ? galleryContainer.offsetWidth : window.innerWidth
-			const containerHeight = window.innerHeight - navbarHeight
-
-			const itemsPerRow = Math.floor(containerWidth / itemSize)
-			const rowsPerPage = Math.round(containerHeight / itemSize)
-
-			// DEBUG: WIP:
-			/*
-			console.log('containerWidth', containerWidth)
-			console.log('containerHeight', containerHeight)
-			console.log('itemSize', itemSize)
-			console.log('containerWidth/itemSize =', (containerWidth/itemSize))
-			console.log('itemsPerRow', itemsPerRow)
-			console.log('rowsPerPage', rowsPerPage)
-			*/
-
-			// Calculate pageSize.
-			const newPagingSize = (itemsPerRow * rowsPerPage)
-
-			// Set pageSize
-			setPagingSize(newPagingSize)
-		}
-
-		// Initial calculation
-		calculatePageSize()
-
-		// Add resize event listener
-		window.addEventListener('resize', calculatePageSize)
-
-		// Cleanup: remove event listener
-		return () => window.removeEventListener('resize', calculatePageSize)
-	}, [filtdSortdFiles])
 
 	/**
 	 * Set to page 1 on startup
