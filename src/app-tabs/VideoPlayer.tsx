@@ -74,12 +74,9 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark">
+			<nav className="navbar my-3">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
-						<div className='col-auto d-none d-xl-block'>
-							<a className="navbar-brand me-0 text-white">Video Viewer</a>
-						</div>
 						<div className="col">
 							<button className='btn btn-secondary w-100' disabled={usedIndexes.length <= 1} onClick={goToPrevSlide} title="Prev">
 								<i className="bi-chevron-left me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>

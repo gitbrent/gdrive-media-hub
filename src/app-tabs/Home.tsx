@@ -13,24 +13,10 @@ interface Props {
 const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusyGapiLoad, handleAuthClick }) => {
 	const fileAnalysis = useMemo(() => { return getFileAnalysis() }, [allFiles])
 
-	function renderTopBar(): JSX.Element {
-		return (
-			<nav className="navbar sticky-top bg-dark">
-				<div className="container-fluid">
-					<div className="row align-items-center">
-						<div className="col-auto d-none d-lg-block">
-							<a className="navbar-brand me-0 text-white">Home</a>
-						</div>
-					</div>
-				</div>
-			</nav>
-		)
-	}
-
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center cursor-link bg-secondary p-4 rounded" onClick={handleAuthClick}>
+				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={handleAuthClick}>
 					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
@@ -52,7 +38,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4">
+			<div className="bg-black p-4">
 				<div className="row align-items-center mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Type</h4></div>
 					<div className='col-auto'>
@@ -94,7 +80,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4">
+			<div className="bg-black p-4">
 				<div className="row align-items-center flex-nowrap mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Size</h4></div>
 					<div className='col-auto'>
@@ -152,7 +138,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		})
 
 		return (
-			<div className="bg-secondary p-4">
+			<div className="bg-black p-4">
 				<div className='row align-items-center'>
 					<div className='col'><h4 className='mb-0'>Files By Year</h4></div>
 					<div className='col-auto'>
@@ -234,7 +220,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		}
 
 		return (
-			<div className="bg-secondary p-4">
+			<div className="bg-black p-4">
 				<div className="row align-items-center mb-4">
 					<div className='col'><h4 className='mb-0'>Top Filenames</h4></div>
 					<div className='col-auto'>
@@ -264,7 +250,6 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	return (
 		<section>
-			{renderTopBar()}
 			{authUserName ? renderHome() : renderLogin()}
 		</section>
 	)

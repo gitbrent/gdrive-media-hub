@@ -5,7 +5,7 @@ import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
-import '../css/ImageGrid.css'
+import useCalcMaxGridItems from './useCalcMaxGridItems'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -14,24 +14,27 @@ interface Props {
 }
 
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
-	const ITEMS_PER_PAGE = 6 * 4 // current style sets 6 items per row
 	const SHOW_CAPTIONS = false
 	//
 	const loadingRef = useRef(new Set<string>())
-	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
+	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
+	const [pagingSize, setPagingSize] = useState(0)
 
 	// --------------------------------------------------------------------------------------------
 
+	useCalcMaxGridItems(setPagingSize)
+
 	/**
-	 * Handle scroll event to load more items
+	 * @summary Handle scroll event to load more items
+	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
 		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
-			const nextItemsEndIndex = Math.min(currentItems.length + ITEMS_PER_PAGE, currFolderContents.length)
+			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
 			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
 
 			// Append new items to the current list
@@ -48,8 +51,8 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents.slice(0, ITEMS_PER_PAGE))
-	}, [currFolderContents])
+		setDisplayedItems(currFolderContents.slice(0, pagingSize))
+	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -180,7 +183,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon" onClick={() => setSelectedFile(item)}>
+					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
 						<i className="bi-file-play" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
@@ -220,7 +223,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	}
 
 	return (
-		<section>
+		<section className="bg-black">
 			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
 				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
 			}

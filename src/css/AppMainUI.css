@@ -31,10 +31,11 @@
 /* -- bootstrap-5 mods and adds                                                  -- */
 /* -------------------------------------------------------------------------------- */
 
+/* some topnav bars have buttons, some dont, so just use larger, button size for all */
+/*
 .navbar {
-	/* some topnav bars have buttons, some dont, so just use larger, button size for all */
 	min-height: 70px !important;
-}
+}*/
 
 /* following two rules are to make the google drive logo (initial, not logged in screen) to be 100% h */
 .col.py-3 {

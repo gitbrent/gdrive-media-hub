@@ -145,11 +145,47 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark">
+			<nav className="navbar my-3">
 				<div className="container-fluid">
 					<div className="row align-items-center w-100">
-						<div className="col d-none d-lg-block">
-							<a className="navbar-brand me-0 text-white">File Browser</a>
+						<div className="col-4 col-md-auto">
+							<div className="btn-group" role="group" aria-label="view switcher">
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
+									aria-label="list view"
+									onClick={() => setViewMode('list')}
+								>
+									<i className="bi-card-list" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
+									aria-label="grid view"
+									onClick={() => setViewMode('grid')}
+								>
+									<i className="bi-grid" />
+								</button>
+							</div>
+						</div>
+						<div className="col-8 col-md-auto">
+							<div className="btn-group" role="group" aria-label="sort options">
+								<button type="button" aria-label="sort by name"
+									className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
+									onClick={() => toggleSortOrder('name')}>
+									Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+								</button>
+								<button type="button" aria-label="sort by size"
+									className={`btn btn-outline-secondary ${sortField === 'size' ? 'active' : ''}`}
+									onClick={() => toggleSortOrder('size')}>
+									Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
+								</button>
+								<button type="button" aria-label="sort by modified"
+									className={`btn btn-outline-secondary ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
+									onClick={() => toggleSortOrder('modifiedByMeTime')}>
+									Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
+								</button>
+							</div>
 						</div>
 						<div className="col-12 col-md">
 							<div className="input-group">
@@ -157,7 +193,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-12 col-md-auto h4 mb-0 mt-2 mt-md-0 text-center">
+						<div className="col-12 col-md-auto text-center">
 							<span className='text-nowrap text-success'>
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
@@ -179,53 +215,10 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderBrowser(): JSX.Element {
 		return (
-			<section className="p-4">
-				<div className="row align-items-center fs-5 mb-2">
-					<div className='col'>
-						<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
-					</div>
-					<div className='col-12 col-md-auto'>
-						<div className="btn-group" role="group" aria-label="sort options">
-							<button type="button" aria-label="sort by name"
-								className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
-								onClick={() => toggleSortOrder('name')}>
-								Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
-							</button>
-							<button type="button" aria-label="sort by size"
-								className={`btn btn-outline-secondary ${sortField === 'size' ? 'active' : ''}`}
-								onClick={() => toggleSortOrder('size')}>
-								Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
-							</button>
-							<button type="button" aria-label="sort by modified"
-								className={`btn btn-outline-secondary ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
-								onClick={() => toggleSortOrder('modifiedByMeTime')}>
-								Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
-							</button>
-						</div>
-					</div>
-					<div className='col-12 col-md-auto'>
-						<div className="btn-group" role="group" aria-label="view switcher">
-							<button
-								type="button"
-								className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
-								aria-label="list view"
-								onClick={() => setViewMode('list')}
-							>
-								<i className="bi-card-list" />
-							</button>
-							<button
-								type="button"
-								className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
-								aria-label="grid view"
-								onClick={() => setViewMode('grid')}
-							>
-								<i className="bi-grid" />
-							</button>
-						</div>
-					</div>
-				</div>
-				{viewMode === 'grid'
-					? <section className="bg-black h-100">
+			<section className="p-3 pt-0">
+				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />
+				{viewMode === 'grid' ?
+					<section className="bg-black h-100">
 						<GridView
 							currFolderContents={currFolderContents}
 							isFolderLoading={isFolderLoading}

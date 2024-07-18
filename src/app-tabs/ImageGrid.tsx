@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
+import { IMediaFile, OPT_SORTBY, OPT_SORTDIR, log } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import GridView from '../components/GridView'
 import { isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import useCalcMaxGridItems from '../components/useCalcMaxGridItems'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
@@ -18,8 +19,8 @@ interface IProps {
 type MediaType = 'all' | 'image' | 'video'
 
 export default function ImageGrid(props: IProps) {
-	const [pagingSize, setPagingSize] = useState(0)
 	const [pagingPage, setPagingPage] = useState(0)
+	const [pagingSize, setPagingSize] = useState<number>(0)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
 	const [lastLoadDate, setLastLoadDate] = useState('')
@@ -63,6 +64,8 @@ export default function ImageGrid(props: IProps) {
 		return filtdSortdFiles.filter((_item, idx) => { return idx >= ((pagingPage - 1) * pagingSize) && idx <= ((pagingPage * pagingSize) - 1) })
 	}, [filtdSortdFiles, pagingPage, pagingSize, props.optSortBy, props.optSortDir])
 
+	useCalcMaxGridItems(setPagingSize)
+
 	// --------------------------------------------------------------------------------------------
 
 	// Fix issue with initial images all showing loading images
@@ -70,46 +73,6 @@ export default function ImageGrid(props: IProps) {
 		const noBlobIds = gridShowFiles.filter((file) => !file.original).map((file) => file.id as string)
 		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds).then(() => setLastLoadDate((new Date).toISOString()))
 	}, [gridShowFiles])
-
-	/**
-	 * Set `pageSize` based upon current container size
-	 * - also creates up a window.resize event listener!
-	 */
-	useEffect(() => {
-		const calculatePageSize = () => {
-			// Get the height of a single figure element inside #gallery-container
-			const galleryContainer = document.getElementById('contImageGrid')
-			const galleryTopBar = document.getElementById('topGridBar')
-			const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
-			const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
-			const marginTop = figureStyles ? parseFloat(figureStyles.marginTop) : 0
-			const marginBottom = figureStyles ? parseFloat(figureStyles.marginBottom) : 0
-			const rowHeight = figureElement ? figureElement.offsetHeight + marginTop + marginBottom : 199 + 8  // fallback to 198 if not found
-
-			// Calculate the available height and width for the gallery.
-			const availableHeight = galleryContainer ? galleryContainer.clientHeight - (galleryTopBar ? galleryTopBar.clientHeight : 0) : window.innerHeight
-			const availableWidth = galleryContainer ? galleryContainer.clientWidth : window.innerWidth
-
-			// Calculate the number of rows and columns that can fit.
-			const numRows = Math.floor(availableHeight / rowHeight)
-			const numColumns = Math.floor(availableWidth / rowHeight)
-
-			// Calculate pageSize.
-			const newPagingSize = numRows * numColumns
-
-			// Set pageSize
-			setPagingSize(newPagingSize)
-		}
-
-		// Initial calculation
-		calculatePageSize()
-
-		// Add resize event listener
-		window.addEventListener('resize', calculatePageSize)
-
-		// Cleanup: remove event listener
-		return () => window.removeEventListener('resize', calculatePageSize)
-	}, [filtdSortdFiles])
 
 	/**
 	 * Set to page 1 on startup
@@ -147,7 +110,7 @@ export default function ImageGrid(props: IProps) {
 		}
 
 		return (
-			<nav className='text-center' aria-label="page navigation">
+			<nav className="text-center" aria-label="page navigation">
 				<ul className="pagination mb-0">
 					<li className={`page-item ${pagingPage === 1 ? 'disabled' : ''}`}>
 						<button type="button" className="page-link text-nowrap" onClick={() => setPagingPage(1)}>
@@ -189,7 +152,7 @@ export default function ImageGrid(props: IProps) {
 
 	function renderMainContBody_TopBar(): JSX.Element {
 		return (
-			<nav className="navbar sticky-top bg-dark" id="topGridBar">
+			<nav className="navbar my-3">
 				<form className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-12 col-md-auto">
@@ -250,7 +213,7 @@ export default function ImageGrid(props: IProps) {
 	// --------------------------------------------------------------------------------------------
 
 	return (
-		<section className="bg-black h-100">
+		<section>
 			{renderMainContBody_TopBar()}
 			{pagingSize > 0 && gridShowFiles && gridShowFiles.length > 0
 				? <GridView

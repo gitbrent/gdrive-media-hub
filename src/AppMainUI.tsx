@@ -49,7 +49,7 @@ export default function AppMainUI() {
 
 	// --------------------------------------------------------------------------------------------
 
-	function renderLNav(): JSX.Element {
+	function renderNavbar(): JSX.Element {
 		return (
 			<nav id="leftNav" className={`col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark ${isSidebarOpen ? '' : 'collapsed'}`}>
 				<div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-3 text-white min-vh-100-fixed position-sticky" style={{ top: 0, zIndex: 100 }}>
@@ -134,6 +134,88 @@ export default function AppMainUI() {
 		)
 	}
 
+	function renderTopBar(): JSX.Element {
+		return (
+			<nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+				<div className="container-fluid">
+					<a className="navbar-brand" href="#">
+						<img src="/google-drive.png" alt="Drive" width="30" height="26" />
+					</a>
+					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span className="navbar-toggler-icon"></span>
+					</button>
+					<div className="collapse navbar-collapse" id="navbarSupportedContent">
+						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
+							<li className="nav-item">
+								<a href="#" onClick={() => setCurrentTab(AppTabs.Home)} className={`nav-link ${currentTab === AppTabs.Home ? 'active' : ''}`} title="home" aria-label="home">
+									Home
+								</a>
+							</li>
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.FileBrowser)} className={`nav-link ${currentTab === AppTabs.FileBrowser ? 'active' : ''}`} title="file browser" aria-label="file browser">
+										File Browser
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
+										Image Grid
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
+										Slide Show
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.VideoPlayer)} className={`nav-link ${currentTab === AppTabs.VideoPlayer ? 'active' : ''}`} title="video grid" aria-label="video grid">
+										Video Grid
+									</a>
+								</li>
+							}
+							{authUserName &&
+								<li className="nav-item">
+									<a href="#" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link ${currentTab === AppTabs.Settings ? 'active' : ''}`} title="settings" aria-label="settings">
+										Settings
+									</a>
+								</li>
+							}
+
+						</ul>
+						<div className="dropdown">
+							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+								{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill" />}
+								<span className={`mx-1 ${isSidebarOpen ? 'd-sm-inline' : 'd-none'}`}>{authUserName}</span>
+							</a>
+							{authUserName ?
+								<ul className="dropdown-menu dropdown-menu-end">
+									<li>
+										<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.UserProfile)}>Profile</a>
+									</li>
+									<li><hr className="dropdown-divider" /></li>
+									<li>
+										<button className="dropdown-item" onClick={handleSignOutClick}>Sign Out</button>
+									</li>
+								</ul>
+								:
+								<ul className="dropdown-menu dropdown-menu-end">
+									<li>
+										<a className="dropdown-item" href="#" onClick={handleClearFileCache}>Clear Cache</a>
+									</li>
+								</ul>
+							}
+						</div>
+					</div>
+				</div>
+			</nav>)
+	}
+
 	function renderBody(): JSX.Element {
 		let returnJsx = <div>Loading...</div>
 
@@ -185,16 +267,14 @@ export default function AppMainUI() {
 		}
 
 		return (
-			<main className="col p-0">{returnJsx}</main>
+			<main className="container-fluid">{returnJsx}</main>
 		)
 	}
 
 	return (
-		<div className="container-fluid">
-			<div className="row flex-nowrap">
-				{renderLNav()}
-				{renderBody()}
-			</div>
-		</div>
+		<>
+			{renderTopBar()}
+			{renderBody()}
+		</>
 	)
 }
