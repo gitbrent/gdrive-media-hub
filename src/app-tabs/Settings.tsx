@@ -86,7 +86,7 @@ const Settings: React.FC<Props> = ({ optSortBy, optSortDir, optIsShowCap, setOpt
 
 	function renderOptionsSlideShow(): JSX.Element {
 		return (
-			<section className="mt-4">
+			<section className="p-4 mt-4">
 				<h3>Slide Show Options</h3>
 				<div className="row row-cols-3 mt-4">
 					<div className="col">
