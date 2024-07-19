@@ -31,6 +31,15 @@ $table-bg: var(--bs-black);
 // STEP 2: After customizations above
 @import "bootstrap";
 
+.nouserselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 // STEP 3: Your other styles
 .ReactGridGallery_tile {
 	background: transparent !important;

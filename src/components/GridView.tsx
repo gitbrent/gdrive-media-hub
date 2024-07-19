@@ -4,8 +4,8 @@ import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
-import 'photoswipe/dist/photoswipe.css'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
+import 'photoswipe/dist/photoswipe.css'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -75,6 +75,10 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			const blobFetchPromises: Promise<any>[] = []
 
 			updatedItems.forEach((item) => {
+				if (isImage(item) && 'original' in item) {
+					console.log('WTF', item?.original)
+				}
+
 				// NOTE: only download images
 				if (isImage(item) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
@@ -190,6 +194,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			}
 		} else if (isImage(item)) {
+			console.log(item) // FIXME: filtered items from FileBrowser lack `original` and neve rload!!!
 			if ('original' in item && item.original) {
 				return (
 					<Item {...item} key={`${index}${item.id}`}>

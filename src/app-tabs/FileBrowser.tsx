@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
+import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
@@ -9,6 +9,7 @@ import Breadcrumbs from '../components/Breadcrumbs'
 import '../css/FileBrowser.css'
 
 interface Props {
+	allFiles: IMediaFile[]
 	isBusyGapiLoad: boolean
 }
 
@@ -16,11 +17,12 @@ type ViewMode = 'grid' | 'list'
 type SortField = 'name' | 'size' | 'modifiedByMeTime';
 type SortOrder = 'asc' | 'desc';
 
-const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
+const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [optSchWord, setOptSchWord] = useState('')
+	const [isGlobalSearch, setIsGlobalSearch] = useState(false)
 	const [isFolderLoading, setIsFolderLoading] = useState(false)
 	const [viewMode, setViewMode] = useState<ViewMode>('list')
 	const [sortField, setSortField] = useState<SortField>('name')
@@ -107,7 +109,9 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 			mimeType: string;
 		}
 
-		const sortedContents = [...origFolderContents].sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
+		const sourceItems = isGlobalSearch && optSchWord ? [...allFiles] : [...origFolderContents]
+
+		const sortedContents = sourceItems.sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
 			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
 			const isFolderB = b.mimeType === 'application/vnd.google-apps.folder'
 			if (isFolderA && !isFolderB) {
@@ -131,10 +135,11 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 		})
 
 		// Filter results
-		setCurrFolderContents(
-			sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-		)
-	}, [origFolderContents, optSchWord, sortField, sortOrder])
+		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		log(2, `[FileBrowser] currFolderContents: "${currFolderContents.length}"`)
+
+		setCurrFolderContents(filteredContents)
+	}, [allFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -190,6 +195,10 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="col-12 col-md">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
+								<div className="input-group-text">
+									<input className="form-check-input mt-0" type="checkbox" id="globalSearchCheck" value="" checked={isGlobalSearch} onChange={(ev) => setIsGlobalSearch(ev.currentTarget.checked)} aria-label="Checkbox for global search" />
+									<label className="form-check-label ms-2 text-white-50 nouserselect" htmlFor="globalSearchCheck">Global</label>
+								</div>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
