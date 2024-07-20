@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { IGapiFolder, IMediaFile, log } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
@@ -51,7 +51,9 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents.slice(0, pagingSize))
+		const pageOfImages: IMediaFile[] = currFolderContents.slice(0, pagingSize).filter((file) => isMedia(file))
+		pageOfImages.filter((file) => !file.original).forEach((file) => file.original = '')
+		setDisplayedItems(pageOfImages)
 	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
@@ -75,10 +77,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			const blobFetchPromises: Promise<any>[] = []
 
 			updatedItems.forEach((item) => {
-				if (isImage(item) && 'original' in item) {
-					console.log('WTF', item?.original)
-				}
-
 				// NOTE: only download images
 				if (isImage(item) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
@@ -194,7 +192,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			}
 		} else if (isImage(item)) {
-			console.log(item) // FIXME: filtered items from FileBrowser lack `original` and neve rload!!!
 			if ('original' in item && item.original) {
 				return (
 					<Item {...item} key={`${index}${item.id}`}>
