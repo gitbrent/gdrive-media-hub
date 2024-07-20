@@ -101,6 +101,14 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 		setIsFolderLoading(false)
 	}
 
+	/* FIXME: WIP:
+	// Fix issue with initial images all showing loading images
+	useEffect(() => {
+		const noBlobIds = allFiles.filter((file) => !file.original).map((file) => file.id as string)
+		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds).then(() => setLastLoadDate((new Date).toISOString()))
+	}, [allFiles])
+	*/
+
 	useEffect(() => {
 		interface ICommonFileFolderProperties {
 			name: string;
@@ -136,7 +144,7 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 
 		// Filter results
 		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-		log(2, `[FileBrowser] currFolderContents: "${currFolderContents.length}"`)
+		if (currFolderContents[0]) console.log('currFolderContents:', currFolderContents[0])
 
 		setCurrFolderContents(filteredContents)
 	}, [allFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
