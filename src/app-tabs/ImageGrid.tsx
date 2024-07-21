@@ -64,8 +64,8 @@ export default function ImageGrid(props: IProps) {
 
 	function renderMainContBody_TopBar(): JSX.Element {
 		return (
-			<nav className="navbar my-3">
-				<form className="container-fluid">
+			<nav className="navbar mb-3">
+				<form className="container-fluid px-0">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-12 col-md-auto">
 							<div className="btn-group" role="group" aria-label="item type switcher">
@@ -109,14 +109,14 @@ export default function ImageGrid(props: IProps) {
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-auto col-md-auto mt-2 mt-md-0">
+						<div className="col-auto col-md-auto mt-2 mt-md-0 pe-0">
 							<div className="text-muted">
 								{isSearching ? <span>searching...</span>
 									: filtdSortdFiles.length === 0
 										? ('No files to show')
 										: (<span>
-											<span className="d-none d-lg-inline-block">Showing&nbsp;</span><b>{filtdSortdFiles.length}</b>&nbsp;of&nbsp;
-											<b>{filtdSortdFiles.length}</b><span className="d-none d-lg-inline-block">&nbsp;files</span>
+											<b>{filtdSortdFiles.length}</b>&nbsp;of&nbsp;<b>{props.allFiles.length}</b>
+											<span className="d-none d-lg-inline-block">&nbsp;files</span>
 										</span>)
 								}
 							</div>
@@ -138,7 +138,7 @@ export default function ImageGrid(props: IProps) {
 					isFolderLoading={isSearching}
 					handleFolderClick={() => Promise.resolve()}
 				/>
-				: props.allFiles?.length > 0 ? (
+				: filtdSortdFiles.length > 0 ? (
 					<AlertLoading />
 				) : (
 					<AlertNoImages />

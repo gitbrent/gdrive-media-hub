@@ -145,7 +145,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar my-3">
+			<nav className="navbar mb-3">
 				<div className="container-fluid">
 					<div className="row align-items-center w-100">
 						<div className="col-4 col-md-auto">
@@ -215,7 +215,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderBrowser(): JSX.Element {
 		return (
-			<section className="p-3 pt-0">
+			<section>
 				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />
 				{viewMode === 'grid' ?
 					<section className="bg-black h-100">

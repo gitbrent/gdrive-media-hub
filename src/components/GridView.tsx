@@ -31,12 +31,13 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
+		console.log('handleScroll!!') // FIXME: initial page load scroll wont load new images, works after filter type tho
+
 		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
 			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
 			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
-
 			// Append new items to the current list
 			return [...currentItems, ...newItems]
 		})
@@ -218,7 +219,12 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				<div id="gallery-container" className="gallery">
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
-				<div className='p-3 mt-3 bg-dark border text-center'>LOAD ME MORE DADDY</div>
+				<div className="p-3 bg-darker text-muted text-center">
+					{displayedItems < currFolderContents
+						? <span>(scroll for more files)</span>
+						: <span>(all files shown)</span>
+					}
+				</div>
 			</Gallery>
 		)
 	}

@@ -100,8 +100,10 @@ export default function AppMainUI() {
 						</ul>
 						<div className="dropdown">
 							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-								{authUserPict ? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" /> : <i className="fs-4 bi bi-question-circle-fill" />}
-								<span className="mx-1">{authUserName}</span>
+								{authUserPict
+									? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" />
+									: <i className="fs-4 bi bi-question-circle-fill" />
+								}
 							</a>
 							{authUserName ?
 								<ul className="dropdown-menu dropdown-menu-end">
@@ -123,7 +125,8 @@ export default function AppMainUI() {
 						</div>
 					</div>
 				</div>
-			</nav>)
+			</nav>
+		)
 	}
 
 	function renderBody(): JSX.Element {
@@ -176,9 +179,7 @@ export default function AppMainUI() {
 				returnJsx = <div />
 		}
 
-		return (
-			<main className="container-fluid">{returnJsx}</main>
-		)
+		return <main className="p-4 pt-3">{returnJsx}</main>
 	}
 
 	return (
