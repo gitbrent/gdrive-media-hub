@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
@@ -51,9 +51,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		const pageOfImages: IMediaFile[] = currFolderContents.slice(0, pagingSize).filter((file) => isMedia(file))
-		pageOfImages.filter((file) => !file.original).forEach((file) => file.original = '')
-
 		setDisplayedItems(currFolderContents.slice(0, pagingSize))
 	}, [currFolderContents, pagingSize])
 
@@ -79,7 +76,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 			updatedItems.forEach((item) => {
 				// NOTE: only download images
-				if (isImage(item) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
+				if ((isImage(item) || isGif(item)) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 

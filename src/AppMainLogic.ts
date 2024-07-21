@@ -1,5 +1,5 @@
 import { FileSizeThresholds, IAuthState, IFileAnalysis, IFileListCache, IMediaFile, log } from './App.props'
-import { isImage, isVideo } from './utils/mimeTypes'
+import { isGif, isImage, isVideo } from './utils/mimeTypes'
 import {
 	doAuthSignIn,
 	doAuthSignOut,
@@ -52,6 +52,7 @@ async function initGapiCallback() {
 		if (_authUserName) {
 			log(2, `[AppMainLogic] signedInUser = "${_authUserName}"`)
 			_gapiFiles = await fetchDriveFiles()
+			_gapiFiles.forEach((item) => item.original = '')
 			log(2, `[AppMainLogic] _gapiFiles.length = ${_gapiFiles.length}`)
 		}
 	} catch (error) {
@@ -112,7 +113,7 @@ export const downloadFile = async (fileId: string): Promise<boolean> => {
 		const objectUrl = await getBlobForFile(file.id)
 		if (!objectUrl) return false
 
-		if (isImage(file)) {
+		if (isImage(file) || isGif(file)) {
 			return new Promise((resolve) => {
 				const img = new Image()
 				img.src = objectUrl
