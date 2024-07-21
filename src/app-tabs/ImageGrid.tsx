@@ -11,14 +11,14 @@ interface IProps {
 	allFiles: IMediaFile[]
 	loadPageImages: (fileIds: string[]) => Promise<boolean>
 	isShowCap: boolean
-	optSortBy: OPT_SORTBY
-	optSortDir: OPT_SORTDIR
 }
 
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 
 export default function ImageGrid(props: IProps) {
 	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
+	const [optSortBy, setIptSortBy] = useState<OPT_SORTBY>(OPT_SORTBY.modDate)
+	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
 
@@ -29,11 +29,16 @@ export default function ImageGrid(props: IProps) {
 
 		// A: define sorter
 		const sorter = (a: IMediaFile, b: IMediaFile) => {
-			if (props.optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (props.optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+			if (optSortBy === OPT_SORTBY.filName) {
+				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
-			else if (props.optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedByMeTime < b.modifiedByMeTime ? (props.optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (props.optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+			else if (optSortBy === OPT_SORTBY.modDate) {
+				return a.modifiedByMeTime < b.modifiedByMeTime ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+			}
+			else if (optSortBy === OPT_SORTBY.filSize) {
+				const sizeA = Number(a.size || 0)
+				const sizeB = Number(b.size || 0)
+				return optSortDir === OPT_SORTDIR.asce ? sizeA - sizeB : sizeB - sizeA
 			}
 			else {
 				console.error('unknown OPT_SORTBY value')
@@ -58,7 +63,12 @@ export default function ImageGrid(props: IProps) {
 
 		setIsSearching(false)
 		return showImages
-	}, [props.allFiles, props.optSortBy, props.optSortDir, optSchWord, mediaTypeFilter])
+	}, [props.allFiles, optSortBy, optSortDir, optSchWord, mediaTypeFilter])
+
+	const toggleSortOrder = (field: OPT_SORTBY) => {
+		setIptSortBy(field)
+		setOptSortDir((prevOrder) => (prevOrder === OPT_SORTDIR.asce ? OPT_SORTDIR.desc : OPT_SORTDIR.asce))
+	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -100,6 +110,25 @@ export default function ImageGrid(props: IProps) {
 									aria-label="show videos"
 									onClick={() => setMediaTypeFilter('video')}>
 									<i className="bi-play-btn-fill me-2" />Video
+								</button>
+							</div>
+						</div>
+						<div className="col-8 col-md-auto">
+							<div className="btn-group" role="group" aria-label="sort options">
+								<button type="button" aria-label="sort by name"
+									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
+									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
+									Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+								</button>
+								<button type="button" aria-label="sort by size"
+									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
+									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
+									Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+								</button>
+								<button type="button" aria-label="sort by modified"
+									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
+									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
+									Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 							</div>
 						</div>

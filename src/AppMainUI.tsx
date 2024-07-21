@@ -145,12 +145,7 @@ export default function AppMainUI() {
 				returnJsx = <FileBrowser isBusyGapiLoad={isBusyGapiLoad} />
 				break
 			case AppTabs.ImageGrid:
-				returnJsx = <ImageGrid
-					allFiles={allFiles}
-					isShowCap={optIsShowCap}
-					loadPageImages={loadPageImages}
-					optSortBy={optSortBy}
-					optSortDir={optSortDir} />
+				returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} />
 				break
 			case AppTabs.SlideShow:
 				returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />
