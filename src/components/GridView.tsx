@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import 'photoswipe/dist/photoswipe.css'
@@ -51,6 +51,9 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
+		const pageOfImages: IMediaFile[] = currFolderContents.slice(0, pagingSize).filter((file) => isMedia(file))
+		pageOfImages.filter((file) => !file.original).forEach((file) => file.original = '')
+
 		setDisplayedItems(currFolderContents.slice(0, pagingSize))
 	}, [currFolderContents, pagingSize])
 
@@ -82,7 +85,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 					const fetchPromise = getBlobForFile(item.id).then(original => {
 						if (original) {
-							if (isImage(item)) {
+							if (isImage(item) || isGif(item)) {
 								return loadImage(original).then(({ width, height }) => {
 									item.original = original
 									item.width = width
@@ -177,19 +180,19 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			if (isLoadingFile) {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-file-play" />}
+						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-play-btn-fill" />}
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
-						<i className="bi-file-play" />
+						<i className="bi-play-btn-fill" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			}
-		} else if (isImage(item)) {
+		} else if (isImage(item) || isGif(item)) {
 			if ('original' in item && item.original) {
 				return (
 					<Item {...item} key={`${index}${item.id}`}>
@@ -218,6 +221,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				<div id="gallery-container" className="gallery">
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
+				<div className='p-3 mt-3 bg-dark border text-center'>LOAD ME MORE DADDY</div>
 			</Gallery>
 		)
 	}
