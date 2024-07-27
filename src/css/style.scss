@@ -1,22 +1,10 @@
+// ============================================================================
 // STEP 1: import these
+// ============================================================================
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
 
-/*
-// pagination
-$pagination-hover-bg: $gray-500;
-$pagination-bg: $gray-600;
-$pagination-disabled-bg: $gray-700;
-$pagination-active-bg: $primary;
-*/
-/*
-$pagination-color: $secondary;
-$pagination-active-bg: $secondary;
-$pagination-hover-bg: $secondary;
-$pagination-hover-color: var(--bs-white);
-$pagination-active-border-color: $secondary;
-*/
 // breadcrumbs
 $breadcrumb-bg: null;
 //$breadcrumb-font-size: 1.25rem; // "fs-5"
@@ -29,15 +17,19 @@ $breadcrumb-divider: quote(">");
 
 $table-bg: var(--bs-black);
 
+// ============================================================================
 // STEP 2: After customizations above
+// ============================================================================
 @import "bootstrap";
 
+// ============================================================================
 // STEP 3: Your other styles
+// ============================================================================
 .ReactGridGallery_tile {
 	background: transparent !important;
 }
 
-// FIXME:
-.bg-darker-gray {
-	background-color: #1d1b1b !important;
+.navbar input.form-control,
+.navbar .btn-group button:not(.active) {
+	background-color: var(--bs-dark-bg-subtle);
 }
