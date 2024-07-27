@@ -146,42 +146,40 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 	function renderTopBar(): JSX.Element {
 		return (
 			<nav className="navbar mb-3">
-				<div className="container-fluid">
-					<div className="row align-items-center w-100">
+				<form className="container-fluid px-0">
+					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-4 col-md-auto">
 							<div className="btn-group" role="group" aria-label="view switcher">
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
 									aria-label="list view"
-									onClick={() => setViewMode('list')}
-								>
-									<i className="bi-card-list" />
+									onClick={() => setViewMode('list')}>
+									<i className="bi-card-list me-2" />List
 								</button>
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
 									aria-label="grid view"
-									onClick={() => setViewMode('grid')}
-								>
-									<i className="bi-grid" />
+									onClick={() => setViewMode('grid')}>
+									<i className="bi-grid me-2" />Grid
 								</button>
 							</div>
 						</div>
 						<div className="col-8 col-md-auto">
 							<div className="btn-group" role="group" aria-label="sort options">
 								<button type="button" aria-label="sort by name"
-									className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'name' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('name')}>
 									Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
-									className={`btn btn-outline-secondary ${sortField === 'size' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'size' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('size')}>
 									Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
-									className={`btn btn-outline-secondary ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('modifiedByMeTime')}>
 									Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
@@ -212,7 +210,7 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 							</span>
 						</div>
 					</div>
-				</div>
+				</form>
 			</nav>
 		)
 	}

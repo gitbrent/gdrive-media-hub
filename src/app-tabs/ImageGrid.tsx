@@ -113,20 +113,20 @@ export default function ImageGrid(props: IProps) {
 								</button>
 							</div>
 						</div>
-						<div className="col-8 col-md-auto">
+						<div className="col-12 col-md-auto mt-2 mt-md-0">
 							<div className="btn-group" role="group" aria-label="sort options">
 								<button type="button" aria-label="sort by name"
-									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
 									Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
-									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
 									Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
-									className={`btn btn-outline-secondary ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
 									Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
@@ -155,8 +155,6 @@ export default function ImageGrid(props: IProps) {
 			</nav>
 		)
 	}
-
-	// --------------------------------------------------------------------------------------------
 
 	return (
 		<section>

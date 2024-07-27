@@ -88,10 +88,10 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 							</button>
 						</div>
 						<div className="col mt-3 mt-md-0">
-							<form className="d-flex" role="search">
+							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</form>
+							</div>
 						</div>
 						<div className="col-auto mt-3 mt-md-0">
 							<div className="text-muted">
