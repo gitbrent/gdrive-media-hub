@@ -4,8 +4,8 @@ import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
-import 'photoswipe/dist/photoswipe.css'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
+import 'photoswipe/dist/photoswipe.css'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -31,8 +31,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
-		console.log('handleScroll!!') // FIXME: initial page load scroll wont load new images, works after filter type tho
-
 		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
