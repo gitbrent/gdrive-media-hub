@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
 import GridView from '../components/GridView'
 import AlertLoading from '../components/AlertLoading'
@@ -190,21 +190,25 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="col-12 col-md">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+								<input type="search" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="grp-search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-12 col-md-auto text-center">
-							<span className='text-nowrap text-success'>
+						<div className="col-12 col-md-auto text-center h4 fw-light mb-0">
+							<span className="text-nowrap text-success">
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
 							</span>
-							<span className='text-nowrap text-info ms-3'>
+							<span className="text-nowrap text-info ms-3">
 								{currFolderContents.filter(item => isImage(item)).length}
 								<i className="bi-image-fill ms-2" />
 							</span>
-							<span className='text-nowrap text-warning ms-3'>
+							<span className="text-nowrap text-warning ms-3">
+								{currFolderContents.filter(item => isGif(item)).length}
+								<i className="bi-play-circle-fill ms-2" />
+							</span>
+							<span className="text-nowrap text-warning ms-3">
 								{currFolderContents.filter(item => isVideo(item)).length}
-								<i className="bi-camera-video-fill ms-2" />
+								<i className="bi-play-btn-fill ms-2" />
 							</span>
 						</div>
 					</div>
