@@ -44,9 +44,12 @@ export default function AppMainUI() {
 
 	// --------------------------------------------------------------------------------------------
 
+	/**
+	 * @see https://getbootstrap.com/docs/5.3/utilities/background/
+	 */
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+			<nav className="navbar navbar-expand-lg bg-dark-subtle2 bg-body-secondary sticky-top">
 				<div className="container-fluid">
 					<a className="navbar-brand" href="#">
 						<img src="/google-drive.png" alt="Drive" width="30" height="26" />
