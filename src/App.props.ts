@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20240713-1140'
+export const APP_BLD = '20241026-1140'
 export const APP_VER = '2.0.0-WIP'
 
 // ============================================================================
@@ -64,7 +64,8 @@ export const formatDate = (dateString: string, format: 'full' | 'short' = 'full'
 
 export enum OPT_SORTBY {
 	modDate = 'Modified Date',
-	filName = 'File Name'
+	filName = 'File Name',
+	filSize = 'File Size'
 }
 
 export enum OPT_SORTDIR {
@@ -152,6 +153,7 @@ export interface IGapiFile extends gapi.client.drive.File {
 export interface IMediaFile extends IGapiFile {
 	/**
 	 * Url of image
+	 * @example "blob:http://localhost:3000/fa7ff500-2d80-4e57-a2e7-ab4992e01bf6"
 	 */
 	original?: string
 	width?: string | number

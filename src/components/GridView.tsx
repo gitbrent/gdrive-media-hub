@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
-import 'photoswipe/dist/photoswipe.css'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
+import 'photoswipe/dist/photoswipe.css'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -36,7 +36,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			// Calculate the number of new items to add
 			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
 			const newItems = currFolderContents.slice(currentItems.length, nextItemsEndIndex)
-
 			// Append new items to the current list
 			return [...currentItems, ...newItems]
 		})
@@ -76,13 +75,13 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 			updatedItems.forEach((item) => {
 				// NOTE: only download images
-				if (isImage(item) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
+				if ((isImage(item) || isGif(item)) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
 					const fetchPromise = getBlobForFile(item.id).then(original => {
 						if (original) {
-							if (isImage(item)) {
+							if (isImage(item) || isGif(item)) {
 								return loadImage(original).then(({ width, height }) => {
 									item.original = original
 									item.width = width
@@ -177,19 +176,19 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			if (isLoadingFile) {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-file-play" />}
+						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-play-btn-fill" />}
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
-						<i className="bi-file-play" />
+						<i className="bi-play-btn-fill" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			}
-		} else if (isImage(item)) {
+		} else if (isImage(item) || isGif(item)) {
 			if ('original' in item && item.original) {
 				return (
 					<Item {...item} key={`${index}${item.id}`}>
@@ -217,6 +216,12 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			<Gallery id="contImageGrid">
 				<div id="gallery-container" className="gallery">
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
+				</div>
+				<div className="p-3 bg-darker text-muted text-center">
+					{displayedItems.length < currFolderContents.length
+						? <span>(showing {displayedItems.length} of {currFolderContents.length} - scroll for more files)</span>
+						: <span>(all {displayedItems.length} shown)</span>
+					}
 				</div>
 			</Gallery>
 		)

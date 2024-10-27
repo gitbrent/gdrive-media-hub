@@ -68,7 +68,12 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 		})
 
 		allFiles = allFiles.concat(response.result.files as IGapiFile[]) || []
-		pageToken = response.result.nextPageToken
+		if (allFiles?.length < 10000) {
+			pageToken = response.result.nextPageToken
+		}
+		else {
+			pageToken = ''
+		}
 		//
 		badgeElement.textContent = `Loading files... (${allFiles?.length})`
 	} while (pageToken)

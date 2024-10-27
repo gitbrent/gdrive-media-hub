@@ -144,10 +144,10 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar my-3">
+			<nav className="navbar mb-3">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center">
-						<div className="col col-md">
+						<div className="col-12 col-md">
 							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause (space)">
 								{isPaused
 									? <span><i className='bi-play  me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Play</span></span>
@@ -155,17 +155,17 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 								}
 							</button>
 						</div>
-						<div className="col-3 col-md-auto">
+						<div className="col-5 col-md-auto">
 							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPrevSlide} title="prev (left-arrow)">
 								<i className="bi-chevron-left me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
 							</button>
 						</div>
-						<div className="col-3 col-md-auto">
+						<div className="col-5 col-md-auto">
 							<button className='btn btn-secondary w-100' disabled={shfImages.length === 0} onClick={goToNextSlide} title="next (right-arrow)">
 								<span className="d-none d-lg-inline-block">Next</span><i className="bi-chevron-right ms-0 ms-md-2"></i>
 							</button>
 						</div>
-						<div className="col-3 col-md-auto">
+						<div className="col-2 col-md-auto">
 							<div className="dropdown">
 								<button className="btn btn-secondary dropdown-toggle" type="button" id="delayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
 									<span className="d-none d-lg-inline-block">Delay:&nbsp;</span>{optSlideshowSecs}<span className="d-none d-lg-inline-block">&nbsp;sec</span>
@@ -185,10 +185,10 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 							</div>
 						</div>
 						<div className="col col-md mt-3 mt-md-0">
-							<form className="d-flex" role="search">
+							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</form>
+							</div>
 						</div>
 						<div className="col-auto col-md-auto mt-3 mt-md-0">
 							<div className="text-muted">
@@ -209,8 +209,8 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	return (
 		<section>
 			{renderTopBar()}
-			<div className='slideShowContainer'>
-				<div className='slideShowMain'>
+			<div className="slideShowContainer">
+				<div className="slideShowMain">
 					{shfImages.length === 0
 						? <AlertNoImages />
 						: currentImageUrl

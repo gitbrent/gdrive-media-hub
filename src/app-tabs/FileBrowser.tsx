@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
-import { isFolder, isImage, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
 import GridView from '../components/GridView'
 import AlertLoading from '../components/AlertLoading'
@@ -145,43 +145,41 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar my-3">
-				<div className="container-fluid">
-					<div className="row align-items-center w-100">
+			<nav className="navbar mb-3">
+				<form className="container-fluid px-0">
+					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col-4 col-md-auto">
 							<div className="btn-group" role="group" aria-label="view switcher">
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
 									aria-label="list view"
-									onClick={() => setViewMode('list')}
-								>
-									<i className="bi-card-list" />
+									onClick={() => setViewMode('list')}>
+									<i className="bi-card-list me-2" />List
 								</button>
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
 									aria-label="grid view"
-									onClick={() => setViewMode('grid')}
-								>
-									<i className="bi-grid" />
+									onClick={() => setViewMode('grid')}>
+									<i className="bi-grid me-2" />Grid
 								</button>
 							</div>
 						</div>
 						<div className="col-8 col-md-auto">
 							<div className="btn-group" role="group" aria-label="sort options">
 								<button type="button" aria-label="sort by name"
-									className={`btn btn-outline-secondary ${sortField === 'name' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'name' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('name')}>
 									Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
-									className={`btn btn-outline-secondary ${sortField === 'size' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'size' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('size')}>
 									Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
-									className={`btn btn-outline-secondary ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
+									className={`btn btn-outline-secondary text-nowrap ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('modifiedByMeTime')}>
 									Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
@@ -190,32 +188,36 @@ const FileBrowser: React.FC<Props> = ({ isBusyGapiLoad }) => {
 						<div className="col-12 col-md">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+								<input type="search" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="grp-search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-12 col-md-auto text-center">
-							<span className='text-nowrap text-success'>
+						<div className="col-12 col-md-auto text-center h4 fw-light mb-0">
+							<span className="text-nowrap text-success">
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
 							</span>
-							<span className='text-nowrap text-info ms-3'>
+							<span className="text-nowrap text-info ms-3">
 								{currFolderContents.filter(item => isImage(item)).length}
 								<i className="bi-image-fill ms-2" />
 							</span>
-							<span className='text-nowrap text-warning ms-3'>
+							<span className="text-nowrap text-warning ms-3">
+								{currFolderContents.filter(item => isGif(item)).length}
+								<i className="bi-play-circle-fill ms-2" />
+							</span>
+							<span className="text-nowrap text-warning ms-3">
 								{currFolderContents.filter(item => isVideo(item)).length}
-								<i className="bi-camera-video-fill ms-2" />
+								<i className="bi-play-btn-fill ms-2" />
 							</span>
 						</div>
 					</div>
-				</div>
+				</form>
 			</nav>
 		)
 	}
 
 	function renderBrowser(): JSX.Element {
 		return (
-			<section className="p-3 pt-0">
+			<section>
 				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />
 				{viewMode === 'grid' ?
 					<section className="bg-black h-100">
