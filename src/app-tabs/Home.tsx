@@ -236,8 +236,8 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 
 	function renderHome(): JSX.Element {
 		return (
-			<section className='p-4'>
-				<h5 className='mb-4'>Welcome {authUserName}!</h5>
+			<section>
+				<h3 className='mt-2 mb-4'>Welcome {authUserName}!</h3>
 				<div className='row row-cols g-4'>
 					<div className='col-12 col-md'>{renderFilesBySize()}</div>
 					<div className='col-12 col-md'>{renderFilesByType()}</div>

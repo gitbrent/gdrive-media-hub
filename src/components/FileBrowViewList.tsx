@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import { getBlobForFile } from '../api'
 
 interface Props {
@@ -169,9 +169,11 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 													? 'fs-4 bi-folder-fill'
 													: isImage(item)
 														? 'fs-4 bi-image-fill'
-														: isVideo(item)
-															? 'fs-4 bi-camera-video-fill'
-															: 'fs-4 bi-file-x text-light'
+														: isGif(item)
+															? 'fs-4 bi-play-circle'
+															: isVideo(item)
+																? 'fs-4 bi-play-btn-fill'
+																: 'fs-4 bi-file-x text-light'
 										} />
 									</div>
 								</td>
