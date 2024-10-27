@@ -145,7 +145,7 @@ export default function AppMainUI() {
 					handleAuthClick={handleAuthClick} />
 				break
 			case AppTabs.FileBrowser:
-				returnJsx = <FileBrowser isBusyGapiLoad={isBusyGapiLoad} />
+				returnJsx = <FileBrowser allFiles={allFiles} isBusyGapiLoad={isBusyGapiLoad} />
 				break
 			case AppTabs.ImageGrid:
 				returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} />
