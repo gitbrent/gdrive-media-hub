@@ -85,7 +85,7 @@ export default function ImageGrid(props: IProps) {
 									title="show all"
 									aria-label="show all"
 									onClick={() => setMediaTypeFilter('all')}>
-									<i className="bi-files me-2" />All
+									<i className="bi-files me-2 d-none d-lg-inline" />All
 								</button>
 								<button
 									type="button"
@@ -93,7 +93,7 @@ export default function ImageGrid(props: IProps) {
 									title="show images"
 									aria-label="show images"
 									onClick={() => setMediaTypeFilter('image')}>
-									<i className="bi-image me-2" />Image
+									<i className="bi-image me-2 d-none d-lg-inline" />Image
 								</button>
 								<button
 									type="button"
@@ -101,7 +101,7 @@ export default function ImageGrid(props: IProps) {
 									title="show gifs"
 									aria-label="show gifs"
 									onClick={() => setMediaTypeFilter('gif')}>
-									<i className="bi-play-circle me-2" />GIF
+									<i className="bi-play-circle me-2 d-none d-lg-inline" />GIF
 								</button>
 								<button
 									type="button"
@@ -109,7 +109,7 @@ export default function ImageGrid(props: IProps) {
 									title="show videos"
 									aria-label="show videos"
 									onClick={() => setMediaTypeFilter('video')}>
-									<i className="bi-play-btn-fill me-2" />Video
+									<i className="bi-play-btn-fill me-2 d-none d-lg-inline" />Video
 								</button>
 							</div>
 						</div>

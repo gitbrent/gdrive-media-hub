@@ -218,9 +218,9 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
 				<div className="p-3 bg-darker text-muted text-center">
-					{displayedItems < currFolderContents
-						? <span>(scroll for more files)</span>
-						: <span>(all files shown)</span>
+					{displayedItems.length < currFolderContents.length
+						? <span>(showing {displayedItems.length} of {currFolderContents.length} - scroll for more files)</span>
+						: <span>(all {displayedItems.length} shown)</span>
 					}
 				</div>
 			</Gallery>
