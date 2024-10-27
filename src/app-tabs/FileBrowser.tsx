@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
+import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'

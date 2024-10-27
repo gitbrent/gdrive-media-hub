@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import { getBlobForFile } from '../api'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
@@ -50,9 +50,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		const pageOfImages: IMediaFile[] = currFolderContents.slice(0, pagingSize).filter((file) => isMedia(file))
-		pageOfImages.filter((file) => !file.original).forEach((file) => file.original = '')
-		setDisplayedItems(pageOfImages)
+		setDisplayedItems(currFolderContents.slice(0, pagingSize))
 	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
