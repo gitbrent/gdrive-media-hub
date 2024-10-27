@@ -22,15 +22,7 @@ $table-bg: var(--bs-black);
 // ============================================================================
 @import "bootstrap";
 
-.nouserselect {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
+// ============================================================================
 // STEP 3: Your other styles
 // ============================================================================
 .ReactGridGallery_tile {
@@ -40,4 +32,13 @@ $table-bg: var(--bs-black);
 .navbar input.form-control,
 .navbar .btn-group button:not(.active) {
 	background-color: var(--bs-dark-bg-subtle);
+}
+
+.nouserselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

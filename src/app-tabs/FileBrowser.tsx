@@ -101,14 +101,6 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 		setIsFolderLoading(false)
 	}
 
-	/* FIXME: WIP:
-	// Fix issue with initial images all showing loading images
-	useEffect(() => {
-		const noBlobIds = allFiles.filter((file) => !file.original).map((file) => file.id as string)
-		if (noBlobIds.length > 0) props.loadPageImages(noBlobIds).then(() => setLastLoadDate((new Date).toISOString()))
-	}, [allFiles])
-	*/
-
 	useEffect(() => {
 		interface ICommonFileFolderProperties {
 			name: string;
