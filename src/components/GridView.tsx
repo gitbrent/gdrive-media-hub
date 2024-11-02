@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
@@ -44,6 +44,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	useEffect(() => {
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currFolderContents])
 
 	/**
@@ -71,6 +72,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		const loadBlobs = async () => {
 			let itemsUpdated = false
 			const updatedItems = [...displayedItems]
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const blobFetchPromises: Promise<any>[] = []
 
 			updatedItems.forEach((item) => {
@@ -194,7 +196,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					<Item {...item} key={`${index}${item.id}`}>
 						{({ ref, open }) => (
 							<figure>
-								<img ref={ref as React.MutableRefObject<HTMLImageElement>} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
+								<img ref={ref} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
 								{figCaption}
 							</figure>
 						)}

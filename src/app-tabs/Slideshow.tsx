@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IMediaFile } from '../App.props'
 import { isImage } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { FileSizeThresholds, IFileAnalysis, IGapiFile, formatBytes } from '../App.props'
 import '../css/Home.css'
 

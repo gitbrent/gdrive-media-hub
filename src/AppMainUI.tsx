@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { OPT_SORTBY, OPT_SORTDIR } from './App.props'
 import { useAppMain } from './api/useAppMain'
 import Home from './app-tabs/Home'

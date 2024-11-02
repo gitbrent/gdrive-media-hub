@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
 import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
