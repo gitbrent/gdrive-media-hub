@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
