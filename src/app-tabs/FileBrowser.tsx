@@ -93,9 +93,8 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 			setOrigFolderContents(contents.items)
 			setCurrFolderContents(contents.items)
 			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
-		} catch (err: any) {
+		} catch (err) {
 			console.error('Error fetching folder contents:', err)
-			console.error(err.status)
 		}
 
 		setIsFolderLoading(false)

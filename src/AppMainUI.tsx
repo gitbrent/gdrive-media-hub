@@ -10,7 +10,7 @@ import Settings from './app-tabs/Settings'
 import UserProfile from './app-tabs/UserProfile'
 import './css/AppMainUI.css'
 
-export enum AppTabs {
+enum AppTabs {
 	Home = 'Home',
 	FileBrowser = 'FileBrowser',
 	ImageGrid = 'ImageGrid',

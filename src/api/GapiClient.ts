@@ -13,6 +13,7 @@ export const checkGapiInitialized = () => {
 function callbackInit() {
 	isGapiInitialized = true
 	log(2, 'GapiClient.useAppMainCallback')
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useAppMainCallback()
 }
 
