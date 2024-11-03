@@ -48,7 +48,6 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 
 	// B: read files
 	do {
-		// eslint-disable-next-line quotes
 		let query = "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')"
 		if (lastLoadDate) {
 			query = `modifiedTime > '${lastLoadDate}' and ${query}`

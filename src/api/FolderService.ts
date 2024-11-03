@@ -113,8 +113,8 @@ export async function fetchFolderContents(folderId: string): Promise<IDirectory>
 export const fetchWithTokenRefresh = async (folderId: string) => {
 	try {
 		return await fetchFolderContents(folderId)
-	} catch (err: any) {
-		if (err.status === 401) {
+	} catch (err) {
+		if (isAuthError(err)) {
 			// Attempt to refresh the token
 			await refreshToken()
 			// Retry the request after token refresh
@@ -124,4 +124,9 @@ export const fetchWithTokenRefresh = async (folderId: string) => {
 			throw err
 		}
 	}
+}
+
+// Helper function to narrow down the type of the error
+const isAuthError = (err: unknown): err is { status: number } => {
+	return typeof err === 'object' && err !== null && 'status' in err && err.status === 401
 }
