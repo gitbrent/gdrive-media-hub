@@ -144,6 +144,7 @@ async function initGapiClient() {
 /** STEP 1: load <script> */
 async function loadGsiScript() {
 	return new Promise((resolve) => {
+		log(1, '[loadGsiScript] go...')
 		const script = document.createElement('script')
 		script.src = 'https://accounts.google.com/gsi/client'
 		script.async = true
@@ -159,6 +160,7 @@ async function loadGsiScript() {
  */
 async function initGsiClient() {
 	return new Promise((resolve) => {
+		log(1, '[initGsiClient] go...')
 		window.google.accounts.id.initialize({
 			client_id: GAPI_CLIENT_ID,
 			callback: (resp) => initGsiCallback(resp).then(() => resolve(true)),
@@ -167,6 +169,7 @@ async function initGsiClient() {
 			context: 'signin',
 		})
 		window.google.accounts.id.prompt()
+		log(1, '[initGsiClient] prompt ^^^')
 	})
 }
 
@@ -174,6 +177,7 @@ async function initGsiClient() {
  * STEP 3: process cred resp
  */
 async function initGsiCallback(response: CredentialResponse) {
+	log(1, '[initGsiCallback] go...')
 	/**
 	 * @note `credential`: This field is the ID token as a base64-encoded JSON Web Token (JWT) string.
 	 * @see https://developers.google.com/identity/gsi/web/reference/js-reference#credential
