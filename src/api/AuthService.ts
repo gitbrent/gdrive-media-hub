@@ -42,8 +42,8 @@ declare global {
 	}
 }
 
-const GAPI_CLIENT_ID = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || ''
-const GAPI_API_KEY = process.env.REACT_APP_GOOGLE_DRIVE_API_KEY || ''
+const GAPI_CLIENT_ID = import.meta.env.VITE_GOOGLE_DRIVE_CLIENT_ID || '';
+const GAPI_API_KEY = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY || '';
 const GAPI_DISC_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
 const GAPI_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 let clientCallback: () => void

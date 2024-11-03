@@ -1,35 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/**
+ * @see https://console.firebase.google.com/u/0/project/gdrive-media-hub/
+ * @see https://console.cloud.google.com/apis/credentials?project=gdrive-media-hub
+ * @see https://medium.com/@willikay11/how-to-link-your-react-application-with-google-drive-api-v3-list-and-search-files-2e4e036291b7
+ * @see https://github.com/partnerhero/gapi-script
+ * ...
+ * @see https://www.youtube.com/watch?v=IPyl0igVkH4&t=287s
+ * @see https://www.youtube.com/watch?v=TFIt9o6BWqA (HOWTO: process.env)
+ */
+import AppMainUI from './AppMainUI'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+function App(): JSX.Element {
+	return <AppMainUI />
 }
 
 export default App
