@@ -28,12 +28,7 @@ enum AppTabs {
 export default function AppMainUI() {
 	const {
 		allFiles,
-		//userProfile,
-		authUserPict,
 		downloadFile,
-		//getFileAnalysis,
-		//handleAuthClick,
-		//handleSignOutClick,
 		handleClearFileCache,
 		isBusyGapiLoad,
 		loadPageImages,
@@ -151,7 +146,7 @@ export default function AppMainUI() {
 				returnJsx = <FileBrowser />
 				break
 			case AppTabs.ImageGrid:
-				returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} />
+				returnJsx = <ImageGrid isShowCap={optIsShowCap} loadPageImages={loadPageImages} />
 				break
 			case AppTabs.SlideShow:
 				returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />

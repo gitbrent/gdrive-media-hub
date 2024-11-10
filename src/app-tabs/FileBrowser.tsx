@@ -1,23 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
-import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
 import GridView from '../components/GridView'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import '../css/FileBrowser.css'
-
-interface Props {
-	allFiles?: IMediaFile[]
-	isBusyGapiLoad?: boolean
-}
+// WIP: BELOW:
+import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api' // WIP: REMOVE
+import { DataContext } from '../api-google/DataContext'
 
 type ViewMode = 'grid' | 'list'
 type SortField = 'name' | 'size' | 'modifiedByMeTime';
 type SortOrder = 'asc' | 'desc';
 
-const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
+const FileBrowser: React.FC = () => {
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
@@ -27,6 +24,8 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 	const [viewMode, setViewMode] = useState<ViewMode>('list')
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+	//
+	const { mediaFiles, isLoading } = useContext(DataContext);
 
 	// --------------------------------------------------------------------------------------------
 
@@ -108,7 +107,7 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 			mimeType: string;
 		}
 
-		const sourceItems = isGlobalSearch && optSchWord ? [...allFiles] : [...origFolderContents]
+		const sourceItems = isGlobalSearch && optSchWord ? [...mediaFiles] : [...origFolderContents]
 
 		const sortedContents = sourceItems.sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
 			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
@@ -138,7 +137,7 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 		if (currFolderContents[0]) console.log('currFolderContents:', currFolderContents[0])
 
 		setCurrFolderContents(filteredContents)
-	}, [allFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
+	}, [mediaFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -248,7 +247,7 @@ const FileBrowser: React.FC<Props> = ({ allFiles, isBusyGapiLoad }) => {
 	return (
 		<section>
 			{renderTopBar()}
-			{isBusyGapiLoad ? <AlertLoading /> : renderBrowser()}
+			{isLoading ? <AlertLoading /> : renderBrowser()}
 		</section>
 	)
 }
