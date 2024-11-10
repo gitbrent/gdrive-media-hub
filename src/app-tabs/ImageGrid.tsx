@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
@@ -6,21 +6,17 @@ import GridView from '../components/GridView'
 import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
-
-interface IProps {
-	allFiles: IMediaFile[]
-	loadPageImages: (fileIds: string[]) => Promise<boolean>
-	isShowCap: boolean
-}
+import { DataContext } from '../api-google/DataContext'
 
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 
-export default function ImageGrid(props: IProps) {
+export default function ImageGrid() {
 	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
 	const [optSortBy, setIptSortBy] = useState<OPT_SORTBY>(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
+	const { mediaFiles } = useContext(DataContext);
 
 	// --------------------------------------------------------------------------------------------
 
@@ -30,10 +26,10 @@ export default function ImageGrid(props: IProps) {
 		// A: define sorter
 		const sorter = (a: IMediaFile, b: IMediaFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+				return a.name! < b.name! ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
-				return a.modifiedByMeTime < b.modifiedByMeTime ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+				return a.modifiedByMeTime! < b.modifiedByMeTime! ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.filSize) {
 				const sizeA = Number(a.size || 0)
@@ -49,13 +45,13 @@ export default function ImageGrid(props: IProps) {
 		setIsSearching(true)
 
 		// B: filter, sort, populate image array
-		props.allFiles
+		mediaFiles
 			.filter((item) => mediaTypeFilter === 'all' ? isMedia(item)
 				: mediaTypeFilter === 'image' ? isImage(item)
 					: mediaTypeFilter === 'gif' ? isGif(item)
 						: mediaTypeFilter === 'video' ? isVideo(item)
 							: false)
-			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.filter((item) => { return !optSchWord || item.name!.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {
 				showImages.push(item)
@@ -63,7 +59,7 @@ export default function ImageGrid(props: IProps) {
 
 		setIsSearching(false)
 		return showImages
-	}, [props.allFiles, optSortBy, optSortDir, optSchWord, mediaTypeFilter])
+	}, [mediaFiles, optSortBy, optSortDir, optSchWord, mediaTypeFilter])
 
 	const toggleSortOrder = (field: OPT_SORTBY) => {
 		setIptSortBy(field)
@@ -144,7 +140,7 @@ export default function ImageGrid(props: IProps) {
 									: filtdSortdFiles.length === 0
 										? ('No files to show')
 										: (<span>
-											<b>{filtdSortdFiles.length}</b>&nbsp;of&nbsp;<b>{props.allFiles.length}</b>
+											<b>{filtdSortdFiles.length}</b>&nbsp;of&nbsp;<b>{mediaFiles.length}</b>
 											<span className="d-none d-lg-inline-block">&nbsp;files</span>
 										</span>)
 								}
