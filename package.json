@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@popperjs/core": "^2.11.6",
 		"bootstrap": "^5.3.3",
+		"gapi-script": "^1.2.0",
 		"jose": "^4.13.1",
 		"photoswipe": "^5.4.4",
 		"popper.js": "^1.16.1",
@@ -22,9 +23,9 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.13.0",
-		"@types/gapi": "^0.0.44",
-		"@types/gapi.auth2": "^0.0.57",
-		"@types/gapi.client.drive-v3": "^0.0.1",
+		"@types/gapi": "^0.0.47",
+		"@types/gapi.auth2": "^0.0.61",
+		"@types/gapi.client.drive-v3": "^0.0.5",
 		"@types/google-one-tap": "^1.2.2",
 		"@types/node": "^18.11.9",
 		"@types/photoswipe": "^4.1.2",

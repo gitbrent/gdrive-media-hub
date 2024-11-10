@@ -9,8 +9,8 @@ import Breadcrumbs from '../components/Breadcrumbs'
 import '../css/FileBrowser.css'
 
 interface Props {
-	allFiles: IMediaFile[]
-	isBusyGapiLoad: boolean
+	allFiles?: IMediaFile[]
+	isBusyGapiLoad?: boolean
 }
 
 type ViewMode = 'grid' | 'list'

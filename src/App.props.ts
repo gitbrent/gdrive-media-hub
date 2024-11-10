@@ -120,22 +120,22 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 * id
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
 	 */
-	id: string
+	id?: string | undefined
 	/**
 	 * mime type
 	 * @example "application/json"
 	 */
-	mimeType: string
+	mimeType?: string | undefined
 	/**
 	 * modified time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	modifiedByMeTime: string
+	modifiedByMeTime?: string | undefined
 	/**
 	 * file name
 	 * @example "corp-logo.png"
 	 */
-	name: string
+	name?: string | undefined
 	/**
 	 * file size (bytes)
 	 * - only populated for files
@@ -146,7 +146,7 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 * IDs of parent folders
 	 * @example ["1jjOs28hGj3as3vorJveCI00NY1PmDbTr"]
 	 */
-	parents: string[]
+	parents?: string[] | undefined
 }
 
 // NOTE: prop names follow [PhotoswipeGalleryItems] **DO NOT RENAME**

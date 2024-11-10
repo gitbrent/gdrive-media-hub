@@ -1,31 +1,25 @@
-import { useMemo } from 'react'
-import { FileSizeThresholds, IFileAnalysis, IGapiFile, formatBytes } from '../App.props'
+import { useContext } from 'react'
+import { FileSizeThresholds, formatBytes, IFileAnalysis } from '../App.props'
 import '../css/Home.css'
+import { AuthContext } from '../api-google/AuthContext'
+import { DataContext } from '../api-google/DataContext'
+import { getFileAnalysis } from '../api-google/utils/fileAnalysis';
 
-interface Props {
-	authUserName: string | null
-	allFiles: IGapiFile[]
-	getFileAnalysis: () => IFileAnalysis
-	isBusyGapiLoad: boolean
-	handleAuthClick: () => void
-}
-
-const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusyGapiLoad, handleAuthClick }) => {
-	const fileAnalysis = useMemo(() => { return getFileAnalysis() }, [allFiles])
+const Home: React.FC = () => {
+	const { isSignedIn, signIn } = useContext(AuthContext);
+	const { mediaFiles, userProfile } = useContext(DataContext);
+	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles);
 
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={handleAuthClick}>
+				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={signIn}>
 					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
-					{isBusyGapiLoad
-						? <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>
-						: <div id="loginContClick" className="text-muted mt-3">click to connect</div>
-					}
+					<div id="loginContClick" className="text-muted mt-3">click to connect</div>
 				</div>
 			</section>
 		)
@@ -237,7 +231,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 	function renderHome(): JSX.Element {
 		return (
 			<section>
-				<h3 className='mt-2 mb-4'>Welcome {authUserName}!</h3>
+				<h3 className='mt-2 mb-4'>Welcome {userProfile?.getName()}!</h3>
 				<div className='row row-cols g-4'>
 					<div className='col-12 col-md'>{renderFilesBySize()}</div>
 					<div className='col-12 col-md'>{renderFilesByType()}</div>
@@ -248,11 +242,7 @@ const Home: React.FC<Props> = ({ authUserName, allFiles, getFileAnalysis, isBusy
 		)
 	}
 
-	return (
-		<section>
-			{authUserName ? renderHome() : renderLogin()}
-		</section>
-	)
+	return (isSignedIn ? renderHome() : renderLogin())
 }
 
 export default Home

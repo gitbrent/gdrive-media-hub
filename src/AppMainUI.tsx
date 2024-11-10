@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { OPT_SORTBY, OPT_SORTDIR } from './App.props'
-import { useAppMain } from './api/useAppMain'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
@@ -9,6 +8,12 @@ import VideoPlayer from './app-tabs/VideoPlayer'
 import Settings from './app-tabs/Settings'
 import UserProfile from './app-tabs/UserProfile'
 import './css/AppMainUI.css'
+// NEW:
+import { AuthContext } from './api-google/AuthContext'
+import { DataContext } from './api-google/DataContext'
+// vvv DELETE ME vvv - once above is implemented in all tabs
+import { useAppMain } from './api/useAppMain'
+// ^^^ WIP: REMOVE ME:
 
 enum AppTabs {
 	Home = 'Home',
@@ -23,12 +28,12 @@ enum AppTabs {
 export default function AppMainUI() {
 	const {
 		allFiles,
-		authUserName,
+		//userProfile,
 		authUserPict,
 		downloadFile,
-		getFileAnalysis,
-		handleAuthClick,
-		handleSignOutClick,
+		//getFileAnalysis,
+		//handleAuthClick,
+		//handleSignOutClick,
 		handleClearFileCache,
 		isBusyGapiLoad,
 		loadPageImages,
@@ -41,6 +46,10 @@ export default function AppMainUI() {
 	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
 	const [optIsShowCap, setOptIsShowCap] = useState(false)
+
+	// NEW!!! BELOW: WIP: TODO:
+	const { isSignedIn, signIn, signOut } = useContext(AuthContext);
+	const { mediaFiles, userProfile } = useContext(DataContext);
 
 	// --------------------------------------------------------------------------------------------
 
@@ -64,58 +73,57 @@ export default function AppMainUI() {
 									Home
 								</a>
 							</li>
-							{authUserName &&
+							{userProfile &&
 								<li className="nav-item">
 									<a href="#" onClick={() => setCurrentTab(AppTabs.FileBrowser)} className={`nav-link ${currentTab === AppTabs.FileBrowser ? 'active' : ''}`} title="file browser" aria-label="file browser">
 										File Browser
 									</a>
 								</li>
 							}
-							{authUserName &&
+							{userProfile &&
 								<li className="nav-item">
 									<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
 										Image Grid
 									</a>
 								</li>
 							}
-							{authUserName &&
+							{userProfile &&
 								<li className="nav-item">
 									<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
 										Slide Show
 									</a>
 								</li>
 							}
-							{authUserName &&
+							{userProfile &&
 								<li className="nav-item">
 									<a href="#" onClick={() => setCurrentTab(AppTabs.VideoPlayer)} className={`nav-link ${currentTab === AppTabs.VideoPlayer ? 'active' : ''}`} title="video grid" aria-label="video grid">
 										Video Grid
 									</a>
 								</li>
 							}
-							{authUserName &&
+							{userProfile &&
 								<li className="nav-item">
 									<a href="#" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link ${currentTab === AppTabs.Settings ? 'active' : ''}`} title="settings" aria-label="settings">
 										Settings
 									</a>
 								</li>
 							}
-
 						</ul>
 						<div className="dropdown">
 							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-								{authUserPict
-									? <img src={authUserPict} alt="User Avatar" width="30" height="30" className="rounded-circle" />
+								{userProfile
+									? <img src={userProfile.getImageUrl()} alt="User Avatar" width="30" height="30" className="rounded-circle" />
 									: <i className="fs-4 bi bi-question-circle-fill" />
 								}
 							</a>
-							{authUserName ?
+							{userProfile ?
 								<ul className="dropdown-menu dropdown-menu-end">
 									<li>
 										<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.UserProfile)}>Profile</a>
 									</li>
 									<li><hr className="dropdown-divider" /></li>
 									<li>
-										<button className="dropdown-item" onClick={handleSignOutClick}>Sign Out</button>
+										<button className="dropdown-item" onClick={signOut}>Sign Out</button>
 									</li>
 								</ul>
 								:
@@ -137,15 +145,10 @@ export default function AppMainUI() {
 
 		switch (currentTab) {
 			case AppTabs.Home:
-				returnJsx = <Home
-					authUserName={authUserName}
-					allFiles={allFiles}
-					getFileAnalysis={getFileAnalysis}
-					isBusyGapiLoad={isBusyGapiLoad}
-					handleAuthClick={handleAuthClick} />
+				returnJsx = <Home />
 				break
 			case AppTabs.FileBrowser:
-				returnJsx = <FileBrowser allFiles={allFiles} isBusyGapiLoad={isBusyGapiLoad} />
+				returnJsx = <FileBrowser />
 				break
 			case AppTabs.ImageGrid:
 				returnJsx = <ImageGrid allFiles={allFiles} isShowCap={optIsShowCap} loadPageImages={loadPageImages} />
@@ -181,9 +184,18 @@ export default function AppMainUI() {
 	}
 
 	return (
-		<>
-			{renderTopBar()}
-			{renderBody()}
-		</>
-	)
+		<section>
+			{mediaFiles.length === 0 ?
+				<div>BUSY</div>
+				:
+				isSignedIn ? (
+					<>
+						{renderTopBar()}
+						{renderBody()}
+					</>
+				) : (
+					<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
+				)}
+		</section>
+	);
 }
