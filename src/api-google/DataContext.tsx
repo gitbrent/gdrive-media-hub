@@ -1,12 +1,16 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { listFiles, getCurrentUserProfile } from './';
 import { IMediaFile } from '../App.props';
+import { isGif, isImage, isVideo } from './utils/fileHelpers';
 
 interface DataContextProps {
 	mediaFiles: IMediaFile[];
 	userProfile: gapi.auth2.BasicProfile | null;
 	refreshData: () => void;
 	isLoading: boolean;
+	downloadFile: (fileId: string) => Promise<boolean>;
+	loadPageImages: (fileIds: string[]) => Promise<boolean>;
+	getBlobForFile: (fileId: string) => Promise<string | null>;
 }
 
 export const DataContext = createContext<DataContextProps>({
@@ -14,6 +18,9 @@ export const DataContext = createContext<DataContextProps>({
 	userProfile: null,
 	refreshData: () => { },
 	isLoading: false,
+	downloadFile: async () => false,
+	loadPageImages: async () => false,
+	getBlobForFile: async () => '',
 });
 
 interface DataProviderProps {
@@ -24,6 +31,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
 	const [userProfile, setUserProfile] = useState<gapi.auth2.BasicProfile | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({});
 
 	const refreshData = async () => {
 		try {
@@ -44,8 +52,153 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		refreshData();
 	}, []);
 
+	const downloadFile = async (fileId: string): Promise<boolean> => {
+		try {
+			const file = mediaFiles.find((item) => item.id === fileId);
+			if (!file) {
+				console.warn(`File not found: "${fileId}"`);
+				return false;
+			}
+
+			const accessToken = gapi.auth.getToken()?.access_token;
+			if (!accessToken) {
+				console.error('Access token is not available.');
+				return false;
+			}
+
+			const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			});
+
+			if (response.ok) {
+				const blob = await response.blob();
+				const objectUrl = URL.createObjectURL(blob);
+
+				if (isImage(file) || isGif(file)) {
+					return new Promise((resolve) => {
+						const img = new Image();
+						img.src = objectUrl;
+						img.onload = () => {
+							const updatedFiles = mediaFiles.map((f) =>
+								f.id === fileId
+									? {
+										...f,
+										original: objectUrl,
+										width: img.width || 100,
+										height: img.height || 100,
+									}
+									: f
+							);
+							setMediaFiles(updatedFiles);
+							resolve(true);
+						};
+						img.onerror = () => {
+							console.error('Error loading image');
+							resolve(false);
+						};
+					});
+				} else if (isVideo(file)) {
+					const updatedFiles = mediaFiles.map((f) =>
+						f.id === fileId
+							? {
+								...f,
+								original: objectUrl,
+								// Optionally set width and height
+							}
+							: f
+					);
+					setMediaFiles(updatedFiles);
+					return true;
+				} else {
+					console.warn(`Unknown mimeType: ${file.mimeType}`);
+					console.warn(`File name: ${file.name}`);
+					return false;
+				}
+			} else {
+				console.error('Failed to fetch file content.');
+				return false;
+			}
+		} catch (error) {
+			console.error(`Failed to download file with ID ${fileId}:`, error);
+			return false;
+		}
+	};
+
+	const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
+		setIsLoading(true);
+		try {
+			const downloadPromises = fileIds.map(downloadFile);
+			const results = await Promise.all(downloadPromises);
+			setIsLoading(false);
+			return results.every(Boolean);
+		} catch (error) {
+			console.error('Failed to load page images:', error);
+			setIsLoading(false);
+			return false;
+		}
+	};
+
+	/**
+	 * Fetches the file content as a blob from Google Drive.
+	 * @param fileId The ID of the file to fetch.
+	 * @returns A Response object if successful, or null if an error occurs.
+	 */
+	const fetchFileImgBlob = async (fileId: string): Promise<Response | null> => {
+		try {
+			const accessToken = gapi.auth.getToken()?.access_token;
+			if (!accessToken) {
+				console.error('Access token is not available.');
+				return null;
+			}
+
+			const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			});
+
+			if (response.ok) {
+				return response;
+			} else {
+				console.error('Failed to fetch file blob:', response.statusText);
+				return null;
+			}
+		} catch (error) {
+			console.error('Error fetching file blob:', error);
+			return null;
+		}
+	};
+
+	/**
+	 * Retrieves the blob URL for a file, fetching it if not cached.
+	 * @param fileId The ID of the file.
+	 * @returns The blob URL as a string, or null if an error occurs.
+	 */
+	const getBlobForFile = async (fileId: string): Promise<string | null> => {
+		if (blobUrlCache[fileId]) {
+			// Return the cached blob URL
+			return blobUrlCache[fileId];
+		} else {
+			const response = await fetchFileImgBlob(fileId);
+			if (response) {
+				const blob = await response.blob();
+				const blobUrl = URL.createObjectURL(blob);
+				// Update the cache
+				setBlobUrlCache((prevCache) => ({ ...prevCache, [fileId]: blobUrl }));
+				return blobUrl;
+			} else {
+				return null;
+			}
+		}
+	};
+
 	return (
-		<DataContext.Provider value={{ mediaFiles, userProfile, refreshData, isLoading }}>
+		<DataContext.Provider
+			value={{ mediaFiles, userProfile, refreshData, isLoading, downloadFile, loadPageImages, getBlobForFile }}>
 			{children}
 		</DataContext.Provider>
 	);

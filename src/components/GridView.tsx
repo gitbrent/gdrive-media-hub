@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
-import { getBlobForFile } from '../api'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
 import 'photoswipe/dist/photoswipe.css'
+// WIP:
+//import { getBlobForFile } from '../api'
+import { DataContext } from '../api-google/DataContext'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -15,6 +17,7 @@ interface Props {
 
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
 	const SHOW_CAPTIONS = false
+	const { getBlobForFile } = useContext(DataContext);
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
