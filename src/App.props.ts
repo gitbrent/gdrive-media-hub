@@ -117,25 +117,26 @@ export interface IAuthState {
 
 export interface IGapiFile extends gapi.client.drive.File {
 	/**
-	 * id
+	 * file id
+	 * @summary optional in gapi client, made required to avoid checking constantly!
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
 	 */
-	id?: string | undefined
+	id: string
 	/**
 	 * mime type
 	 * @example "application/json"
 	 */
-	mimeType?: string | undefined
+	mimeType: string | undefined
 	/**
 	 * modified time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	modifiedByMeTime?: string | undefined
+	modifiedByMeTime: string | undefined
 	/**
 	 * file name
 	 * @example "corp-logo.png"
 	 */
-	name?: string | undefined
+	name: string
 	/**
 	 * file size (bytes)
 	 * - only populated for files

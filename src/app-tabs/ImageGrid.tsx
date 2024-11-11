@@ -26,7 +26,7 @@ export default function ImageGrid() {
 		// A: define sorter
 		const sorter = (a: IMediaFile, b: IMediaFile) => {
 			if (optSortBy === OPT_SORTBY.filName) {
-				return a.name! < b.name! ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
+				return a.name < b.name ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
 			}
 			else if (optSortBy === OPT_SORTBY.modDate) {
 				return a.modifiedByMeTime! < b.modifiedByMeTime! ? (optSortDir === OPT_SORTDIR.asce ? -1 : 1) : (optSortDir === OPT_SORTDIR.asce ? 1 : -1)
@@ -51,7 +51,7 @@ export default function ImageGrid() {
 					: mediaTypeFilter === 'gif' ? isGif(item)
 						: mediaTypeFilter === 'video' ? isVideo(item)
 							: false)
-			.filter((item) => { return !optSchWord || item.name!.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 			.sort(sorter)
 			.forEach((item) => {
 				showImages.push(item)

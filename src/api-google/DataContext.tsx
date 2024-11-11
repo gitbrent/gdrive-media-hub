@@ -36,9 +36,15 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const refreshData = async () => {
 		try {
 			setIsLoading(true);
-			const files = await listFiles();
-			setMediaFiles(files);
-
+			const gapiFiles = await listFiles();
+			const mediaFiles = gapiFiles
+				.filter((file) => file.id !== undefined && file.id !== null)
+				.map((file) => ({
+					...file,
+					// Initialize or map any additional properties specific to IMediaFile
+					original: '', // *REQUIRED* to hold image blob later
+				})) as IMediaFile[];
+			setMediaFiles(mediaFiles);
 			const profile = getCurrentUserProfile();
 			setUserProfile(profile);
 		} catch (error) {

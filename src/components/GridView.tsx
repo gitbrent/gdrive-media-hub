@@ -4,10 +4,8 @@ import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
-import 'photoswipe/dist/photoswipe.css'
-// WIP:
-//import { getBlobForFile } from '../api'
 import { DataContext } from '../api-google/DataContext'
+import 'photoswipe/dist/photoswipe.css'
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -17,7 +15,8 @@ interface Props {
 
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
 	const SHOW_CAPTIONS = false
-	const { getBlobForFile } = useContext(DataContext);
+	//
+	const { getBlobForFile } = useContext(DataContext)
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
@@ -126,7 +125,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		}
 
 		loadBlobs()
-	}, [displayedItems])
+	}, [displayedItems, getBlobForFile])
 
 	/**
 	 * download videos when they're clicked
@@ -156,7 +155,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					setIsLoadingFile(false)
 				})
 		}
-	}, [selectedFile])
+	}, [getBlobForFile, selectedFile])
 
 	// --------------------------------------------------------------------------------------------
 

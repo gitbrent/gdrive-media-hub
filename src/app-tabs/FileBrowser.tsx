@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder, IMediaFile } from '../App.props'
+import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import FileBrowViewList from '../components/FileBrowViewList'
 import GridView from '../components/GridView'
