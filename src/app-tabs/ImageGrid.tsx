@@ -16,7 +16,7 @@ export default function ImageGrid() {
 	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isSearching, setIsSearching] = useState(false)
-	const { mediaFiles } = useContext(DataContext);
+	const { mediaFiles } = useContext(DataContext)
 
 	// --------------------------------------------------------------------------------------------
 

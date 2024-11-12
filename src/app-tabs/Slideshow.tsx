@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { IMediaFile } from '../App.props'
 import { isImage } from '../utils/mimeTypes'
+import { DataContext } from '../api-google/DataContext'
 import AlertNoImages from '../components/AlertNoImages'
 import '../css/Slideshow.css'
 
@@ -10,104 +11,124 @@ enum SlideShowDelay {
 	Slow = 10,
 }
 
-interface Props {
-	allFiles: IMediaFile[];
-	downloadFile: (fileId: string) => Promise<boolean>;
-}
-
-const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
-	const [allImages, setAllImages] = useState<IMediaFile[]>([])
+const Slideshow: React.FC = () => {
+	const { mediaFiles, downloadFile } = useContext(DataContext)
+	//
+	const [randomizedImages, setRandomizedImages] = useState<IMediaFile[]>([])
+	const [filteredImages, setFilteredImages] = useState<IMediaFile[]>([])
+	//
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(SlideShowDelay.Normal)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [isPaused, setIsPaused] = useState(true)
 	//
-	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
-	//
-	const [isPaused, setIsPaused] = useState(true)
 	const [currentImageUrl, setCurrentImageUrl] = useState('')
 
 	/**
 	 * filter images from all files and shuffle at startup
 	 */
 	useEffect(() => {
-		setAllImages([...allFiles]
+		setRandomizedImages([...mediaFiles]
 			.filter((item) => isImage(item))
 			.sort(() => Math.random() - 0.5))
-	}, [allFiles])
+	}, [mediaFiles])
 
 	useEffect(() => {
-		setShfImages(allImages
+		setFilteredImages(randomizedImages
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 		)
-	}, [allImages, optSchWord])
+	}, [randomizedImages, optSchWord])
 
 	useEffect(() => {
-		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.original) {
-			downloadFile(shfImages[currIndex].id).then(() => {
-				setCurrentImageUrl(shfImages[currIndex].original || '')
+		if (filteredImages[currIndex]?.id && !filteredImages[currIndex]?.original) {
+			downloadFile(filteredImages[currIndex].id).then(() => {
+				setCurrentImageUrl(filteredImages[currIndex].original || '')
 			})
 		}
 		else {
-			setCurrentImageUrl(shfImages[currIndex]?.original || '')
+			setCurrentImageUrl(filteredImages[currIndex]?.original || '')
 		}
-	}, [currIndex, shfImages])
+	}, [currIndex, downloadFile, filteredImages])
 
-	// Pre-fetching logic
+	// Load current image
 	useEffect(() => {
-		for (let i = 1; i <= 3; i++) {
-			const nextIndex = (currIndex + i) % shfImages.length
-			if (shfImages[nextIndex] && !shfImages[nextIndex].original) {
-				downloadFile(shfImages[nextIndex].id)
+		let isMounted = true;
+		const loadImage = async () => {
+			const currentImage = filteredImages[currIndex];
+			if (currentImage?.id && !currentImage?.original) {
+				await downloadFile(currentImage.id);
 			}
-		}
-	}, [currIndex, shfImages])
+			if (isMounted) {
+				setCurrentImageUrl(currentImage?.original || '');
+			}
+		};
+		loadImage();
+		return () => {
+			isMounted = false;
+		};
+	}, [currIndex, downloadFile, filteredImages]);
+
+	// Pre-fetch next images
+	useEffect(() => {
+		const prefetchImages = async () => {
+			for (let i = 1; i <= 3; i++) {
+				const nextIndex = (currIndex + i) % filteredImages.length;
+				const nextImage = filteredImages[nextIndex];
+				if (nextImage && !nextImage.original) {
+					await downloadFile(nextImage.id);
+				}
+			}
+		};
+		prefetchImages();
+	}, [currIndex, downloadFile, filteredImages]);
 
 	/**
 	 * Handle resetting of current index when search word entered
 	 * - ex: if user is on index 12, search word returns 1 result, index 12 is no longer valid
 	 */
 	useEffect(() => {
-		if (currIndex >= shfImages.length) {
+		if (currIndex >= filteredImages.length) {
 			setCurrIndex(0)
 		}
-	}, [shfImages, currIndex])
+	}, [filteredImages, currIndex])
 
-	const goToNextSlide = () => {
-		if (shfImages.length === 0) return
-		const nextIndex = (currIndex + 1) % shfImages.length
-		setCurrIndex(nextIndex)
-		setUsedIndices([...usedIndices, nextIndex])
-	}
+	const goToNextSlide = useCallback(() => {
+		if (filteredImages.length === 0) return
+		setCurrIndex((prevIndex) => {
+			const nextIndex = (prevIndex + 1) % filteredImages.length
+			setUsedIndices((prevUsedIndices) => [...prevUsedIndices, nextIndex])
+			return nextIndex
+		})
+	}, [filteredImages.length])
 
-	const goToPrevSlide = () => {
-		if (usedIndices.length <= 1) return  // Can't go back if there's only one or no image
-		const prevIndex = usedIndices[usedIndices.length - 2] // Get the second last index
-		setUsedIndices(usedIndices.slice(0, -1)) // Remove the last index
-		setCurrIndex(prevIndex)
-	}
+	const goToPrevSlide = useCallback(() => {
+		if (usedIndices.length <= 1) return
+		setUsedIndices((prevUsedIndices) => {
+			const newUsedIndices = prevUsedIndices.slice(0, -1)
+			const prevIndex = newUsedIndices[newUsedIndices.length - 1]
+			setCurrIndex(prevIndex)
+			return newUsedIndices
+		})
+	}, [usedIndices])
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'ArrowLeft') {
 				goToPrevSlide()
-			}
-			else if (event.key === 'ArrowRight') {
+			} else if (event.key === 'ArrowRight') {
 				goToNextSlide()
-			}
-			else if (event.key === ' ') {
-				setIsPaused(!isPaused)
+			} else if (event.key === ' ') {
+				setIsPaused((prevIsPaused) => !prevIsPaused)
 			}
 		}
 
-		// Add event listener
 		window.addEventListener('keydown', handleKeyDown)
 
-		// Cleanup event listener
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [goToPrevSlide, goToNextSlide, setIsPaused])
+	}, [goToPrevSlide, goToNextSlide])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -116,29 +137,16 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 		if (isPaused) return
 
 		const interval = setInterval(() => {
-			if (shfImages.length === 0) return
-			const nextIndex = (currIndex + 1) % shfImages.length
-			setCurrIndex(nextIndex)
-			setUsedIndices([...usedIndices, nextIndex])
+			if (filteredImages.length === 0) return
+			setCurrIndex((prevIndex) => {
+				const nextIndex = (prevIndex + 1) % filteredImages.length
+				setUsedIndices((prevUsedIndices) => [...prevUsedIndices, nextIndex])
+				return nextIndex
+			})
 		}, optSlideshowSecs * 1000)
 
 		return () => clearInterval(interval)
-	}, [optSlideshowSecs, currIndex, shfImages, usedIndices, isPaused])
-
-	// TODO: 20231029: use `downloadFile` on first init, then use UpdateDate like gird so we GUARANTEE the image shows/is loaded
-	/* 20231029 - not working, seems like a closure issue in `AppMainLogic.ts`
-	useEffect(() => {
-		if (currentImage && currentImage.id && !currentImage.original) {
-			downloadFile(currentImage.id)
-				.then(() => {
-					//setLastLoadDate(new Date().toISOString())
-				})
-				.catch((error) => {
-					console.error(`Error downloading item: ${currentImage.id}`, error)
-				})
-		}
-	}, [currentImage])
-	*/
+	}, [isPaused, optSlideshowSecs, filteredImages.length])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -161,7 +169,7 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 							</button>
 						</div>
 						<div className="col-5 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={shfImages.length === 0} onClick={goToNextSlide} title="next (right-arrow)">
+							<button className='btn btn-secondary w-100' disabled={filteredImages.length === 0} onClick={goToNextSlide} title="next (right-arrow)">
 								<span className="d-none d-lg-inline-block">Next</span><i className="bi-chevron-right ms-0 ms-md-2"></i>
 							</button>
 						</div>
@@ -192,11 +200,11 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 						</div>
 						<div className="col-auto col-md-auto mt-3 mt-md-0">
 							<div className="text-muted">
-								{shfImages.length === 0
-									? (<span><b>{0}</b>&nbsp;of&nbsp;<b>{allImages.length}</b></span>)
+								{filteredImages.length === 0
+									? (<span><b>{0}</b>&nbsp;of&nbsp;<b>{randomizedImages.length}</b></span>)
 									: optSchWord
-										? (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{shfImages.length}</b>&nbsp;(<b>{allImages.length} total)</b></span>)
-										: (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{allImages.length}</b></span>)
+										? (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{filteredImages.length}</b>&nbsp;(<b>{randomizedImages.length} total)</b></span>)
+										: (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{randomizedImages.length}</b></span>)
 								}
 							</div>
 						</div>
@@ -211,11 +219,11 @@ const Slideshow: React.FC<Props> = ({ allFiles, downloadFile }) => {
 			{renderTopBar()}
 			<div className="slideShowContainer">
 				<div className="slideShowMain">
-					{shfImages.length === 0
+					{filteredImages.length === 0
 						? <AlertNoImages />
 						: currentImageUrl
 							? <img src={currentImageUrl} />
-							: <i title={shfImages[currIndex]?.name} className="h1 mb-0 bi-arrow-repeat" />
+							: <i title={filteredImages[currIndex]?.name} className="h1 mb-0 bi-arrow-repeat" />
 					}
 				</div>
 			</div>

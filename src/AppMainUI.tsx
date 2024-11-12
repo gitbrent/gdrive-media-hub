@@ -31,7 +31,6 @@ export default function AppMainUI() {
 		downloadFile,
 		handleClearFileCache,
 		isBusyGapiLoad,
-		//loadPageImages,
 		getUserAuthState,
 		getCacheStatus,
 	} = useAppMain()
@@ -149,7 +148,7 @@ export default function AppMainUI() {
 				returnJsx = <ImageGrid />
 				break
 			case AppTabs.SlideShow:
-				returnJsx = <Slideshow allFiles={allFiles} downloadFile={downloadFile} />
+				returnJsx = <Slideshow />
 				break
 			case AppTabs.VideoPlayer:
 				returnJsx = <VideoPlayer allFiles={allFiles} downloadFile={downloadFile} />
