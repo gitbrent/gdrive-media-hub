@@ -1,19 +1,14 @@
-import { useContext, useState } from 'react'
-import { OPT_SORTBY, OPT_SORTDIR } from './App.props'
+import { useContext, useEffect, useState } from 'react'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
-import Settings from './app-tabs/Settings'
 import UserProfile from './app-tabs/UserProfile'
 import './css/AppMainUI.css'
-// NEW:
+//
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
-// vvv DELETE ME vvv - once above is implemented in all tabs
-import { useAppMain } from './api/useAppMain'
-// ^^^ WIP: REMOVE ME:
 
 enum AppTabs {
 	Home = 'Home',
@@ -21,29 +16,18 @@ enum AppTabs {
 	ImageGrid = 'ImageGrid',
 	SlideShow = 'SlideShow',
 	VideoPlayer = 'VideoPlayer',
-	Settings = 'Settings',
 	UserProfile = 'UserProfile',
 }
 
 export default function AppMainUI() {
-	const {
-		allFiles,
-		downloadFile,
-		handleClearFileCache,
-		isBusyGapiLoad,
-		getUserAuthState,
-		getCacheStatus,
-	} = useAppMain()
+	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
+	const { userProfile, refreshData } = useContext(DataContext)
 	//
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
-	//
-	const [optSortBy, setOptSortBy] = useState(OPT_SORTBY.modDate)
-	const [optSortDir, setOptSortDir] = useState(OPT_SORTDIR.desc)
-	const [optIsShowCap, setOptIsShowCap] = useState(false)
 
-	// NEW!!! BELOW: WIP: TODO:
-	const { isSignedIn, signIn, signOut } = useContext(AuthContext);
-	const { mediaFiles, userProfile } = useContext(DataContext);
+	useEffect(() => {
+		if (isSignedIn) refreshData()
+	}, [isSignedIn])
 
 	// --------------------------------------------------------------------------------------------
 
@@ -95,13 +79,6 @@ export default function AppMainUI() {
 									</a>
 								</li>
 							}
-							{userProfile &&
-								<li className="nav-item">
-									<a href="#" onClick={() => setCurrentTab(AppTabs.Settings)} className={`nav-link ${currentTab === AppTabs.Settings ? 'active' : ''}`} title="settings" aria-label="settings">
-										Settings
-									</a>
-								</li>
-							}
 						</ul>
 						<div className="dropdown">
 							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -123,7 +100,7 @@ export default function AppMainUI() {
 								:
 								<ul className="dropdown-menu dropdown-menu-end">
 									<li>
-										<a className="dropdown-item" href="#" onClick={handleClearFileCache}>Clear Cache</a>
+										<a className="dropdown-item" href="#" onClick={() => { alert('TODO:') }}>Clear Cache</a>
 									</li>
 								</ul>
 							}
@@ -151,24 +128,10 @@ export default function AppMainUI() {
 				returnJsx = <Slideshow />
 				break
 			case AppTabs.VideoPlayer:
-				returnJsx = <VideoPlayer allFiles={allFiles} downloadFile={downloadFile} />
-				break
-			case AppTabs.Settings:
-				returnJsx = <Settings
-					optSortBy={optSortBy}
-					optSortDir={optSortDir}
-					optIsShowCap={optIsShowCap}
-					setOptSortBy={setOptSortBy}
-					setOptSortDir={setOptSortDir}
-					setOptIsShowCap={setOptIsShowCap} />
+				returnJsx = <VideoPlayer />
 				break
 			case AppTabs.UserProfile:
-				returnJsx = <UserProfile
-					getUserAuthState={getUserAuthState}
-					getCacheStatus={getCacheStatus}
-					handleClearFileCache={handleClearFileCache}
-					isBusyGapiLoad={isBusyGapiLoad}
-				/>
+				returnJsx = <UserProfile />
 				break
 			default:
 				returnJsx = <div />
@@ -179,17 +142,14 @@ export default function AppMainUI() {
 
 	return (
 		<section>
-			{mediaFiles.length === 0 ?
-				<div>BUSY</div>
+			{!isSignedIn ?
+				<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
 				:
-				isSignedIn ? (
-					<>
-						{renderTopBar()}
-						{renderBody()}
-					</>
-				) : (
-					<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
-				)}
+				<>
+					{renderTopBar()}
+					{renderBody()}
+				</>
+			}
 		</section>
-	);
+	)
 }

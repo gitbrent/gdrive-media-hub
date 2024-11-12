@@ -126,12 +126,12 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 * mime type
 	 * @example "application/json"
 	 */
-	mimeType: string | undefined
+	mimeType: string
 	/**
 	 * modified time (ISO format)
 	 * @example "2022-11-21T14:54:14.453Z"
 	 */
-	modifiedByMeTime: string | undefined
+	modifiedByMeTime: string
 	/**
 	 * file name
 	 * @example "corp-logo.png"
