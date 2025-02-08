@@ -27,17 +27,13 @@ const App: React.FC = () => {
 		gapi.load('client:auth2', start);
 	}, []);
 
-	if (!gapiInitialized) {
-		return <div className='alert alert-info'>Loading GAPI...</div>;
-	}
-
-	return (
-		<AuthProvider>
+	return !gapiInitialized
+		? <div className='alert alert-info'>Initializing GAPI...</div>
+		: <AuthProvider>
 			<DataProvider>
 				<AppMainUI />
 			</DataProvider>
 		</AuthProvider>
-	);
 };
 
 export default App;
