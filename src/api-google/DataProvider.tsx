@@ -1,8 +1,9 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode, useContext } from 'react';
 import { listFiles, getCurrentUserProfile } from '.';
 import { IMediaFile } from '../App.props';
 import { isGif, isImage, isVideo } from './utils/fileHelpers';
 import { DataContext } from './DataContext';
+import { AuthContext } from './AuthContext'
 
 interface DataProviderProps {
 	children: ReactNode;
@@ -13,8 +14,10 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const [userProfile, setUserProfile] = useState<gapi.auth2.BasicProfile | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({});
+	const { isSignedIn } = useContext(AuthContext)
 
 	const refreshData = async () => {
+		console.log('[DataProvider] Refreshing data...');
 		try {
 			setIsLoading(true);
 			const gapiFiles = await listFiles();
@@ -36,8 +39,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	};
 
 	useEffect(() => {
-		refreshData();
-	}, []);
+		console.log('[DataProvider] isSignedIn', isSignedIn);
+		if (isSignedIn) refreshData();
+	}, [isSignedIn]);
 
 	const downloadFile = async (fileId: string): Promise<boolean> => {
 		try {

@@ -28,7 +28,9 @@ const App: React.FC = () => {
 	}, []);
 
 	return !gapiInitialized
-		? <div className='alert alert-info'>Initializing GAPI...</div>
+		? <div className='text-center m-5'>
+			<div className='alert alert-info'>Initializing GAPI...</div>
+		</div>
 		: <AuthProvider>
 			<DataProvider>
 				<AppMainUI />
