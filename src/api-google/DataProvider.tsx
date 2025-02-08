@@ -1,27 +1,8 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { listFiles, getCurrentUserProfile } from './';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { listFiles, getCurrentUserProfile } from '.';
 import { IMediaFile } from '../App.props';
 import { isGif, isImage, isVideo } from './utils/fileHelpers';
-
-interface DataContextProps {
-	mediaFiles: IMediaFile[];
-	userProfile: gapi.auth2.BasicProfile | null;
-	refreshData: () => void;
-	isLoading: boolean;
-	downloadFile: (fileId: string) => Promise<boolean>;
-	loadPageImages: (fileIds: string[]) => Promise<boolean>;
-	getBlobForFile: (fileId: string) => Promise<string | null>;
-}
-
-export const DataContext = createContext<DataContextProps>({
-	mediaFiles: [],
-	userProfile: null,
-	refreshData: () => { },
-	isLoading: false,
-	downloadFile: async () => false,
-	loadPageImages: async () => false,
-	getBlobForFile: async () => '',
-});
+import { DataContext } from './DataContext';
 
 interface DataProviderProps {
 	children: ReactNode;

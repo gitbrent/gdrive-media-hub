@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { gapi } from 'gapi-script';
-import { AuthProvider } from './api-google/AuthContext';
-import { DataProvider } from './api-google/DataContext';
+import { AuthProvider } from './api-google/AuthProvider';
+import { DataProvider } from './api-google/DataProvider';
 import { initClient } from './api-google';
 import AppMainUI from './AppMainUI';
 

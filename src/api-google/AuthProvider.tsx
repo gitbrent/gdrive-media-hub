@@ -1,17 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { gapi } from 'gapi-script';
-
-interface AuthContextProps {
-	isSignedIn: boolean;
-	signIn: () => void;
-	signOut: () => void;
-}
-
-export const AuthContext = createContext<AuthContextProps>({
-	isSignedIn: false,
-	signIn: () => { },
-	signOut: () => { },
-});
+import { AuthContext } from './AuthContext';
 
 interface AuthProviderProps {
 	children: ReactNode;
