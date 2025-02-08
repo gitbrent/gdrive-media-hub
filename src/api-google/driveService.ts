@@ -1,4 +1,4 @@
-import { gapi } from 'gapi-script';
+//import { gapi } from 'gapi-script';
 
 export const createFile = async (name: string, content: string): Promise<gapi.client.Response<gapi.client.drive.File>> => {
 	try {

@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { IMediaFile } from '../App.props'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import { isVideo } from '../utils/mimeTypes'
 import '../css/VideoPlayer.css'
+import { DataContext } from '../api-google/DataContext'
 
-export interface Props {
-	allFiles: IMediaFile[];
-	downloadFile: (fileId: string) => Promise<boolean>;
-}
-
-const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
+const VideoPlayer: React.FC = () => {
+	const { mediaFiles, downloadFile } = useContext(DataContext)
+	//
 	const [allVideos, setAllVideos] = useState<IMediaFile[]>([])
 	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
 	const [currIndex, setCurrIndex] = useState(0)
@@ -22,10 +20,10 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	 * filter videos from all files and shuffle at startup
 	 */
 	useEffect(() => {
-		setAllVideos([...allFiles]
+		setAllVideos([...mediaFiles]
 			.filter((item) => isVideo(item))
 			.sort(() => Math.random() - 0.5))
-	}, [allFiles])
+	}, [mediaFiles])
 
 	/**
 	 * update shuffled videos when search term changes
@@ -45,6 +43,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 		else {
 			setCurrentImageUrl(shfImages[currIndex]?.original || '')
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currIndex, shfImages])
 
 	useEffect(() => {

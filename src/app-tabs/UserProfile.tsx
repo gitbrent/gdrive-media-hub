@@ -3,10 +3,10 @@ import { AuthState, IAuthState, IFileListCache } from '../App.props'
 import AlertLoading from '../components/AlertLoading'
 
 interface Props {
-	getUserAuthState: () => IAuthState
-	getCacheStatus: () => Promise<IFileListCache | null>
-	handleClearFileCache: () => void
-	isBusyGapiLoad: boolean
+	getUserAuthState?: () => IAuthState
+	getCacheStatus?: () => Promise<IFileListCache | null>
+	handleClearFileCache?: () => void
+	isBusyGapiLoad?: boolean
 }
 
 const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handleClearFileCache, isBusyGapiLoad }) => {
