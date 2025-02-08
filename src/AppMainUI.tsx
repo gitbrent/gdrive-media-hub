@@ -9,6 +9,7 @@ import './css/AppMainUI.css'
 //
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
+//import { log } from 'console'
 
 enum AppTabs {
 	Home = 'Home',
@@ -26,7 +27,10 @@ export default function AppMainUI() {
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 
 	useEffect(() => {
+		//log(1, `isSignedIn: ${isSignedIn}`)
+		console.log('isSignedIn', isSignedIn)
 		if (isSignedIn) refreshData()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isSignedIn])
 
 	// --------------------------------------------------------------------------------------------
@@ -143,7 +147,9 @@ export default function AppMainUI() {
 	return (
 		<section>
 			{!isSignedIn ?
-				<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
+				<div className='text-center m-5'>
+					<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
+				</div>
 				:
 				<>
 					{renderTopBar()}
