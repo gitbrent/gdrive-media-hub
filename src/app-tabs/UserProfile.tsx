@@ -65,7 +65,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 							</div>
 							<div className="row align-items-center mt-4">
 								<div className="col"><h4 className="fw-light mb-0">File Count</h4></div>
-								<div className="col-auto">{cacheStatus?.gapiFiles?.length}</div>
+								<div className="col-auto">{mediaFiles?.length}</div>
 							</div>
 						</div>
 						<div className="card-footer text-center">
@@ -80,7 +80,6 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 	return (
 		<section>
 			<h3>Welcome!</h3>
-			<h5>{mediaFiles?.length}</h5>
 			{isBusyGapiLoad ? <AlertLoading /> : renderProfile()}
 		</section>
 	)
