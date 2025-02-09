@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
+import { AuthContext } from './api-google/AuthContext'
+import { DataContext } from './api-google/DataContext'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
@@ -6,9 +8,6 @@ import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
 import UserProfile from './app-tabs/UserProfile'
 import './css/AppMainUI.css'
-//
-import { AuthContext } from './api-google/AuthContext'
-import { DataContext } from './api-google/DataContext'
 
 enum AppTabs {
 	Home = 'Home',
@@ -22,7 +21,6 @@ enum AppTabs {
 export default function AppMainUI() {
 	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
 	const { userProfile, refreshData } = useContext(DataContext)
-	//
 	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 
 	useEffect(() => {
