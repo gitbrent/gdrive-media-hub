@@ -1,19 +1,19 @@
-import React, { useState, useEffect, ReactNode, useContext } from 'react';
-import { listFiles, getCurrentUserProfile } from '.';
-import { IMediaFile } from '../App.props';
-import { isGif, isImage, isVideo } from './utils/fileHelpers';
-import { DataContext } from './DataContext';
+import React, { useState, useEffect, ReactNode, useContext } from 'react'
+import { IMediaFile } from '../App.props'
+import { listFiles, getCurrentUserProfile } from '.'
+import { isGif, isImage, isVideo } from './utils/fileHelpers'
 import { AuthContext } from './AuthContext'
+import { DataContext } from './DataContext'
 
 interface DataProviderProps {
 	children: ReactNode;
 }
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
-	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
-	const [userProfile, setUserProfile] = useState<gapi.auth2.BasicProfile | null>(null);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({});
+	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([])
+	const [userProfile, setUserProfile] = useState<gapi.auth2.BasicProfile | null>(null)
+	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
 	const { isSignedIn } = useContext(AuthContext)
 
 	const refreshData = async () => {
@@ -36,12 +36,12 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}
 
 	useEffect(() => {
 		console.log('[DataProvider] isSignedIn', isSignedIn);
 		if (isSignedIn) refreshData();
-	}, [isSignedIn]);
+	}, [isSignedIn])
 
 	const downloadFile = async (fileId: string): Promise<boolean> => {
 		try {
@@ -116,7 +116,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 			console.error(`Failed to download file with ID ${fileId}:`, error);
 			return false;
 		}
-	};
+	}
 
 	const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 		setIsLoading(true);
@@ -130,7 +130,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 			setIsLoading(false);
 			return false;
 		}
-	};
+	}
 
 	/**
 	 * Fetches the file content as a blob from Google Drive.
@@ -162,7 +162,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 			console.error('Error fetching file blob:', error);
 			return null;
 		}
-	};
+	}
 
 	/**
 	 * Retrieves the blob URL for a file, fetching it if not cached.
@@ -185,12 +185,12 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 				return null;
 			}
 		}
-	};
+	}
 
 	return (
 		<DataContext.Provider
 			value={{ mediaFiles, userProfile, refreshData, isLoading, downloadFile, loadPageImages, getBlobForFile }}>
 			{children}
 		</DataContext.Provider>
-	);
-};
+	)
+}

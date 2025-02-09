@@ -1,14 +1,16 @@
 import { useContext } from 'react'
 import { FileSizeThresholds, formatBytes, IFileAnalysis } from '../App.props'
-import '../css/Home.css'
+import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
-import { getFileAnalysis } from '../api-google/utils/fileAnalysis';
+import '../css/Home.css'
 
 const Home: React.FC = () => {
-	const { isSignedIn, signIn } = useContext(AuthContext);
-	const { mediaFiles, userProfile } = useContext(DataContext);
-	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles);
+	const { isSignedIn, signIn } = useContext(AuthContext)
+	const { mediaFiles, userProfile } = useContext(DataContext)
+	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles)
+
+	// --------------------------------------------------------------------------------------------
 
 	function renderLogin(): JSX.Element {
 		return (
@@ -241,6 +243,8 @@ const Home: React.FC = () => {
 			</section>
 		)
 	}
+
+	// --------------------------------------------------------------------------------------------
 
 	return (isSignedIn ? renderHome() : renderLogin())
 }
