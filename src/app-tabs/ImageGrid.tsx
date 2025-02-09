@@ -1,12 +1,12 @@
 import { useContext, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
+import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
+import { DataContext } from '../api-google/DataContext'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
 import GridView from '../components/GridView'
-import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
 import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
-import { DataContext } from '../api-google/DataContext'
 
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 

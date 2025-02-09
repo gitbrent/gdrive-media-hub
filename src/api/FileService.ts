@@ -1,6 +1,6 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
 import { loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
-import { getAccessToken } from './AuthService'
+//import { getAccessToken } from './AuthService'
 
 const blobUrlCache: Record<string, string> = {}
 
@@ -86,6 +86,7 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 	return allFiles
 }
 
+/*
 export const fetchFileImgBlob = async (fileId: IGapiFile['id']) => {
 	try {
 		return fileId ?
@@ -119,6 +120,10 @@ export const getBlobForFile = async (fileId: IGapiFile['id']): Promise<string | 
 		}
 	}
 }
+*/
+
+// TODO: WIP:
+// 20250208: BELOW is still used - merge this file with new driveService.ts, then remove it
 
 export function releaseAllBlobUrls() {
 	function releaseBlobUrl(fileId: string) {

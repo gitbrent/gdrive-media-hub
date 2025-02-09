@@ -101,7 +101,7 @@ export const FileSizeThresholds = {
 }
 
 // ----------------------------------------------------------------------------
-
+/*
 export enum AuthState {
 	Authenticated = 'Authenticated',
 	Unauthenticated = 'Unauthenticated',
@@ -112,7 +112,7 @@ export interface IAuthState {
 	userName: string
 	userPict: string
 }
-
+*/
 // ----------------------------------------------------------------------------
 
 export interface IGapiFile extends gapi.client.drive.File {
