@@ -1,23 +1,22 @@
-import { useEffect, useState } from 'react'
-import { AuthState, IAuthState, IFileListCache } from '../App.props'
+import { useContext, useState } from 'react'
+import { IFileListCache } from '../App.props'
+import { AuthContext } from '../api-google/AuthContext'
+import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
 
 interface Props {
-	getUserAuthState?: () => IAuthState
-	getCacheStatus?: () => Promise<IFileListCache | null>
 	handleClearFileCache?: () => void
 	isBusyGapiLoad?: boolean
 }
 
-const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handleClearFileCache, isBusyGapiLoad }) => {
-	const [userAuthState, setUserAuthState] = useState<IAuthState | null>(null)
-	const [cacheStatus, setCacheStatus] = useState<IFileListCache | null>(null)
+const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) => {
+	const { isSignedIn, signOut } = useContext(AuthContext)
+	const { mediaFiles, userProfile } = useContext(DataContext)
+	//
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [cacheStatus, _setCacheStatus] = useState<IFileListCache | null>(null)
 
-	useEffect(() => {
-		const authState = getUserAuthState()
-		setUserAuthState(authState)
-	}, [getUserAuthState])
-
+	/* WIP: FIXME:
 	useEffect(() => {
 		const fetchStatus = async () => {
 			const status = await getCacheStatus()
@@ -25,6 +24,7 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 		}
 		fetchStatus()
 	}, [getCacheStatus])
+	*/
 
 	// --------------------------------------------------------------------------------------------
 
@@ -32,23 +32,23 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 		return (
 			<div className="row mt-4">
 				<div className="col">
-					{userAuthState &&
+					{isSignedIn &&
 						<div className="card h-100">
-							<div className={`card-header ${userAuthState.status === AuthState.Authenticated ? 'text-bg-success' : 'text-bg-warning'}`} title={userAuthState.status}>
+							<div className={`card-header ${userProfile?.getName() ? 'text-bg-success' : 'text-bg-warning'}`}>
 								<h5 className="mb-0">Auth Status</h5>
 							</div>
 							<div className="card-body bg-black">
 								<div className="row align-items-center">
 									<div className="col-auto">
-										<img src={userAuthState.userPict} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
+										<img src={userProfile?.getImageUrl() || ''} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
 									</div>
 									<div className="col">
-										<h4 className="mb-0">{userAuthState.userName}</h4>
+										<h4 className="mb-0">{userProfile?.getName() || ''}</h4>
 									</div>
 								</div>
 							</div>
 							<div className="card-footer text-center">
-								<button type="button" className="btn btn-outline-danger" onClick={() => { alert('TODO:') }}>Sign Out</button>
+								<button type="button" className="btn btn-outline-danger" onClick={() => signOut}>Sign Out</button>
 							</div>
 						</div>
 					}
@@ -80,6 +80,7 @@ const UserProfile: React.FC<Props> = ({ getUserAuthState, getCacheStatus, handle
 	return (
 		<section>
 			<h3>Welcome!</h3>
+			<h5>{mediaFiles?.length}</h5>
 			{isBusyGapiLoad ? <AlertLoading /> : renderProfile()}
 		</section>
 	)
