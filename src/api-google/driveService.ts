@@ -1,4 +1,12 @@
-//import { gapi } from 'gapi-script';
+/**
+ * Drive Service
+ * - perform CRUD operations on Google Drive files
+ * - Some of these methods can be called directly (they dont have to be wrapped in DataProvider)
+ */
+
+import { IDirectory, IGapiFile, IGapiFolder, IMediaFile } from "../App.props";
+
+// == FILES ===================================================================
 
 export const createFile = async (name: string, content: string): Promise<gapi.client.Response<gapi.client.drive.File>> => {
 	try {
@@ -54,3 +62,48 @@ export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 		throw error;
 	}
 };
+
+// == FOLDERS =================================================================
+
+export const getRootFolderId = async (): Promise<string | undefined> => {
+	try {
+		const response = await gapi.client.drive.files.get({
+			fileId: 'root',
+			fields: 'id'
+		})
+		return response.result.id
+	} catch (error) {
+		// NOTE: This occurs when Google App/Drive Permissions are not correct (e.g.: "Can read only its own files")
+		console.error('[getRootFolderId] Could not fetch root folder ID!', error)
+		return ''
+	}
+}
+
+export const fetchFolderContents = async (folderId: string): Promise<IDirectory> => {
+	try {
+		const response = await gapi.client.drive.files.list({
+			q: `'${folderId}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/' or mimeType contains 'video/')`,
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, webContentLink)',
+			pageSize: 1000,
+		})
+
+		const files: IGapiFile[] = []
+		const folders: IGapiFolder[] = []
+		const results: IGapiFile[] = (response.result.files || []) as IGapiFile[]
+		results.forEach((file) => {
+			if (file.mimeType === 'application/vnd.google-apps.folder') {
+				folders.push(file as IGapiFolder)
+			} else {
+				files.push({ ...file, original: '' } as IMediaFile)
+			}
+		})
+
+		return {
+			currentFolder: {}, // current folder details
+			items: [...folders, ...files],
+		} as IDirectory
+	} catch (error) {
+		console.error('Error fetching folder contents:', error)
+		throw error
+	}
+}

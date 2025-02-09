@@ -1,18 +1,18 @@
 import { useContext, useEffect, useState } from 'react'
 import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
+import { getRootFolderId, fetchFolderContents } from '../api-google'
+import { DataContext } from '../api-google/DataContext'
+import { releaseAllBlobUrls } from '../api'
 import FileBrowViewList from '../components/FileBrowViewList'
-import GridView from '../components/GridView'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
+import GridView from '../components/GridView'
 import '../css/FileBrowser.css'
-// WIP: BELOW:
-import { fetchFolderContents, fetchWithTokenRefresh, getRootFolderId, releaseAllBlobUrls } from '../api' // WIP: REMOVE
-import { DataContext } from '../api-google/DataContext'
 
 type ViewMode = 'grid' | 'list'
-type SortField = 'name' | 'size' | 'modifiedByMeTime';
-type SortOrder = 'asc' | 'desc';
+type SortField = 'name' | 'size' | 'modifiedByMeTime'
+type SortOrder = 'asc' | 'desc'
 
 const FileBrowser: React.FC = () => {
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
@@ -25,7 +25,7 @@ const FileBrowser: React.FC = () => {
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 	//
-	const { mediaFiles, isLoading } = useContext(DataContext);
+	const { mediaFiles, isLoading } = useContext(DataContext)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -34,8 +34,12 @@ const FileBrowser: React.FC = () => {
 	 */
 	useEffect(() => {
 		const loadRootFolder = async () => {
-			const rootFolderId = await getRootFolderId() || ''
-			const rootContents = await fetchWithTokenRefresh(rootFolderId)
+			const rootFolderId = await getRootFolderId()
+			if (!rootFolderId) {
+				console.error('Root folder ID not found')
+				return
+			}
+			const rootContents = await fetchFolderContents(rootFolderId)
 			setCurrentFolderPath([{ folderName: 'My Drive', folderId: rootFolderId }])
 			setCurrFolderContents(rootContents.items)
 			setOrigFolderContents(rootContents.items)
@@ -88,7 +92,7 @@ const FileBrowser: React.FC = () => {
 		setIsFolderLoading(true)
 
 		try {
-			const contents = await fetchWithTokenRefresh(folderId)
+			const contents = await fetchFolderContents(folderId)
 			setOrigFolderContents(contents.items)
 			setCurrFolderContents(contents.items)
 			setCurrentFolderPath([...currentFolderPath, { folderName: folderName, folderId: folderId }])
@@ -134,7 +138,6 @@ const FileBrowser: React.FC = () => {
 
 		// Filter results
 		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
-		if (currFolderContents[0]) console.log('currFolderContents:', currFolderContents[0])
 
 		setCurrFolderContents(filteredContents)
 	}, [mediaFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
