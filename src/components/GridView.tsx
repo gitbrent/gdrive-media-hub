@@ -16,7 +16,7 @@ interface Props {
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
 	const SHOW_CAPTIONS = false
 	//
-	const { getBlobForFile } = useContext(DataContext)
+	const { getBlobUrlForFile } = useContext(DataContext)
 	//
 	const loadingRef = useRef(new Set<string>())
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
@@ -83,7 +83,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
-					const fetchPromise = getBlobForFile(item.id).then(original => {
+					const fetchPromise = getBlobUrlForFile(item.id).then(original => {
 						if (original) {
 							if (isImage(item) || isGif(item)) {
 								return loadImage(original).then(({ width, height }) => {
@@ -125,7 +125,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		}
 
 		loadBlobs()
-	}, [displayedItems, getBlobForFile])
+	}, [displayedItems, getBlobUrlForFile])
 
 	/**
 	 * download videos when they're clicked
@@ -136,7 +136,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			log(2, `[useEffect] loading video selectedFile.id "${selectedFile.id}"...`)
 			setIsLoadingFile(true)
 			const item = { ...selectedFile }
-			getBlobForFile(selectedFile.id)
+			getBlobUrlForFile(selectedFile.id)
 				.then(original => {
 					if (original) {
 						item.original = original
@@ -155,7 +155,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					setIsLoadingFile(false)
 				})
 		}
-	}, [getBlobForFile, selectedFile])
+	}, [getBlobUrlForFile, selectedFile])
 
 	// --------------------------------------------------------------------------------------------
 

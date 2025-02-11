@@ -6,6 +6,8 @@ import { isVideo } from '../utils/mimeTypes'
 import '../css/VideoPlayer.css'
 import { DataContext } from '../api-google/DataContext'
 
+// TODO: COPY SLIDESHOW: (replace `downloadFile()` 20250210)
+
 const VideoPlayer: React.FC = () => {
 	const { mediaFiles, downloadFile } = useContext(DataContext)
 	//

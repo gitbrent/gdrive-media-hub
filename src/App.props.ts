@@ -2,8 +2,8 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20250208-1420'
-export const APP_VER = '2.0.0-WIP'
+export const APP_BLD = '20250210-1820'
+export const APP_VER = '2.0.0-WIP-VITE-NEW_API'
 
 // ============================================================================
 
@@ -99,21 +99,6 @@ export const FileSizeThresholds = {
 	Giant: 10 * 1024 * 1024, // files up to 10MB
 	Huge: 25 * 1024 * 1024,  // files up to 25MB
 }
-
-// ----------------------------------------------------------------------------
-/*
-export enum AuthState {
-	Authenticated = 'Authenticated',
-	Unauthenticated = 'Unauthenticated',
-	Expired = 'Expired',
-}
-export interface IAuthState {
-	status: AuthState
-	userName: string
-	userPict: string
-}
-*/
-// ----------------------------------------------------------------------------
 
 export interface IGapiFile extends gapi.client.drive.File {
 	/**

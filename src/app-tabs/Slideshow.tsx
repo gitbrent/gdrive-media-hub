@@ -12,7 +12,7 @@ enum SlideShowDelay {
 }
 
 const Slideshow: React.FC = () => {
-	const { mediaFiles, downloadFile, getBlobUrlForFile } = useContext(DataContext)
+	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
 	//
 	const [randomizedImages, setRandomizedImages] = useState<IMediaFile[]>([])
 	const [filteredImages, setFilteredImages] = useState<IMediaFile[]>([])
@@ -24,6 +24,7 @@ const Slideshow: React.FC = () => {
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
 	const [currentImageUrl, setCurrentImageUrl] = useState('')
+	const [remainingSecs, setRemainingSecs] = useState(optSlideshowSecs)
 
 	/**
 	 * filter images from all files and shuffle at startup
@@ -43,8 +44,10 @@ const Slideshow: React.FC = () => {
 	useEffect(() => {
 		const loadImage = async () => {
 			const currentImage = filteredImages[currIndex];
-			const imageBlob = await getBlobUrlForFile(currentImage.id) || '';
-			setCurrentImageUrl(imageBlob);
+			if (currentImage?.id) {
+				const imageBlob = await getBlobUrlForFile(currentImage.id) || '';
+				setCurrentImageUrl(imageBlob);
+			}
 		};
 		loadImage();
 		// IMPORTANT: Done include `filteredImages` or `getBlobUrlForFile` in the dependencies array!!!
@@ -56,17 +59,17 @@ const Slideshow: React.FC = () => {
 		if (isPaused) return
 
 		const prefetchImages = async () => {
-			for (let i = 1; i <= 3; i++) {
+			for (let i = 1; i <= 2; i++) {
 				const nextIndex = (currIndex + i) % filteredImages.length;
 				const nextImage = filteredImages[nextIndex];
 				if (nextImage && !nextImage.original) {
-					await downloadFile(nextImage.id);
+					await getBlobUrlForFile(nextImage.id);
 				}
 			}
 		};
 		prefetchImages();
 
-		// IMPORTANT: Done include `filteredImages` or `downloadFile` in the dependencies array, or RACE CONDITION!!
+		// IMPORTANT: Done include `filteredImages` or `getBlobUrlForFile` in the dependencies array, or RACE CONDITION!!
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currIndex, isPaused]);
 
@@ -135,6 +138,18 @@ const Slideshow: React.FC = () => {
 		return () => clearInterval(interval)
 	}, [isPaused, optSlideshowSecs, filteredImages.length])
 
+	// Update remaining seconds
+	useEffect(() => {
+		if (isPaused) return
+
+		setRemainingSecs(optSlideshowSecs)
+		const interval = setInterval(() => {
+			setRemainingSecs((prevSecs) => (prevSecs > 1 ? prevSecs - 1 : optSlideshowSecs))
+		}, 1000)
+
+		return () => clearInterval(interval)
+	}, [isPaused, optSlideshowSecs])
+
 	// --------------------------------------------------------------------------------------------
 
 	function renderTopBar(): JSX.Element {
@@ -146,7 +161,7 @@ const Slideshow: React.FC = () => {
 							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause (space)">
 								{isPaused
 									? <span><i className='bi-play  me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Play</span></span>
-									: <span><i className='bi-pause me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Pause</span></span>
+									: <span><i className='bi-pause me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Pause ({remainingSecs} sec)</span></span>
 								}
 							</button>
 						</div>

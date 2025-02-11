@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactNode, useContext } from 'react'
-import { IMediaFile } from '../App.props'
+import { IMediaFile, log } from '../App.props'
 import { listFiles, getCurrentUserProfile } from '.'
 import { isGif, isImage, isVideo } from './utils/fileHelpers'
 import { AuthContext } from './AuthContext'
@@ -17,7 +17,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const { isSignedIn } = useContext(AuthContext)
 
 	const refreshData = async () => {
-		console.log('[DataProvider] Refreshing data...');
+		log(2, `[DataProvider] refreshData!`)
 		try {
 			setIsLoading(true);
 			const gapiFiles = await listFiles();
@@ -39,12 +39,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	}
 
 	useEffect(() => {
-		console.log('[DataProvider] isSignedIn', isSignedIn);
+		log(2, `[DataProvider] isSignedIn = ${isSignedIn}`)
 		if (isSignedIn) refreshData();
 	}, [isSignedIn])
 
+	// TODO: REMOVE - update VideoPlayer to be like SlideShow, then no other calls to this exist [20250210]
 	const downloadFile = async (fileId: string): Promise<boolean> => {
 		try {
+			log(2, `[DataProvider] downloadFile = ${fileId}`)
 			const file = mediaFiles.find((item) => item.id === fileId);
 			if (!file) {
 				console.warn(`File not found: "${fileId}"`);
@@ -59,9 +61,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 			const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
+				headers: { Authorization: `Bearer ${accessToken}` },
 			});
 
 			if (response.ok) {
@@ -109,7 +109,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 					return false;
 				}
 			} else {
-				console.error('Failed to fetch file content.');
+				console.error('Failed to fetch file content. ', response);
 				return false;
 			}
 		} catch (error) {
@@ -118,6 +118,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		}
 	}
 
+	// TODO: Unused??? [20250210]
 	const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
 		setIsLoading(true);
 		try {
@@ -147,9 +148,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 			const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
 				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
+				headers: { Authorization: `Bearer ${accessToken}` },
 			});
 
 			if (response.ok) {
@@ -169,7 +168,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	 * @param fileId The ID of the file.
 	 * @returns The blob URL as a string, or null if an error occurs.
 	 */
-	const getBlobForFile = async (fileId: string): Promise<string | null> => {
+	const getBlobUrlForFile = async (fileId: string): Promise<string | null> => {
 		if (blobUrlCache[fileId]) {
 			// Return the cached blob URL
 			return blobUrlCache[fileId];
@@ -189,7 +188,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 	return (
 		<DataContext.Provider
-			value={{ mediaFiles, userProfile, refreshData, isLoading, downloadFile, loadPageImages, getBlobForFile }}>
+			value={{ mediaFiles, userProfile, refreshData, isLoading, downloadFile, loadPageImages, getBlobUrlForFile }}>
 			{children}
 		</DataContext.Provider>
 	)

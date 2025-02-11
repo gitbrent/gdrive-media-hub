@@ -15,25 +15,25 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
 	const [touchEnd, setTouchEnd] = useState<number | null>(null)
-	const { getBlobForFile } = useContext(DataContext)
+	const { getBlobUrlForFile } = useContext(DataContext)
 
 	const handleFileClick = useCallback(async (file: IGapiFile) => {
 		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
 			setIsMediaLoading(true)
 
-			const original = await getBlobForFile(file.id)
+			const original = await getBlobUrlForFile(file.id)
 			if (original) {
 				setSelectedFile({ ...file, original: original })
 			}
 			else {
-				console.error('unable to getBlobForFile() for file!')
+				console.error('unable to getBlobUrlForFile() for file!')
 			}
 
 			setIsMediaLoading(false)
 		} else {
 			// TODO: Handle error scenario (e.g., show an error message)
 		}
-	}, [getBlobForFile])
+	}, [getBlobUrlForFile])
 
 	const navigateToNextFile = useCallback(() => {
 		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
