@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
+import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
 import { isImage } from '../utils/mimeTypes'
-import { DataContext } from '../api-google/DataContext'
 import AlertNoImages from '../components/AlertNoImages'
 import '../css/Slideshow.css'
 
@@ -12,7 +12,7 @@ enum SlideShowDelay {
 }
 
 const Slideshow: React.FC = () => {
-	const { mediaFiles, downloadFile } = useContext(DataContext)
+	const { mediaFiles, downloadFile, getBlobUrlForFile } = useContext(DataContext)
 	//
 	const [randomizedImages, setRandomizedImages] = useState<IMediaFile[]>([])
 	const [filteredImages, setFilteredImages] = useState<IMediaFile[]>([])
@@ -41,36 +41,20 @@ const Slideshow: React.FC = () => {
 	}, [randomizedImages, optSchWord])
 
 	useEffect(() => {
-		if (filteredImages[currIndex]?.id && !filteredImages[currIndex]?.original) {
-			downloadFile(filteredImages[currIndex].id).then(() => {
-				setCurrentImageUrl(filteredImages[currIndex].original || '')
-			})
-		}
-		else {
-			setCurrentImageUrl(filteredImages[currIndex]?.original || '')
-		}
-	}, [currIndex, downloadFile, filteredImages])
-
-	// Load current image
-	useEffect(() => {
-		let isMounted = true;
 		const loadImage = async () => {
 			const currentImage = filteredImages[currIndex];
-			if (currentImage?.id && !currentImage?.original) {
-				await downloadFile(currentImage.id);
-			}
-			if (isMounted) {
-				setCurrentImageUrl(currentImage?.original || '');
-			}
+			const imageBlob = await getBlobUrlForFile(currentImage.id) || '';
+			setCurrentImageUrl(imageBlob);
 		};
 		loadImage();
-		return () => {
-			isMounted = false;
-		};
-	}, [currIndex, downloadFile, filteredImages]);
+		// IMPORTANT: Done include `filteredImages` or `getBlobUrlForFile` in the dependencies array!!!
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currIndex, filteredImages.length]);
 
 	// Pre-fetch next images
 	useEffect(() => {
+		if (isPaused) return
+
 		const prefetchImages = async () => {
 			for (let i = 1; i <= 3; i++) {
 				const nextIndex = (currIndex + i) % filteredImages.length;
@@ -81,7 +65,10 @@ const Slideshow: React.FC = () => {
 			}
 		};
 		prefetchImages();
-	}, [currIndex, downloadFile, filteredImages]);
+
+		// IMPORTANT: Done include `filteredImages` or `downloadFile` in the dependencies array, or RACE CONDITION!!
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currIndex, isPaused]);
 
 	/**
 	 * Handle resetting of current index when search word entered
