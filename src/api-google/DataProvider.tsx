@@ -186,9 +186,27 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		}
 	}
 
+	/**
+	 * Releases all blob URLs from the cache.
+	 */
+	const releaseAllBlobUrls = () => {
+		function releaseBlobUrl(fileId: string) {
+			const blobUrl = blobUrlCache[fileId];
+			if (blobUrl) {
+				URL.revokeObjectURL(blobUrl);
+				delete blobUrlCache[fileId];
+			}
+		}
+
+		Object.keys(blobUrlCache).forEach(releaseBlobUrl);
+	}
+
 	return (
 		<DataContext.Provider
-			value={{ mediaFiles, userProfile, refreshData, isLoading, downloadFile, loadPageImages, getBlobUrlForFile }}>
+			value={{
+				mediaFiles, userProfile, refreshData, isLoading, downloadFile,
+				loadPageImages, getBlobUrlForFile, releaseAllBlobUrls
+			}}>
 			{children}
 		</DataContext.Provider>
 	)

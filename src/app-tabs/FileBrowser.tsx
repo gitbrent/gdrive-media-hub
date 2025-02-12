@@ -3,7 +3,6 @@ import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { getRootFolderId, fetchFolderContents } from '../api-google'
 import { DataContext } from '../api-google/DataContext'
-import { releaseAllBlobUrls } from '../api'
 import FileBrowViewList from '../components/FileBrowViewList'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
@@ -25,7 +24,7 @@ const FileBrowser: React.FC = () => {
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 	//
-	const { mediaFiles, isLoading } = useContext(DataContext)
+	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -68,6 +67,7 @@ const FileBrowser: React.FC = () => {
 			window.removeEventListener('pagehide', releaseAllBlobUrls)
 			window.removeEventListener('visibilitychange', handleVisibilityChange)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	// --------------------------------------------------------------------------------------------

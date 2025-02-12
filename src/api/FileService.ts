@@ -1,8 +1,5 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
 import { loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
-//import { getAccessToken } from './AuthService'
-
-const blobUrlCache: Record<string, string> = {}
 
 export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
 	// STEP 1:
@@ -84,55 +81,4 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 
 	// D: done
 	return allFiles
-}
-
-/*
-export const fetchFileImgBlob = async (fileId: IGapiFile['id']) => {
-	try {
-		return fileId ?
-			await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-				method: 'GET',
-				headers: { Authorization: `Bearer ${getAccessToken()}` },
-			})
-			:
-			false
-	}
-	catch (ex) {
-		console.error(ex)
-		return false
-	}
-}
-
-export const getBlobForFile = async (fileId: IGapiFile['id']): Promise<string | null> => {
-	if (blobUrlCache[fileId]) {
-		return blobUrlCache[fileId]
-	}
-	else {
-		const response = await fetchFileImgBlob(fileId)
-		if (response) {
-			const blob = await response.blob()
-			const blobUrl = URL.createObjectURL(blob)
-			blobUrlCache[fileId] = blobUrl
-			return blobUrl
-		}
-		else {
-			return null
-		}
-	}
-}
-*/
-
-// TODO: WIP:
-// 20250208: BELOW is still used - merge this file with new driveService.ts, then remove it
-
-export function releaseAllBlobUrls() {
-	function releaseBlobUrl(fileId: string) {
-		const blobUrl = blobUrlCache[fileId]
-		if (blobUrl) {
-			URL.revokeObjectURL(blobUrl)
-			delete blobUrlCache[fileId]
-		}
-	}
-
-	Object.keys(blobUrlCache).forEach(releaseBlobUrl)
 }
