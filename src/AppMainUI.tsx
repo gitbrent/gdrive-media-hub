@@ -30,6 +30,21 @@ export default function AppMainUI() {
 
 	// --------------------------------------------------------------------------------------------
 
+	function renderLogin(): JSX.Element {
+		return (
+			<section id="contHome" className="m-5">
+				<div id="loginCont" className="text-center bg-black p-5 rounded">
+					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
+					<div className="my-3">
+						<div className="display-6">Google Drive</div>
+						<div className="display-6">Media Viewer</div>
+					</div>
+					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={signIn}>Sign In with Google</button>
+				</div>
+			</section>
+		)
+	}
+
 	/**
 	 * @see https://getbootstrap.com/docs/5.3/utilities/background/
 	 */
@@ -142,9 +157,7 @@ export default function AppMainUI() {
 	return (
 		<section>
 			{!isSignedIn ?
-				<div className='text-center m-5'>
-					<button type='button' className='btn btn-lg bg-success' onClick={signIn}>Sign In with Google</button>
-				</div>
+				renderLogin()
 				:
 				<>
 					{renderTopBar()}
