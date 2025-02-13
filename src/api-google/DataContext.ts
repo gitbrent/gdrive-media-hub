@@ -7,7 +7,6 @@ interface DataContextProps {
 	refreshData: () => void;
 	isLoading: boolean;
 	downloadFile: (fileId: string) => Promise<boolean>;
-	loadPageImages: (fileIds: string[]) => Promise<boolean>;
 	getBlobUrlForFile: (fileId: string) => Promise<string | null>;
 	releaseAllBlobUrls: () => void;
 }
@@ -18,7 +17,6 @@ export const DataContext = createContext<DataContextProps>({
 	refreshData: () => { },
 	isLoading: false,
 	downloadFile: async () => false,
-	loadPageImages: async () => false,
 	getBlobUrlForFile: async () => '',
 	releaseAllBlobUrls: () => { },
 });

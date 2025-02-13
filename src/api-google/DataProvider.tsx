@@ -118,21 +118,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		}
 	}
 
-	// TODO: Unused??? [20250210]
-	const loadPageImages = async (fileIds: string[]): Promise<boolean> => {
-		setIsLoading(true);
-		try {
-			const downloadPromises = fileIds.map(downloadFile);
-			const results = await Promise.all(downloadPromises);
-			setIsLoading(false);
-			return results.every(Boolean);
-		} catch (error) {
-			console.error('Failed to load page images:', error);
-			setIsLoading(false);
-			return false;
-		}
-	}
-
 	/**
 	 * Fetches the file content as a blob from Google Drive.
 	 * @param fileId The ID of the file to fetch.
@@ -204,8 +189,8 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	return (
 		<DataContext.Provider
 			value={{
-				mediaFiles, userProfile, refreshData, isLoading, downloadFile,
-				loadPageImages, getBlobUrlForFile, releaseAllBlobUrls
+				mediaFiles, userProfile, refreshData, isLoading,
+				downloadFile, getBlobUrlForFile, releaseAllBlobUrls
 			}}>
 			{children}
 		</DataContext.Provider>
