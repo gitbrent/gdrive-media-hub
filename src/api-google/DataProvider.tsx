@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactNode, useContext } from 'react'
-import { IMediaFile, log } from '../App.props'
-import { listFiles, getCurrentUserProfile } from '.'
 import { isGif, isImage, isVideo } from './utils/fileHelpers'
+import { listFiles, getCurrentUserProfile } from '.'
+import { IMediaFile, log } from '../App.props'
 import { AuthContext } from './AuthContext'
 import { DataContext } from './DataContext'
 
@@ -10,10 +10,10 @@ interface DataProviderProps {
 }
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
-	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([])
 	const [userProfile, setUserProfile] = useState<gapi.auth2.BasicProfile | null>(null)
-	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([])
 	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
+	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const { isSignedIn } = useContext(AuthContext)
 
 	const refreshData = async () => {
