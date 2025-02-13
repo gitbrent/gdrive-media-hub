@@ -1,14 +1,14 @@
 {
 	"name": "gdrive-media-hub",
-	"version": "2.0.0-beta.4",
+	"version": "2.0.0-beta.5",
 	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "cl && tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"deploy": "tsc -b && vite build && firebase deploy"
+		"deploy": "cl && tsc -b && vite build && firebase deploy"
 	},
 	"dependencies": {
 		"@popperjs/core": "^2.11.6",
