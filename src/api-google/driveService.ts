@@ -55,7 +55,21 @@ export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 			pageSize: 1000,
 		});
 
-		const files = response.result.files;
+		let files = response.result.files || [];
+
+		// TODO: poor-mans paging (just grab 2000)
+		const pageToken = response.result.nextPageToken
+
+		if (files && pageToken) {
+			const response = await gapi.client.drive.files.list({
+				q: "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')",
+				fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
+				pageSize: 1000,
+				pageToken: pageToken,
+			})
+			files = files.concat(response.result.files || [])
+		}
+
 		return files || [];
 	} catch (error) {
 		console.error('Error fetching files:', error);
