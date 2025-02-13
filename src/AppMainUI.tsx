@@ -19,15 +19,12 @@ enum AppTabs {
 }
 
 export default function AppMainUI() {
+	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
 	const { userProfile, refreshData } = useContext(DataContext)
-	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 
 	useEffect(() => {
-		if (isSignedIn) {
-			console.log('[useEffect] isSignedIn! Calling "refreshData()"')
-			refreshData()
-		}
+		if (isSignedIn) refreshData()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isSignedIn])
 
