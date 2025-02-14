@@ -1,15 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
+import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
+import { isVideo } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
-import { isVideo } from '../utils/mimeTypes'
 import '../css/VideoPlayer.css'
-import { DataContext } from '../api-google/DataContext'
-
-// TODO: COPY SLIDESHOW: (replace `downloadFile()` 20250210)
 
 const VideoPlayer: React.FC = () => {
-	const { mediaFiles, downloadFile } = useContext(DataContext)
+	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
 	//
 	const [allVideos, setAllVideos] = useState<IMediaFile[]>([])
 	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
@@ -37,14 +35,14 @@ const VideoPlayer: React.FC = () => {
 	}, [allVideos, optSchWord])
 
 	useEffect(() => {
-		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.original) {
-			downloadFile(shfImages[currIndex].id).then(() => {
-				setCurrentImageUrl(shfImages[currIndex].original || '')
-			})
-		}
-		else {
-			setCurrentImageUrl(shfImages[currIndex]?.original || '')
-		}
+		const loadImage = async () => {
+			const currentImage = shfImages[currIndex];
+			if (currentImage?.id) {
+				const imageBlob = await getBlobUrlForFile(currentImage.id) || '';
+				setCurrentImageUrl(imageBlob);
+			}
+		};
+		loadImage();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currIndex, shfImages])
 
