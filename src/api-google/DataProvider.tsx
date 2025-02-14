@@ -1,5 +1,4 @@
 import React, { useState, useEffect, ReactNode, useContext } from 'react'
-import { isGif, isImage, isVideo } from './utils/fileHelpers'
 import { listFiles, getCurrentUserProfile } from '.'
 import { IMediaFile, log } from '../App.props'
 import { AuthContext } from './AuthContext'
@@ -42,81 +41,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		log(2, `[DataProvider] isSignedIn = ${isSignedIn}`)
 		if (isSignedIn) refreshData();
 	}, [isSignedIn])
-
-	// TODO: REMOVE - update VideoPlayer to be like SlideShow, then no other calls to this exist [20250210]
-	const downloadFile = async (fileId: string): Promise<boolean> => {
-		try {
-			log(2, `[DataProvider] downloadFile = ${fileId}`)
-			const file = mediaFiles.find((item) => item.id === fileId);
-			if (!file) {
-				console.warn(`File not found: "${fileId}"`);
-				return false;
-			}
-
-			const accessToken = gapi.auth.getToken()?.access_token;
-			if (!accessToken) {
-				console.error('Access token is not available.');
-				return false;
-			}
-
-			const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-				method: 'GET',
-				headers: { Authorization: `Bearer ${accessToken}` },
-			});
-
-			if (response.ok) {
-				const blob = await response.blob();
-				const objectUrl = URL.createObjectURL(blob);
-
-				if (isImage(file) || isGif(file)) {
-					return new Promise((resolve) => {
-						const img = new Image();
-						img.src = objectUrl;
-						img.onload = () => {
-							const updatedFiles = mediaFiles.map((f) =>
-								f.id === fileId
-									? {
-										...f,
-										original: objectUrl,
-										width: img.width || 100,
-										height: img.height || 100,
-									}
-									: f
-							);
-							setMediaFiles(updatedFiles);
-							resolve(true);
-						};
-						img.onerror = () => {
-							console.error('Error loading image');
-							resolve(false);
-						};
-					});
-				} else if (isVideo(file)) {
-					const updatedFiles = mediaFiles.map((f) =>
-						f.id === fileId
-							? {
-								...f,
-								original: objectUrl,
-								// Optionally set width and height
-							}
-							: f
-					);
-					setMediaFiles(updatedFiles);
-					return true;
-				} else {
-					console.warn(`Unknown mimeType: ${file.mimeType}`);
-					console.warn(`File name: ${file.name}`);
-					return false;
-				}
-			} else {
-				console.error('Failed to fetch file content. ', response);
-				return false;
-			}
-		} catch (error) {
-			console.error(`Failed to download file with ID ${fileId}:`, error);
-			return false;
-		}
-	}
 
 	/**
 	 * Fetches the file content as a blob from Google Drive.
@@ -188,10 +112,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 	return (
 		<DataContext.Provider
-			value={{
-				mediaFiles, userProfile, refreshData, isLoading,
-				downloadFile, getBlobUrlForFile, releaseAllBlobUrls
-			}}>
+			value={{ mediaFiles, userProfile, refreshData, isLoading, getBlobUrlForFile, releaseAllBlobUrls }}>
 			{children}
 		</DataContext.Provider>
 	)

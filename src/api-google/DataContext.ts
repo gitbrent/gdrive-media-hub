@@ -6,7 +6,6 @@ interface DataContextProps {
 	userProfile: gapi.auth2.BasicProfile | null;
 	refreshData: () => void;
 	isLoading: boolean;
-	downloadFile: (fileId: string) => Promise<boolean>;
 	getBlobUrlForFile: (fileId: string) => Promise<string | null>;
 	releaseAllBlobUrls: () => void;
 }
@@ -16,7 +15,6 @@ export const DataContext = createContext<DataContextProps>({
 	userProfile: null,
 	refreshData: () => { },
 	isLoading: false,
-	downloadFile: async () => false,
 	getBlobUrlForFile: async () => '',
 	releaseAllBlobUrls: () => { },
 });
