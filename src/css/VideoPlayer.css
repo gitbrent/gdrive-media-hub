@@ -9,7 +9,7 @@
 	/* Make video responsive to container width */
 	height: auto;
 	/* Maintain aspect ratio */
-	max-height: calc(100vh - 70px);
+	max-height: calc(100vh - 70px - 110px);
 	/* Ensure it does not exceed the height of the viewport */
 	object-fit: contain;
 	/* Contain the video within the element bounds */

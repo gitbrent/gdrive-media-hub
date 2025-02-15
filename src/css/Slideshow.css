@@ -8,7 +8,7 @@
 	justify-content: center;
 	align-items: center;
 	/* height: 100vh; */
-	height: calc(100vh - 56px - 64px - 35px);
+	height: calc(100vh - 56px - 64px - 35px - 20px);
 	height: calc(-webkit-fill-available - 56px - 64px);
 	/* .navbar .sticky-top in BS-5.3.0 is 62px (70px with buttons) */
 }
