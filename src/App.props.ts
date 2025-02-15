@@ -2,8 +2,8 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20250210-1820'
-export const APP_VER = '2.0.0-WIP-VITE-NEW_API'
+export const APP_BLD = '20250213-1820'
+export const APP_VER = '1.1.0-WIP'
 
 // ============================================================================
 
