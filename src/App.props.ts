@@ -2,8 +2,8 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20240721-1212'
-export const APP_VER = '2.0.0-WIP'
+export const APP_BLD = '20250210-1820'
+export const APP_VER = '2.0.0-WIP-VITE-NEW_API'
 
 // ============================================================================
 
@@ -64,7 +64,8 @@ export const formatDate = (dateString: string, format: 'full' | 'short' = 'full'
 
 export enum OPT_SORTBY {
 	modDate = 'Modified Date',
-	filName = 'File Name'
+	filName = 'File Name',
+	filSize = 'File Size'
 }
 
 export enum OPT_SORTDIR {
@@ -99,24 +100,10 @@ export const FileSizeThresholds = {
 	Huge: 25 * 1024 * 1024,  // files up to 25MB
 }
 
-// ----------------------------------------------------------------------------
-
-export enum AuthState {
-	Authenticated = 'Authenticated',
-	Unauthenticated = 'Unauthenticated',
-	Expired = 'Expired',
-}
-export interface IAuthState {
-	status: AuthState
-	userName: string
-	userPict: string
-}
-
-// ----------------------------------------------------------------------------
-
 export interface IGapiFile extends gapi.client.drive.File {
 	/**
-	 * id
+	 * file id
+	 * @summary optional in gapi client, made required to avoid checking constantly!
 	 * @example "1l5mVFTysjVoZ14_unp5F8F3tLH7Vkbtc"
 	 */
 	id: string
@@ -145,7 +132,7 @@ export interface IGapiFile extends gapi.client.drive.File {
 	 * IDs of parent folders
 	 * @example ["1jjOs28hGj3as3vorJveCI00NY1PmDbTr"]
 	 */
-	parents: string[]
+	parents?: string[] | undefined
 }
 
 // NOTE: prop names follow [PhotoswipeGalleryItems] **DO NOT RENAME**

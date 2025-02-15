@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
+import { isVideo } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
-import { isVideo } from '../utils/mimeTypes'
 import '../css/VideoPlayer.css'
 
-export interface Props {
-	allFiles: IMediaFile[];
-	downloadFile: (fileId: string) => Promise<boolean>;
-}
-
-const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
+const VideoPlayer: React.FC = () => {
+	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
+	//
 	const [allVideos, setAllVideos] = useState<IMediaFile[]>([])
 	const [shfImages, setShfImages] = useState<IMediaFile[]>([])
 	const [currIndex, setCurrIndex] = useState(0)
@@ -22,10 +20,10 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	 * filter videos from all files and shuffle at startup
 	 */
 	useEffect(() => {
-		setAllVideos([...allFiles]
+		setAllVideos([...mediaFiles]
 			.filter((item) => isVideo(item))
 			.sort(() => Math.random() - 0.5))
-	}, [allFiles])
+	}, [mediaFiles])
 
 	/**
 	 * update shuffled videos when search term changes
@@ -37,14 +35,15 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 	}, [allVideos, optSchWord])
 
 	useEffect(() => {
-		if (shfImages[currIndex]?.id && !shfImages[currIndex]?.original) {
-			downloadFile(shfImages[currIndex].id).then(() => {
-				setCurrentImageUrl(shfImages[currIndex].original || '')
-			})
-		}
-		else {
-			setCurrentImageUrl(shfImages[currIndex]?.original || '')
-		}
+		const loadImage = async () => {
+			const currentImage = shfImages[currIndex];
+			if (currentImage?.id) {
+				const imageBlob = await getBlobUrlForFile(currentImage.id) || '';
+				setCurrentImageUrl(imageBlob);
+			}
+		};
+		loadImage();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currIndex, shfImages])
 
 	useEffect(() => {
@@ -74,7 +73,7 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar my-3">
+			<nav className="navbar mb-3">
 				<div className="container-fluid">
 					<div className="row w-100 align-items-center justify-content-between">
 						<div className="col">
@@ -88,10 +87,10 @@ const VideoPlayer: React.FC<Props> = ({ allFiles, downloadFile }) => {
 							</button>
 						</div>
 						<div className="col mt-3 mt-md-0">
-							<form className="d-flex" role="search">
+							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</form>
+							</div>
 						</div>
 						<div className="col-auto mt-3 mt-md-0">
 							<div className="text-muted">

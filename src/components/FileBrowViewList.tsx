@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { IGapiFile, IGapiFolder, IMediaFile, formatBytesToMB, formatDate } from '../App.props'
 import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
-import { isFolder, isImage, isMedia, isVideo } from '../utils/mimeTypes'
-import { getBlobForFile } from '../api'
+import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
+import { DataContext } from '../api-google/DataContext'
 
 interface Props {
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
@@ -15,24 +15,45 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 	const [isMediaLoading, setIsMediaLoading] = useState(false)
 	const [touchStart, setTouchStart] = useState<number | null>(null)
 	const [touchEnd, setTouchEnd] = useState<number | null>(null)
+	const { getBlobUrlForFile } = useContext(DataContext)
 
-	const handleFileClick = async (file: IGapiFile) => {
+	const handleFileClick = useCallback(async (file: IGapiFile) => {
 		if (file.mimeType.includes('image/') || file.mimeType.includes('video/')) {
 			setIsMediaLoading(true)
 
-			const original = await getBlobForFile(file.id)
+			const original = await getBlobUrlForFile(file.id)
 			if (original) {
 				setSelectedFile({ ...file, original: original })
 			}
 			else {
-				console.error('unable to getBlobForFile() for file!')
+				console.error('unable to getBlobUrlForFile() for file!')
 			}
 
 			setIsMediaLoading(false)
 		} else {
 			// TODO: Handle error scenario (e.g., show an error message)
 		}
-	}
+	}, [getBlobUrlForFile])
+
+	const navigateToNextFile = useCallback(() => {
+		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
+		if (currentIndex >= 0 && currentIndex < currFolderContents.length - 1) {
+			const nextFile = currFolderContents[currentIndex + 1]
+			if (nextFile.mimeType.includes('image/') || nextFile.mimeType.includes('video/')) {
+				handleFileClick(nextFile)
+			}
+		}
+	}, [currFolderContents, handleFileClick, selectedFile?.id])
+
+	const navigateToPrevFile = useCallback(() => {
+		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
+		if (currentIndex > 0) {
+			const prevFile = currFolderContents[currentIndex - 1]
+			if (prevFile.mimeType.includes('image/') || prevFile.mimeType.includes('video/')) {
+				handleFileClick(prevFile)
+			}
+		}
+	}, [currFolderContents, handleFileClick, selectedFile?.id])
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -49,27 +70,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [currFolderContents, selectedFile])
-
-	const navigateToNextFile = () => {
-		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
-		if (currentIndex >= 0 && currentIndex < currFolderContents.length - 1) {
-			const nextFile = currFolderContents[currentIndex + 1]
-			if (nextFile.mimeType.includes('image/') || nextFile.mimeType.includes('video/')) {
-				handleFileClick(nextFile)
-			}
-		}
-	}
-
-	const navigateToPrevFile = () => {
-		const currentIndex = currFolderContents.findIndex(item => item.id === selectedFile?.id)
-		if (currentIndex > 0) {
-			const prevFile = currFolderContents[currentIndex - 1]
-			if (prevFile.mimeType.includes('image/') || prevFile.mimeType.includes('video/')) {
-				handleFileClick(prevFile)
-			}
-		}
-	}
+	}, [currFolderContents, navigateToNextFile, navigateToPrevFile, selectedFile])
 
 	useEffect(() => {
 		if (!touchStart || !touchEnd) return
@@ -169,9 +170,11 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 													? 'fs-4 bi-folder-fill'
 													: isImage(item)
 														? 'fs-4 bi-image-fill'
-														: isVideo(item)
-															? 'fs-4 bi-camera-video-fill'
-															: 'fs-4 bi-file-x text-light'
+														: isGif(item)
+															? 'fs-4 bi-play-circle'
+															: isVideo(item)
+																? 'fs-4 bi-play-btn-fill'
+																: 'fs-4 bi-file-x text-light'
 										} />
 									</div>
 								</td>

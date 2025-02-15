@@ -1,5 +1,5 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
-import { authUserName } from '../AppMainLogic'
+import { getCurrentUserProfile } from '../api-google'
 
 const CACHE_DBASE_VER = 6
 const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence we break into 10k chunks
@@ -7,7 +7,11 @@ const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence 
 // PRIVATE
 
 function getDatabaseName() {
-	return `${authUserName}-File-Cache`
+	const brent1 = getCurrentUserProfile()
+	const brent2 = brent1?.getName
+	console.log(brent2) // DEBUG: WIP:
+
+	return `${brent2}-File-Cache`
 }
 
 // PUBLIC
