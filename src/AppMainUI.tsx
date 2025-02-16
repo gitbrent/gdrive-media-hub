@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
+import { Routes, Route, Link } from 'react-router'
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
 import Home from './app-tabs/Home'
@@ -9,17 +10,7 @@ import VideoPlayer from './app-tabs/VideoPlayer'
 import UserProfile from './app-tabs/UserProfile'
 import './css/AppMainUI.css'
 
-enum AppTabs {
-	Home = 'Home',
-	FileBrowser = 'FileBrowser',
-	ImageGrid = 'ImageGrid',
-	SlideShow = 'SlideShow',
-	VideoPlayer = 'VideoPlayer',
-	UserProfile = 'UserProfile',
-}
-
 export default function AppMainUI() {
-	const [currentTab, setCurrentTab] = useState(AppTabs.Home)
 	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
 	const { userProfile, refreshData } = useContext(DataContext)
 
@@ -61,37 +52,33 @@ export default function AppMainUI() {
 					<div className="collapse navbar-collapse" id="navbarSupportedContent">
 						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
 							<li className="nav-item">
-								<a href="#" onClick={() => setCurrentTab(AppTabs.Home)} className={`nav-link ${currentTab === AppTabs.Home ? 'active' : ''}`} title="home" aria-label="home">
+								<Link to="/" className="nav-link" title="home" aria-label="home">
 									Home
-								</a>
+								</Link>
 							</li>
 							{userProfile &&
-								<li className="nav-item">
-									<a href="#" onClick={() => setCurrentTab(AppTabs.FileBrowser)} className={`nav-link ${currentTab === AppTabs.FileBrowser ? 'active' : ''}`} title="file browser" aria-label="file browser">
-										File Browser
-									</a>
-								</li>
-							}
-							{userProfile &&
-								<li className="nav-item">
-									<a href="#" onClick={() => setCurrentTab(AppTabs.ImageGrid)} className={`nav-link ${currentTab === AppTabs.ImageGrid ? 'active' : ''}`} title="image grid" aria-label="image grid">
-										Image Grid
-									</a>
-								</li>
-							}
-							{userProfile &&
-								<li className="nav-item">
-									<a href="#" onClick={() => setCurrentTab(AppTabs.SlideShow)} className={`nav-link ${currentTab === AppTabs.SlideShow ? 'active' : ''}`} title="slide show" aria-label="slide show">
-										Slide Show
-									</a>
-								</li>
-							}
-							{userProfile &&
-								<li className="nav-item">
-									<a href="#" onClick={() => setCurrentTab(AppTabs.VideoPlayer)} className={`nav-link ${currentTab === AppTabs.VideoPlayer ? 'active' : ''}`} title="video grid" aria-label="video grid">
-										Video Grid
-									</a>
-								</li>
+								<>
+									<li className="nav-item">
+										<Link to="/file-browser" className="nav-link" title="file browser" aria-label="file browser">
+											File Browser
+										</Link>
+									</li>
+									<li className="nav-item">
+										<Link to="/image-grid" className="nav-link" title="image grid" aria-label="image grid">
+											Image Grid
+										</Link>
+									</li>
+									<li className="nav-item">
+										<Link to="/slide-show" className="nav-link" title="slide show" aria-label="slide show">
+											Slide Show
+										</Link>
+									</li>
+									<li className="nav-item">
+										<Link to="/video-player" className="nav-link" title="video grid" aria-label="video grid">
+											Video Grid
+										</Link>
+									</li>
+								</>
 							}
 						</ul>
 						<div className="dropdown">
@@ -104,7 +91,7 @@ export default function AppMainUI() {
 							{userProfile ?
 								<ul className="dropdown-menu dropdown-menu-end">
 									<li>
-										<a className="dropdown-item" href="#" onClick={() => setCurrentTab(AppTabs.UserProfile)}>Profile</a>
+										<Link className="dropdown-item" to="/user-profile">Profile</Link>
 									</li>
 									<li><hr className="dropdown-divider" /></li>
 									<li>
@@ -125,35 +112,6 @@ export default function AppMainUI() {
 		)
 	}
 
-	function renderBody(): JSX.Element {
-		let returnJsx = <div>Loading...</div>
-
-		switch (currentTab) {
-			case AppTabs.Home:
-				returnJsx = <Home />
-				break
-			case AppTabs.FileBrowser:
-				returnJsx = <FileBrowser />
-				break
-			case AppTabs.ImageGrid:
-				returnJsx = <ImageGrid />
-				break
-			case AppTabs.SlideShow:
-				returnJsx = <Slideshow />
-				break
-			case AppTabs.VideoPlayer:
-				returnJsx = <VideoPlayer />
-				break
-			case AppTabs.UserProfile:
-				returnJsx = <UserProfile />
-				break
-			default:
-				returnJsx = <div />
-		}
-
-		return <main className="p-4 pt-3">{returnJsx}</main>
-	}
-
 	return (
 		<section>
 			{!isSignedIn ?
@@ -161,7 +119,17 @@ export default function AppMainUI() {
 				:
 				<>
 					{renderTopBar()}
-					{renderBody()}
+					<main className="p-4 pt-3">
+						<Routes>
+							<Route path="/" element={<Home />} />
+							<Route path="/file-browser" element={<FileBrowser />} />
+							<Route path="/image-grid" element={<ImageGrid />} />
+							<Route path="/slide-show" element={<Slideshow />} />
+							<Route path="/video-player" element={<VideoPlayer />} />
+							<Route path="/user-profile" element={<UserProfile />} />
+							<Route path="/login" element={renderLogin()} />
+						</Routes>
+					</main>
 				</>
 			}
 		</section>
