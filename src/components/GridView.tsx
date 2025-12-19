@@ -11,9 +11,10 @@ interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
 	isFolderLoading: boolean
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
+	tileSize?: 'small' | 'medium' | 'large'
 }
 
-const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
+const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick, tileSize = 'medium' }) => {
 	const SHOW_CAPTIONS = false
 	//
 	const { getBlobUrlForFile } = useContext(DataContext)
@@ -26,7 +27,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 	// --------------------------------------------------------------------------------------------
 
-	useCalcMaxGridItems(setPagingSize)
+	useCalcMaxGridItems(setPagingSize, tileSize)
 
 	/**
 	 * @summary Handle scroll event to load more items
@@ -224,7 +225,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	const renderGrid = () => {
 		return (
 			<Gallery id="contImageGrid">
-				<div id="gallery-container" className="gallery">
+				<div id="gallery-container" className={`gallery gallery-${tileSize}`}>
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
 				<div className="p-3 bg-darker text-muted text-center">

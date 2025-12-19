@@ -16,6 +16,7 @@ export default function ImageGrid() {
 	const [optSortBy, setIptSortBy] = useState<OPT_SORTBY>(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
 	const [isSearching, setIsSearching] = useState(false)
 	const { mediaFiles } = useContext(DataContext)
 
@@ -129,6 +130,28 @@ export default function ImageGrid() {
 								</button>
 							</div>
 						</div>
+						<div className="col-12 col-md-auto mt-2 mt-md-0">
+							<div className="btn-group" role="group" aria-label="tile size options">
+								<button type="button" aria-label="small tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'small' ? 'active' : ''}`}
+									title="Small tiles"
+									onClick={() => setTileSize('small')}>
+									<i className="bi-grid-3x3-gap" />
+								</button>
+								<button type="button" aria-label="medium tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'medium' ? 'active' : ''}`}
+									title="Medium tiles"
+									onClick={() => setTileSize('medium')}>
+									<i className="bi-grid" />
+								</button>
+								<button type="button" aria-label="large tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'large' ? 'active' : ''}`}
+									title="Large tiles"
+									onClick={() => setTileSize('large')}>
+									<i className="bi-grid-1x2" />
+								</button>
+							</div>
+						</div>
 						<div className="col col-md mt-2 mt-md-0">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
@@ -161,6 +184,7 @@ export default function ImageGrid() {
 					currFolderContents={filtdSortdFiles}
 					isFolderLoading={isSearching}
 					handleFolderClick={() => Promise.resolve()}
+					tileSize={tileSize}
 				/>
 				: filtdSortdFiles.length > 0 ? (
 					<AlertLoading />
