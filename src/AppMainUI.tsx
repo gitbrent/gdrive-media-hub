@@ -8,6 +8,7 @@ import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
 import UserProfile from './app-tabs/UserProfile'
+import { DEBUG, APP_VER, APP_BLD } from './App.props'
 import './css/AppMainUI.css'
 
 export default function AppMainUI() {
@@ -24,15 +25,24 @@ export default function AppMainUI() {
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center bg-black p-5 rounded">
+				<div id="loginCont" className="text-center bg-black p-5 pb-4 rounded">
 					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
-					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={signIn}>Sign In with Google</button>
+					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn()}>Sign In with Google</button>
+					<button type="button" className={`btn btn-sm btn-outline-warning w-100 mt-2 ${!DEBUG ? 'd-none' : ''}`} onClick={() => signIn(true)}>
+						Force Re-authenticate (Dev Only)
+					</button>
 					<div className="mt-3">
 						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none small">Privacy Policy</a>
+					</div>
+					<div className="mt-4">
+						<div className="d-flex justify-content-center gap-2 mt-2">
+							<span className="badge text-bg-primary">{APP_VER}</span>
+							<span className="badge text-bg-secondary">{APP_BLD}</span>
+						</div>
 					</div>
 				</div>
 			</section>
