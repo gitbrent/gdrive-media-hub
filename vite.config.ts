@@ -11,6 +11,7 @@ export default defineConfig({
 	css: {
 		preprocessorOptions: {
 			scss: {
+				api: 'modern-compiler', // Vite 7 recommends this
 				silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import'],
 				quietDeps: true, // Add this line to suppress warnings (above needed for bootstrap SCSS Dart messages)
 			},
