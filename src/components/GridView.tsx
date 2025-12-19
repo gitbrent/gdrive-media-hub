@@ -33,7 +33,13 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
-		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
+		const scrollPosition = window.innerHeight + document.documentElement.scrollTop
+		const scrollThreshold = document.documentElement.offsetHeight - 100 // Trigger 100px before bottom
+
+		// Only load more if we're near the bottom and there are more items to load
+		if (scrollPosition < scrollThreshold) return
+		if (displayedItems.length >= currFolderContents.length) return
+
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
 			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
@@ -47,7 +53,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currFolderContents])
+	}, [currFolderContents, displayedItems, pagingSize])
 
 	/**
 	 * Load initial set of items
