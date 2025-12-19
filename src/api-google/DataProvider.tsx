@@ -1,8 +1,10 @@
 import React, { useState, useEffect, ReactNode, useContext } from 'react'
-import { listFiles, getCurrentUserProfile } from '.'
+import { getCurrentUserProfile } from '.'
 import { IMediaFile, log } from '../App.props'
 import { AuthContext } from './AuthContext'
 import { DataContext } from './DataContext'
+import { getCacheTimestamp } from '../api/CacheService'
+import { fetchDriveFiles } from '../api/FileService'
 
 interface DataProviderProps {
 	children: ReactNode;
@@ -13,13 +15,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([])
 	const [blobUrlCache, setBlobUrlCache] = useState<Record<string, string>>({})
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null)
 	const { isSignedIn } = useContext(AuthContext)
 
 	const refreshData = async () => {
 		log(2, `[DataProvider] refreshData!`)
 		try {
 			setIsLoading(true);
-			const gapiFiles = await listFiles();
+			const gapiFiles = await fetchDriveFiles();
 			const mediaFiles = gapiFiles
 				.filter((file) => file.id !== undefined && file.id !== null)
 				.map((file) => ({
@@ -30,6 +33,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 			setMediaFiles(mediaFiles);
 			const profile = getCurrentUserProfile();
 			setUserProfile(profile);
+			// Fetch cache timestamp
+			const timestamp = await getCacheTimestamp();
+			setCacheTimestamp(timestamp);
 		} catch (error) {
 			console.error('Error refreshing data:', error);
 		} finally {
@@ -112,7 +118,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 	return (
 		<DataContext.Provider
-			value={{ mediaFiles, userProfile, refreshData, isLoading, getBlobUrlForFile, releaseAllBlobUrls }}>
+			value={{ mediaFiles, userProfile, refreshData, isLoading, getBlobUrlForFile, releaseAllBlobUrls, cacheTimestamp }}>
 			{children}
 		</DataContext.Provider>
 	)

@@ -1,7 +1,8 @@
 import { useContext, useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router'
+import { Routes, Route, Link, NavLink } from 'react-router'
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
+import { DEBUG, VIDEO_CAPTURE, APP_VER, APP_BLD } from './App.props'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
@@ -24,13 +25,25 @@ export default function AppMainUI() {
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center bg-black p-5 rounded">
-					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
+				<div id="loginCont" className="text-center bg-black p-5 pb-4 rounded">
+					<img src="/app-logo.png" alt="GoogleDriveLogo" className="w-25" />
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
-					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={signIn}>Sign In with Google</button>
+					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn(VIDEO_CAPTURE ? true : false)}>Sign In with Google</button>
+					<button type="button" className={`btn btn-sm btn-outline-warning w-100 mt-2 ${!DEBUG ? 'd-none' : ''}`} onClick={() => signIn(true)}>
+						Force Re-authenticate (Dev Only)
+					</button>
+					<div className="mt-3">
+						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none small">Privacy Policy</a>
+					</div>
+					<div className={`${!DEBUG ? 'd-none' : ''} mt-4`}>
+						<div className="d-flex justify-content-center gap-2 mt-2">
+							<span className="badge text-bg-primary">{APP_VER}</span>
+							<span className="badge text-bg-secondary">{APP_BLD}</span>
+						</div>
+					</div>
 				</div>
 			</section>
 		)
@@ -44,7 +57,7 @@ export default function AppMainUI() {
 			<nav className="navbar navbar-expand-lg bg-dark-subtle2 bg-body-secondary sticky-top">
 				<div className="container-fluid">
 					<a className="navbar-brand" href="#">
-						<img src="/google-drive.png" alt="Drive" width="30" height="26" />
+						<img src="/app-logo.png" alt="Drive" width="30" height="26" />
 					</a>
 					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span className="navbar-toggler-icon"></span>
@@ -52,31 +65,31 @@ export default function AppMainUI() {
 					<div className="collapse navbar-collapse" id="navbarSupportedContent">
 						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
 							<li className="nav-item">
-								<Link to="/" className="nav-link" title="home" aria-label="home">
+								<NavLink to="/" className="nav-link" title="home" aria-label="home">
 									Home
-								</Link>
+								</NavLink>
 							</li>
 							{userProfile &&
 								<>
 									<li className="nav-item">
-										<Link to="/file-browser" className="nav-link" title="file browser" aria-label="file browser">
+										<NavLink to="/file-browser" className="nav-link" title="file browser" aria-label="file browser">
 											File Browser
-										</Link>
+										</NavLink>
 									</li>
 									<li className="nav-item">
-										<Link to="/image-grid" className="nav-link" title="image grid" aria-label="image grid">
+										<NavLink to="/image-grid" className="nav-link" title="image grid" aria-label="image grid">
 											Image Grid
-										</Link>
+										</NavLink>
 									</li>
 									<li className="nav-item">
-										<Link to="/slide-show" className="nav-link" title="slide show" aria-label="slide show">
+										<NavLink to="/slide-show" className="nav-link" title="slide show" aria-label="slide show">
 											Slide Show
-										</Link>
+										</NavLink>
 									</li>
 									<li className="nav-item">
-										<Link to="/video-player" className="nav-link" title="video grid" aria-label="video grid">
+										<NavLink to="/video-player" className="nav-link" title="video grid" aria-label="video grid">
 											Video Grid
-										</Link>
+										</NavLink>
 									</li>
 								</>
 							}

@@ -2,8 +2,14 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20250213-1820'
-export const APP_VER = '1.1.0-WIP'
+export const APP_BLD = '20251219-1605'
+export const APP_VER = '1.1.0'
+
+/** Debug mode - shows development-only features like force signin and upload testing */
+export const DEBUG = import.meta.env.DEV
+
+/** Video capture mode - shows video capture and additional dev features */
+export const VIDEO_CAPTURE = true
 
 // ============================================================================
 

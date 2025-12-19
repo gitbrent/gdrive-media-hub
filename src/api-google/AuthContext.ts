@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 interface AuthContextProps {
 	isSignedIn: boolean;
-	signIn: () => void;
+	signIn: (forceConsent?: boolean) => void;
 	signOut: () => void;
 }
 

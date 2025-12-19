@@ -8,7 +8,10 @@ import AppMainUI from './AppMainUI';
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_DRIVE_CLIENT_ID;
 const API_KEY = import.meta.env.VITE_GOOGLE_DRIVE_API_KEY;
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+const SCOPES = [
+	'https://www.googleapis.com/auth/drive.readonly',
+	'https://www.googleapis.com/auth/drive.metadata.readonly'
+].join(' ');
 
 const App: React.FC = () => {
 	const [gapiInitialized, setGapiInitialized] = useState<boolean>(false);

@@ -23,25 +23,30 @@ const FileBrowser: React.FC = () => {
 	const [viewMode, setViewMode] = useState<ViewMode>('list')
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+	const [hasRootAccess, setHasRootAccess] = useState(true)
 	//
 	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
 
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Fetch root folder contents on mount
+	 * Fetch root folder contents on mount, or fallback to flat file list if root access denied
 	 */
 	useEffect(() => {
 		const loadRootFolder = async () => {
 			const rootFolderId = await getRootFolderId()
 			if (!rootFolderId) {
-				console.error('Root folder ID not found')
+				console.warn('Root folder ID not found - using flat file view')
+				setHasRootAccess(false)
+				setCurrentFolderPath([{ folderName: 'My Files', folderId: 'flat-view' }])
+				// Files will be populated from mediaFiles via the sorting effect
 				return
 			}
 			const rootContents = await fetchFolderContents(rootFolderId)
 			setCurrentFolderPath([{ folderName: 'My Drive', folderId: rootFolderId }])
 			setCurrFolderContents(rootContents.items)
 			setOrigFolderContents(rootContents.items)
+			setHasRootAccess(true)
 		}
 		loadRootFolder()
 	}, [])
@@ -111,7 +116,9 @@ const FileBrowser: React.FC = () => {
 			mimeType: string;
 		}
 
-		const sourceItems = isGlobalSearch && optSchWord ? [...mediaFiles] : [...origFolderContents]
+		// If no root access, always use mediaFiles; otherwise use origFolderContents unless global search
+		const sourceItems = !hasRootAccess ? [...mediaFiles]
+			: (isGlobalSearch && optSchWord ? [...mediaFiles] : [...origFolderContents])
 
 		const sortedContents = sourceItems.sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
 			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
@@ -140,7 +147,7 @@ const FileBrowser: React.FC = () => {
 		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 
 		setCurrFolderContents(filteredContents)
-	}, [mediaFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder])
+	}, [mediaFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder, hasRootAccess])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -228,7 +235,13 @@ const FileBrowser: React.FC = () => {
 	function renderBrowser(): JSX.Element {
 		return (
 			<section>
-				<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />
+				{hasRootAccess && <Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />}
+				{!hasRootAccess && (
+					<div className="alert alert-info mb-3" role="alert">
+						<i className="bi-info-circle me-2"></i>
+						Showing files created by this app. Full folder browsing requires additional permissions.
+					</div>
+				)}
 				{viewMode === 'grid' ?
 					<section className="bg-black h-100">
 						<GridView
