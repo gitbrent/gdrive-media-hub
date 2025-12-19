@@ -8,6 +8,7 @@ interface DataContextProps {
 	isLoading: boolean;
 	getBlobUrlForFile: (fileId: string) => Promise<string | null>;
 	releaseAllBlobUrls: () => void;
+	cacheTimestamp: number | null;
 }
 
 export const DataContext = createContext<DataContextProps>({
@@ -17,4 +18,5 @@ export const DataContext = createContext<DataContextProps>({
 	isLoading: false,
 	getBlobUrlForFile: async () => '',
 	releaseAllBlobUrls: () => { },
+	cacheTimestamp: null,
 });

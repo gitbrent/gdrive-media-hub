@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { IFileListCache, DEBUG, APP_BLD, APP_VER } from '../App.props'
+import { DEBUG, APP_BLD, APP_VER } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
@@ -11,22 +11,9 @@ interface Props {
 
 const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
-	const { mediaFiles, userProfile } = useContext(DataContext)
-	//
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [cacheStatus, _setCacheStatus] = useState<IFileListCache | null>(null)
+	const { mediaFiles, userProfile, cacheTimestamp } = useContext(DataContext)
 	const [uploading, setUploading] = useState(false)
 	const [uploadStatus, setUploadStatus] = useState<string>('')
-
-	/* WIP: FIXME:
-	useEffect(() => {
-		const fetchStatus = async () => {
-			const status = await getCacheStatus()
-			setCacheStatus(status)
-		}
-		fetchStatus()
-	}, [getCacheStatus])
-	*/
 
 	// --------------------------------------------------------------------------------------------
 
@@ -140,7 +127,9 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 							</div>
 							<div className="row align-items-center mt-4">
 								<div className="col"><h4 className="fw-light mb-0">Time Stamp</h4></div>
-								<div className="col-auto" title={cacheStatus?.timeStamp.toString()}>{/*new Date(cacheStatus?.timeStamp as number).toLocaleString()*/}FIXME:</div>
+								<div className="col-auto" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : 'N/A'}>
+									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleString() : 'No cache'}
+								</div>
 							</div>
 						</div>
 						<div className="card-footer text-center">

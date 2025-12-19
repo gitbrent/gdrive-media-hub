@@ -147,6 +147,46 @@ export const loadCacheFromIndexedDB = (): Promise<IFileListCache> => {
 	})
 }
 
+export const getCacheTimestamp = (): Promise<number | null> => {
+	return new Promise((resolve) => {
+		const open = indexedDB.open(getDatabaseName(), CACHE_DBASE_VER)
+
+		open.onupgradeneeded = () => {
+			const db = open.result
+			if (!db.objectStoreNames.contains('GapiFileCache')) {
+				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			}
+		}
+
+		open.onsuccess = () => {
+			const db = open.result
+			const tx = db.transaction('GapiFileCache', 'readonly')
+			const store = tx.objectStore('GapiFileCache')
+
+			const stampRequest = store.get('timeStamp')
+			stampRequest.onsuccess = () => {
+				if (stampRequest.result) {
+					resolve(stampRequest.result.timeStamp)
+				} else {
+					resolve(null)
+				}
+			}
+
+			stampRequest.onerror = () => {
+				resolve(null)
+			}
+
+			tx.oncomplete = () => {
+				db.close()
+			}
+		}
+
+		open.onerror = () => {
+			resolve(null)
+		}
+	})
+}
+
 export async function doClearFileCache() {
 	const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
 
