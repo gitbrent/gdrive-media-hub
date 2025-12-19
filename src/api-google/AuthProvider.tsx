@@ -13,6 +13,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		try {
 			const auth = gapi.auth2.getAuthInstance();
 			if (auth) {
+				// FIXME: we'll address this when upgrading from gapi to Google Identity Services (20251219)
+				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setIsSignedIn(auth.isSignedIn.get());
 				auth.isSignedIn.listen(setIsSignedIn);
 			} else {
@@ -23,8 +25,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 	}, []);
 
-	const signIn = () => {
-		gapi.auth2.getAuthInstance().signIn();
+	const signIn = (forceConsent: boolean = false) => {
+		//console.log('Initiating sign-in process', forceConsent ? 'with forced consent' : '');
+		const options = forceConsent ? { prompt: 'consent' } : {};
+		gapi.auth2.getAuthInstance().signIn(options);
 	};
 
 	const signOut = () => {
