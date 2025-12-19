@@ -15,7 +15,7 @@ const Home: React.FC = () => {
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={signIn}>
+				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={() => signIn()}>
 					<img src="/google-drive.png" alt="GoogleDriveLogo" className="w-25" />
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
