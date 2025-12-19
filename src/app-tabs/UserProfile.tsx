@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { IFileListCache } from '../App.props'
+import { IFileListCache, DEBUG, APP_BLD, APP_VER } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
@@ -148,16 +148,36 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 						</div>
 					</div>
 				</div>
+				<div className="col">
+					<div className="card h-100">
+						<div className="card-header text-bg-info">
+							<h5 className="mb-0">Application Info</h5>
+						</div>
+						<div className="card-body bg-black p-4">
+							<div className="row align-items-center mt-0">
+								<div className="col"><h4 className="fw-light mb-0">Version</h4></div>
+								<div className="col-auto"><h2 className="fw-light mb-0">{APP_VER}</h2></div>
+							</div>
+							<div className="row align-items-center mt-4">
+								<div className="col"><h4 className="fw-light mb-0">Build</h4></div>
+								<div className="col-auto"><h2 className="fw-light mb-0">{APP_BLD}</h2></div>
+							</div>
+						</div>
+						<div className="card-footer text-center">
+							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline-secondary">View on GitHub</a>
+						</div>
+					</div>
+				</div>
 			</div>
 		)
 	}
 
 	function renderUploadSection(): JSX.Element {
 		return (
-			<div className="row mt-4">
+			<div className={`row mt-4 ${!DEBUG ? 'd-none' : ''}`}>
 				<div className="col">
 					<div className="card">
-						<div className="card-header text-bg-info">
+						<div className="card-header text-bg-warning">
 							<h5 className="mb-0">Upload Test Media</h5>
 						</div>
 						<div className="card-body bg-black p-4">
