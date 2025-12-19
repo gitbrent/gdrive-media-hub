@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-render */
 import { useContext, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
