@@ -6,12 +6,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
 	plugins: [react()],
 	server: {
-		port: 3000
+		port: 3000,
+		strictPort: true, // Recommended to ensure Google API callback doesn't break
 	},
 	css: {
 		preprocessorOptions: {
 			scss: {
-				api: 'modern-compiler', // Vite 7 recommends this
+				//api: 'modern-compiler', // REQUIRED for Vite 7: Specify the modern API
 				silenceDeprecations: ['mixed-decls', 'color-functions', 'global-builtin', 'import'],
 				quietDeps: true, // Add this line to suppress warnings (above needed for bootstrap SCSS Dart messages)
 			},
