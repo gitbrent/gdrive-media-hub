@@ -31,6 +31,9 @@ export default function AppMainUI() {
 						<div className="display-6">Media Viewer</div>
 					</div>
 					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={signIn}>Sign In with Google</button>
+					<div className="mt-3">
+						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none small">Privacy Policy</a>
+					</div>
 				</div>
 			</section>
 		)
