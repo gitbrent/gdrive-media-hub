@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { DEBUG, APP_BLD, APP_VER } from '../App.props'
+import { DEBUG, VIDEO_CAPTURE, APP_BLD, APP_VER } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
@@ -115,7 +115,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 						</div>
 					}
 				</div>
-				<div className="col">
+				<div className={`col ${!VIDEO_CAPTURE ? 'd-none' : ''}`}>
 					<div className="card h-100">
 						<div className="card-header text-bg-primary">
 							<h5 className="mb-0">Media Database</h5>

@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react'
 import { Routes, Route, Link, NavLink } from 'react-router'
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
-import { DEBUG, APP_VER, APP_BLD } from './App.props'
+import { DEBUG, VIDEO_CAPTURE, APP_VER, APP_BLD } from './App.props'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
@@ -31,7 +31,7 @@ export default function AppMainUI() {
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
-					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn()}>Sign In with Google</button>
+					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn(VIDEO_CAPTURE ? true : false)}>Sign In with Google</button>
 					<button type="button" className={`btn btn-sm btn-outline-warning w-100 mt-2 ${!DEBUG ? 'd-none' : ''}`} onClick={() => signIn(true)}>
 						Force Re-authenticate (Dev Only)
 					</button>
