@@ -200,23 +200,25 @@ export const getCacheTimestamp = (): Promise<number | null> => {
 	})
 }
 
-export async function doClearFileCache() {
-	const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
+export async function doClearFileCache(): Promise<boolean> {
+	return new Promise((resolve, reject) => {
+		const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
 
-	deleteRequest.onsuccess = () => {
-		alert('Database deleted successfully')
-		return
-	}
+		deleteRequest.onsuccess = () => {
+			console.log('Database deleted successfully')
+			resolve(true)
+		}
 
-	deleteRequest.onerror = (event) => {
-		console.error('Database deletion failed', event)
-		return
-	}
+		deleteRequest.onerror = (event) => {
+			console.error('Database deletion failed', event)
+			reject(event)
+		}
 
-	deleteRequest.onblocked = () => {
-		console.warn('Database deletion blocked')
-		return
-	}
+		deleteRequest.onblocked = () => {
+			console.warn('Database deletion blocked')
+			reject(new Error('Database deletion blocked'))
+		}
+	})
 }
 
 /**
