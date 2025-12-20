@@ -116,17 +116,17 @@ export default function ImageGrid() {
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
-									Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-alphabet-uppercase me-2 d-none d-lg-inline" />Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
-									Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-hdd me-2 d-none d-lg-inline" />Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
-									Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-clock me-2 d-none d-lg-inline" />Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 							</div>
 						</div>
