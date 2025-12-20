@@ -3,21 +3,29 @@ import { DEBUG, APP_BLD, APP_VER } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
-import { loadCacheFromIndexedDB } from '../api/CacheService'
+import { loadCacheFromIndexedDB, doClearFileCache, cleanupOldCaches } from '../api/CacheService'
 
-interface Props {
-	handleClearFileCache?: () => void
-	isBusyGapiLoad?: boolean
-}
-
-const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) => {
+const UserProfile: React.FC = () => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
-	const { mediaFiles, userProfile, cacheTimestamp } = useContext(DataContext)
+	const { mediaFiles, userProfile, cacheTimestamp, isLoading } = useContext(DataContext)
 	const [uploading, setUploading] = useState(false)
 	const [uploadStatus, setUploadStatus] = useState<string>('')
 	const [showCacheData, setShowCacheData] = useState(false)
 	const [cacheData, setCacheData] = useState<string>('')
 	const [loadingCache, setLoadingCache] = useState(false)
+
+	// --------------------------------------------------------------------------------------------
+
+	const handleCleanupOldCaches = async () => {
+		if (confirm('This will remove old misnamed cache databases from a previous bug. Continue?')) {
+			const result = await cleanupOldCaches()
+			if (result.cleaned > 0) {
+				alert(`Cleaned up ${result.cleaned} old cache(s): ${result.databases.join(', ')}`)
+			} else {
+				alert('No old caches found to clean up.')
+			}
+		}
+	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -28,7 +36,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 			try {
 				// Get all IndexedDB databases
 				const databases = await indexedDB.databases()
-				
+
 				const cache = await loadCacheFromIndexedDB()
 
 				// Truncate gapiFiles array to show only first and last items
@@ -188,7 +196,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 							</div>
 						</div>
 						<div className="card-footer text-center">
-							<button type="button" className="btn btn-outline-danger" onClick={handleClearFileCache}>Clear Cache</button>
+							<button type="button" className="btn btn-outline-danger" onClick={doClearFileCache}>Clear Cache</button>
 							<button
 								type="button"
 								className="btn btn-outline-info ms-2"
@@ -197,6 +205,16 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 							>
 								{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
 							</button>
+							{DEBUG && (
+								<button
+									type="button"
+									className="btn btn-outline-warning ms-2"
+									onClick={handleCleanupOldCaches}
+									title="Remove old misnamed cache databases"
+								>
+									Cleanup Old Caches
+								</button>
+							)}
 						</div>
 					</div>
 				</div>
@@ -293,7 +311,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 	return (
 		<section>
 			<h3>User Profile</h3>
-			{isBusyGapiLoad ? <AlertLoading /> : (
+			{isLoading ? <AlertLoading /> : (
 				<>
 					{renderProfile()}
 					{isSignedIn && DEBUG && renderUploadSection()}
