@@ -184,17 +184,17 @@ const FileBrowser: React.FC = () => {
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'name' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('name')}>
-									Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-alphabet-uppercase me-2 d-none d-lg-inline" />Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'size' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('size')}>
-									Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-hdd me-2 d-none d-lg-inline" />Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('modifiedByMeTime')}>
-									Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-clock-history me-2 d-none d-lg-inline" />Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 							</div>
 						</div>
