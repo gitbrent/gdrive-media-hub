@@ -3,11 +3,12 @@ import { FileSizeThresholds, formatBytes, IFileAnalysis } from '../App.props'
 import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
+import AlertLoading from '../components/AlertLoading'
 import '../css/Home.css'
 
 const Home: React.FC = () => {
 	const { isSignedIn, signIn } = useContext(AuthContext)
-	const { mediaFiles, userProfile } = useContext(DataContext)
+	const { mediaFiles, userProfile, isLoading } = useContext(DataContext)
 	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles)
 
 	// --------------------------------------------------------------------------------------------
@@ -246,7 +247,13 @@ const Home: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
-	return (isSignedIn ? renderHome() : renderLogin())
+	return (
+		<>
+			{!isSignedIn && renderLogin()}
+			{isSignedIn && isLoading && <AlertLoading />}
+			{isSignedIn && !isLoading && renderHome()}
+		</>
+	)
 }
 
 export default Home
