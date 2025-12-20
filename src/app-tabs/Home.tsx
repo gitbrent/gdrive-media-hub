@@ -35,7 +35,7 @@ const Home: React.FC = () => {
 		}
 
 		return (
-			<div className="bg-black p-4">
+			<div className="bg-black p-4 h-100">
 				<div className="row align-items-center mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Type</h4></div>
 					<div className='col-auto'>
