@@ -1,31 +1,15 @@
 import { useContext } from 'react'
 import { FileSizeThresholds, formatBytes, IFileAnalysis } from '../App.props'
 import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
-import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
+import AlertLoading from '../components/AlertLoading'
 import '../css/Home.css'
 
 const Home: React.FC = () => {
-	const { isSignedIn, signIn } = useContext(AuthContext)
-	const { mediaFiles, userProfile } = useContext(DataContext)
+	const { mediaFiles, userProfile, isLoading } = useContext(DataContext)
 	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles)
 
 	// --------------------------------------------------------------------------------------------
-
-	function renderLogin(): JSX.Element {
-		return (
-			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={() => signIn()}>
-					<img src="/app-logo.png" alt="GoogleDriveLogo" className="w-25" />
-					<div className="my-3">
-						<div className="display-6">Google Drive</div>
-						<div className="display-6">Media Viewer</div>
-					</div>
-					<div id="loginContClick" className="text-muted mt-3">click to connect</div>
-				</div>
-			</section>
-		)
-	}
 
 	function renderFilesByType(): JSX.Element {
 		const totalFiles = fileAnalysis.total_files
@@ -34,7 +18,7 @@ const Home: React.FC = () => {
 		}
 
 		return (
-			<div className="bg-black p-4">
+			<div className="bg-black p-4 h-100">
 				<div className="row align-items-center mb-4">
 					<div className='col'><h4 className='mb-0'>Files by Type</h4></div>
 					<div className='col-auto'>
@@ -246,7 +230,12 @@ const Home: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
-	return (isSignedIn ? renderHome() : renderLogin())
+	return (
+		<>
+			{isLoading && <AlertLoading />}
+			{!isLoading && renderHome()}
+		</>
+	)
 }
 
 export default Home

@@ -18,6 +18,13 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null)
 	const { isSignedIn } = useContext(AuthContext)
 
+	const clearData = () => {
+		log(2, `[DataProvider] clearData!`)
+		setMediaFiles([])
+		setCacheTimestamp(null)
+		releaseAllBlobUrls()
+	}
+
 	const refreshData = async () => {
 		log(2, `[DataProvider] refreshData!`)
 		try {
@@ -118,7 +125,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
 	return (
 		<DataContext.Provider
-			value={{ mediaFiles, userProfile, refreshData, isLoading, getBlobUrlForFile, releaseAllBlobUrls, cacheTimestamp }}>
+			value={{ mediaFiles, userProfile, refreshData, clearData, isLoading, getBlobUrlForFile, releaseAllBlobUrls, cacheTimestamp }}>
 			{children}
 		</DataContext.Provider>
 	)

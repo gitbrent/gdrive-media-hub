@@ -1,17 +1,30 @@
-import { IFileListCache, IGapiFile, log } from '../App.props'
+import { IFileListCache, IGapiFile, log, APP_VER } from '../App.props'
 import { getCurrentUserProfile } from '../api-google'
 
-const CACHE_DBASE_VER = 6
+/**
+ * Convert semantic version string (e.g., "1.2.0-WIP") to an integer for IndexedDB
+ * Format: major*100 + minor*10 + patch
+ * Example: "1.2.0" -> 120, "2.5.3" -> 253
+ */
+function getDbVersionFromAppVersion(): number {
+	const versionMatch = APP_VER.match(/^(\d+)\.(\d+)\.(\d+)/)
+	if (!versionMatch) return 1 // Fallback if version format is unexpected
+
+	const [, major, minor, patch] = versionMatch
+	return parseInt(major) * 100 + parseInt(minor) * 10 + parseInt(patch)
+}
+
+export const CACHE_DBASE_VER = getDbVersionFromAppVersion()
 const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence we break into 10k chunks
 
 // PRIVATE
 
 function getDatabaseName() {
-	const brent1 = getCurrentUserProfile()
-	const brent2 = brent1?.getName
-	console.log(brent2) // DEBUG: WIP:
+	const profile = getCurrentUserProfile()
+	const userName = profile?.getName()
+	console.log('Database name for user:', userName)
 
-	return `${brent2}-File-Cache`
+	return `${userName}-File-Cache`
 }
 
 // PUBLIC
@@ -187,21 +200,60 @@ export const getCacheTimestamp = (): Promise<number | null> => {
 	})
 }
 
-export async function doClearFileCache() {
-	const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
+export async function doClearFileCache(): Promise<boolean> {
+	return new Promise((resolve, reject) => {
+		const deleteRequest = indexedDB.deleteDatabase(getDatabaseName())
 
-	deleteRequest.onsuccess = () => {
-		alert('Database deleted successfully')
-		return
-	}
+		deleteRequest.onsuccess = () => {
+			console.log('Database deleted successfully')
+			resolve(true)
+		}
 
-	deleteRequest.onerror = (event) => {
-		console.error('Database deletion failed', event)
-		return
-	}
+		deleteRequest.onerror = (event) => {
+			console.error('Database deletion failed', event)
+			reject(event)
+		}
 
-	deleteRequest.onblocked = () => {
-		console.warn('Database deletion blocked')
-		return
+		deleteRequest.onblocked = () => {
+			console.warn('Database deletion blocked')
+			reject(new Error('Database deletion blocked'))
+		}
+	})
+}
+
+/**
+ * Clean up old misnamed cache databases from the bug where getName was called without ()
+ * This removes databases with names like "function getName() { [native code] }-File-Cache"
+ */
+export async function cleanupOldCaches(): Promise<{ cleaned: number, databases: string[] }> {
+	try {
+		const databases = await indexedDB.databases()
+		const cleaned: string[] = []
+
+		for (const db of databases) {
+			if (db.name) {
+				// Check if database name contains "function" or looks like the old buggy format
+				if (db.name.includes('function') && db.name.includes('File-Cache')) {
+					console.log('Deleting old misnamed cache:', db.name)
+					await new Promise<void>((resolve, reject) => {
+						const deleteRequest = indexedDB.deleteDatabase(db.name!)
+						deleteRequest.onsuccess = () => {
+							cleaned.push(db.name!)
+							resolve()
+						}
+						deleteRequest.onerror = () => reject(deleteRequest.error)
+						deleteRequest.onblocked = () => {
+							console.warn('Deletion blocked for:', db.name)
+							resolve() // Continue anyway
+						}
+					})
+				}
+			}
+		}
+
+		return { cleaned: cleaned.length, databases: cleaned }
+	} catch (error) {
+		console.error('Error cleaning up old caches:', error)
+		return { cleaned: 0, databases: [] }
 	}
 }

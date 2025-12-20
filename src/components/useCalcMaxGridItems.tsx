@@ -1,13 +1,21 @@
 import { useEffect } from 'react'
 
-const useCalcMaxGridItems = (setPagingSize: (size: number) => void) => {
+const useCalcMaxGridItems = (setPagingSize: (size: number) => void, tileSize: 'small' | 'medium' | 'large' = 'medium') => {
 	const calculatePageSize = () => {
+		// Define tile sizes
+		const tileSizes = {
+			small: 120,
+			medium: 200,
+			large: 300
+		}
+		const baseSize = tileSizes[tileSize]
+
 		// A:
 		const galleryContainer = document.getElementById('gallery-container')
 		const figureElement = galleryContainer ? galleryContainer.querySelector('figure') : null
 		const figureStyles = figureElement ? window.getComputedStyle(figureElement) : null
 		const figureMargin = figureStyles ? parseFloat(figureStyles.marginTop) : 8
-		const itemSize = figureElement ? figureElement.offsetHeight + figureMargin * 2 : 216 // 200 + 8 + 8
+		const itemSize = baseSize + figureMargin * 2
 		// B:
 		let navbarHeight = 0
 		const navbars = document.querySelectorAll('.navbar')
@@ -29,7 +37,8 @@ const useCalcMaxGridItems = (setPagingSize: (size: number) => void) => {
 		calculatePageSize() // Initial calculation
 
 		return () => window.removeEventListener('resize', calculatePageSize)
-	}, [])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [tileSize])
 }
 
 export default useCalcMaxGridItems

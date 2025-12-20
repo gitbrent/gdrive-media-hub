@@ -1,4 +1,5 @@
 import { IFileListCache, IGapiFile, log } from '../App.props'
+import { MAX_FILES_TO_FETCH, PAGE_SIZE } from '../api-google/driveService'
 import { loadCacheFromIndexedDB, saveCacheToIndexedDB } from './CacheService'
 
 export const fetchDriveFiles = async (): Promise<IGapiFile[]> => {
@@ -59,12 +60,12 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 			q: query,
 			fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
 			//orderBy: 'modifiedByMeTime desc',
-			pageSize: 1000,
+			pageSize: PAGE_SIZE,
 			pageToken: pageToken,
 		})
 
 		allFiles = allFiles.concat(response.result.files as IGapiFile[]) || []
-		if (allFiles?.length < 10000) {
+		if (allFiles?.length < MAX_FILES_TO_FETCH) {
 			pageToken = response.result.nextPageToken
 		}
 		else {

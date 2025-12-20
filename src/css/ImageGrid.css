@@ -15,15 +15,27 @@
 	border-radius: 0.5rem;
 	margin: 0.5rem;
 	flex: 1 0 auto;
-	/* Set an explicit height */
-	height: 200px;
-	/* Set an explicit width */
-	width: 200px;
 	/* Hide overflow content */
 	overflow: hidden;
 	cursor: pointer;
 	/* Needed for absolute positioning of figcaption */
 	position: relative;
+}
+
+/* Tile size variants */
+.gallery-small figure {
+	height: 120px;
+	width: 120px;
+}
+
+.gallery-medium figure {
+	height: 200px;
+	width: 200px;
+}
+
+.gallery-large figure {
+	height: 300px;
+	width: 300px;
 }
 
 .gallery figcaption {
@@ -32,7 +44,7 @@
 	left: 0;
 	width: 100%;
 	/*background-color: rgba(0, 0, 0, 0.2);*/
-	background: linear-gradient(to right, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.0) 100%);
+	background: linear-gradient(to right, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.0) 100%);
 	text-align: left;
 	font-size: 0.8rem;
 	padding: 0.25rem 0.5rem;

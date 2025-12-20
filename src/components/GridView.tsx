@@ -11,9 +11,10 @@ interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
 	isFolderLoading: boolean
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
+	tileSize?: 'small' | 'medium' | 'large'
 }
 
-const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick }) => {
+const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick, tileSize = 'medium' }) => {
 	const SHOW_CAPTIONS = false
 	//
 	const { getBlobUrlForFile } = useContext(DataContext)
@@ -26,14 +27,20 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 	// --------------------------------------------------------------------------------------------
 
-	useCalcMaxGridItems(setPagingSize)
+	useCalcMaxGridItems(setPagingSize, tileSize)
 
 	/**
 	 * @summary Handle scroll event to load more items
 	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
-		if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return
+		const scrollPosition = window.innerHeight + document.documentElement.scrollTop
+		const scrollThreshold = document.documentElement.offsetHeight - 100 // Trigger 100px before bottom
+
+		// Only load more if we're near the bottom and there are more items to load
+		if (scrollPosition < scrollThreshold) return
+		if (displayedItems.length >= currFolderContents.length) return
+
 		setDisplayedItems(currentItems => {
 			// Calculate the number of new items to add
 			const nextItemsEndIndex = Math.min(currentItems.length + pagingSize, currFolderContents.length)
@@ -47,7 +54,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currFolderContents])
+	}, [currFolderContents, displayedItems, pagingSize])
 
 	/**
 	 * Load initial set of items
@@ -171,7 +178,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			)
 		} else if (isFolder(item)) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-warning figure-icon'>
 					<i className={isFolderLoading ? 'bi-hourglass-split' : 'bi-folder'} />
 					<figcaption>{item.name}</figcaption>
 				</figure>
@@ -180,14 +187,14 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			if (isLoadingFile) {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-play-btn-fill" />}
+						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-camera-video" />}
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
-						<i className="bi-play-btn-fill" />
+					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
+						<i className="bi-camera-video" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
@@ -206,7 +213,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+					<figure key={`${index}${item.id}`} title={item.name} className="text-muted figure-icon">
 						<i className="bi-hourglass-split" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
@@ -218,7 +225,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	const renderGrid = () => {
 		return (
 			<Gallery id="contImageGrid">
-				<div id="gallery-container" className="gallery">
+				<div id="gallery-container" className={`gallery gallery-${tileSize}`}>
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
 				<div className="p-3 bg-darker text-muted text-center">

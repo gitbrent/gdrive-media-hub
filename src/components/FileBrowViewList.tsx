@@ -79,6 +79,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 		const swipeDistance = touchStart - touchEnd
 
 		if (swipeDistance > threshold) { // Swipe left
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			navigateToNextFile()
 		}
 
@@ -158,7 +159,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 			<tbody>
 				{currFolderContents.length > 0
 					? currFolderContents.map((item, index) => {
-						const mimeTextClass = isFolder(item) ? 'text-success' : isImage(item) ? 'text-info' : 'text-warning'
+						const mimeTextClass = isFolder(item) ? 'text-warning' : isImage(item) ? 'text-success' : isGif(item) ? 'text-primary' : isVideo(item) ? 'text-info' : 'text-muted'
 						return (
 							<tr key={index}>
 								<td>
@@ -169,11 +170,11 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 												: isFolder(item)
 													? 'fs-4 bi-folder-fill'
 													: isImage(item)
-														? 'fs-4 bi-image-fill'
+														? 'fs-4 bi-image'
 														: isGif(item)
-															? 'fs-4 bi-play-circle'
+															? 'fs-4 bi-play-btn'
 															: isVideo(item)
-																? 'fs-4 bi-play-btn-fill'
+																? 'fs-4 bi-camera-video'
 																: 'fs-4 bi-file-x text-light'
 										} />
 									</div>

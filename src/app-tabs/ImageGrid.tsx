@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-render */
 import { useContext, useMemo, useState } from 'react'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
@@ -15,6 +16,7 @@ export default function ImageGrid() {
 	const [optSortBy, setIptSortBy] = useState<OPT_SORTBY>(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
+	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
 	const [isSearching, setIsSearching] = useState(false)
 	const { mediaFiles } = useContext(DataContext)
 
@@ -114,17 +116,39 @@ export default function ImageGrid() {
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
-									Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-alphabet-uppercase me-2 d-none d-lg-inline" />Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
-									Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-hdd me-2 d-none d-lg-inline" />Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
-									Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-clock me-2 d-none d-lg-inline" />Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+								</button>
+							</div>
+						</div>
+						<div className="col-12 col-md-auto mt-2 mt-md-0">
+							<div className="btn-group" role="group" aria-label="tile size options">
+								<button type="button" aria-label="small tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'small' ? 'active' : ''}`}
+									title="Small tiles"
+									onClick={() => setTileSize('small')}>
+									<i className="bi-grid-3x3-gap" />
+								</button>
+								<button type="button" aria-label="medium tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'medium' ? 'active' : ''}`}
+									title="Medium tiles"
+									onClick={() => setTileSize('medium')}>
+									<i className="bi-grid" />
+								</button>
+								<button type="button" aria-label="large tiles"
+									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'large' ? 'active' : ''}`}
+									title="Large tiles"
+									onClick={() => setTileSize('large')}>
+									<i className="bi-grid-1x2" />
 								</button>
 							</div>
 						</div>
@@ -160,6 +184,7 @@ export default function ImageGrid() {
 					currFolderContents={filtdSortdFiles}
 					isFolderLoading={isSearching}
 					handleFolderClick={() => Promise.resolve()}
+					tileSize={tileSize}
 				/>
 				: filtdSortdFiles.length > 0 ? (
 					<AlertLoading />

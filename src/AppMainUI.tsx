@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react'
 import { Routes, Route, Link, NavLink } from 'react-router'
 import { AuthContext } from './api-google/AuthContext'
 import { DataContext } from './api-google/DataContext'
-import { DEBUG, VIDEO_CAPTURE, APP_VER, APP_BLD } from './App.props'
+import { DEBUG, APP_VER, APP_BLD } from './App.props'
 import Home from './app-tabs/Home'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
@@ -26,12 +26,19 @@ export default function AppMainUI() {
 		return (
 			<section id="contHome" className="m-5">
 				<div id="loginCont" className="text-center bg-black p-5 pb-4 rounded">
-					<img src="/app-logo.png" alt="GoogleDriveLogo" className="w-25" />
+					<div className="row w-auto justify-content-center align-items-center">
+						<div className='col-auto'>
+							<img src="/google-drive.png" alt="Google Drive Logo" style={{ maxWidth: 100 }} />
+						</div>
+						<div className='col-auto'>
+							<img src="/app-logo.png" alt="App Logo" style={{ maxWidth: 100 }} />
+						</div>
+					</div>
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
 					</div>
-					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn(VIDEO_CAPTURE ? true : false)}>Sign In with Google</button>
+					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn(false)}>Sign In with Google</button>
 					<button type="button" className={`btn btn-sm btn-outline-warning w-100 mt-2 ${!DEBUG ? 'd-none' : ''}`} onClick={() => signIn(true)}>
 						Force Re-authenticate (Dev Only)
 					</button>
