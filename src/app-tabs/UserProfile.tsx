@@ -8,12 +8,27 @@ import { getCurrentUserProfile } from '../api-google'
 
 const UserProfile: React.FC = () => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
-	const { mediaFiles, userProfile, cacheTimestamp, isLoading } = useContext(DataContext)
+	const { mediaFiles, userProfile, cacheTimestamp, isLoading, clearData } = useContext(DataContext)
 	const [uploading, setUploading] = useState(false)
 	const [uploadStatus, setUploadStatus] = useState<string>('')
 	const [showCacheData, setShowCacheData] = useState(false)
 	const [cacheData, setCacheData] = useState<string>('')
 	const [loadingCache, setLoadingCache] = useState(false)
+
+	// --------------------------------------------------------------------------------------------
+
+	const handleClearCache = async () => {
+		if (confirm('This will clear the local file cache. You will need to refresh data from Google Drive. Continue?')) {
+			try {
+				await doClearFileCache()
+				clearData() // Clear the React state
+				alert('Cache cleared successfully')
+			} catch (error) {
+				console.error('Error clearing cache:', error)
+				alert('Failed to clear cache')
+			}
+		}
+	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -285,7 +300,7 @@ const UserProfile: React.FC = () => {
 									<i className="bi bi-recycle me-2"></i>Cleanup Old Caches
 								</button>
 							)}
-							<button type="button" className="btn btn-outline-danger ms-3" onClick={doClearFileCache}>
+							<button type="button" className="btn btn-outline-danger ms-3" onClick={handleClearCache}>
 								<i className="bi bi-trash me-2"></i>Clear Cache
 							</button>
 						</div>
