@@ -214,7 +214,7 @@ export async function cleanupOldCaches(): Promise<{ cleaned: number, databases: 
 	try {
 		const databases = await indexedDB.databases()
 		const cleaned: string[] = []
-		
+
 		for (const db of databases) {
 			if (db.name) {
 				// Check if database name contains "function" or looks like the old buggy format
@@ -235,7 +235,7 @@ export async function cleanupOldCaches(): Promise<{ cleaned: number, databases: 
 				}
 			}
 		}
-		
+
 		return { cleaned: cleaned.length, databases: cleaned }
 	} catch (error) {
 		console.error('Error cleaning up old caches:', error)
