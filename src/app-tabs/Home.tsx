@@ -1,35 +1,15 @@
 import { useContext } from 'react'
 import { FileSizeThresholds, formatBytes, IFileAnalysis } from '../App.props'
 import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
-import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
 import '../css/Home.css'
 
 const Home: React.FC = () => {
-	const { isSignedIn, signIn } = useContext(AuthContext)
 	const { mediaFiles, userProfile, isLoading } = useContext(DataContext)
 	const fileAnalysis: IFileAnalysis = getFileAnalysis(mediaFiles)
 
 	// --------------------------------------------------------------------------------------------
-
-	function renderLogin(): JSX.Element {
-		return (
-			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={() => signIn()}>
-					<div className="d-flex justify-content-center align-items-center gap-3">
-						<img src="/google-drive.png" alt="Google Drive Logo" className="w-25" />
-						<img src="/app-logo.png" alt="App Logo" className="w-25" />
-					</div>
-					<div className="my-3">
-						<div className="display-6">Google Drive</div>
-						<div className="display-6">Media Viewer</div>
-					</div>
-					<div id="loginContClick" className="text-muted mt-3">click to connect</div>
-				</div>
-			</section>
-		)
-	}
 
 	function renderFilesByType(): JSX.Element {
 		const totalFiles = fileAnalysis.total_files
@@ -252,9 +232,8 @@ const Home: React.FC = () => {
 
 	return (
 		<>
-			{!isSignedIn && renderLogin()}
-			{isSignedIn && isLoading && <AlertLoading />}
-			{isSignedIn && !isLoading && renderHome()}
+			{isLoading && <AlertLoading />}
+			{!isLoading && renderHome()}
 		</>
 	)
 }
