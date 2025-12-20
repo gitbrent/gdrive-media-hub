@@ -189,7 +189,17 @@ const UserProfile: React.FC = () => {
 								</div>
 							</div>
 							<div className="card-footer text-center">
-								<button type="button" className="btn btn-outline-danger" onClick={() => signOut}>Sign Out</button>
+								<button type="button" className="btn btn-warning me-2" onClick={() => signOut()}>
+									<i className="bi bi-box-arrow-right me-2"></i>Sign Out
+								</button>
+								<button type="button" className="btn btn-danger" onClick={async () => {
+									await doClearFileCache()
+									clearData()
+									signOut()
+								}}>
+									<i className="bi bi-box-arrow-right me-2"></i>
+									<i className="bi bi-trash3 me-2"></i>Sign Out & Clear Cache
+								</button>
 							</div>
 						</div>
 					}
@@ -210,7 +220,9 @@ const UserProfile: React.FC = () => {
 							</div>
 						</div>
 						<div className="card-footer text-center">
-							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline-secondary">View on GitHub</a>
+							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline-secondary">
+								<i className="bi bi-github me-2"></i>View on GitHub
+							</a>
 						</div>
 					</div>
 				</div>
@@ -283,7 +295,7 @@ const UserProfile: React.FC = () => {
 						<div className="card-footer text-center">
 							<button
 								type="button"
-								className="btn btn-outline-info me-3"
+								className="btn btn-outline-info me-2"
 								onClick={handleToggleCacheData}
 								disabled={loadingCache}
 							>
@@ -293,14 +305,14 @@ const UserProfile: React.FC = () => {
 							{DEBUG && (
 								<button
 									type="button"
-									className="btn btn-outline-warning mx-3"
+									className="btn btn-outline-warning mx-2"
 									onClick={handleCleanupOldCaches}
 									title="Remove old misnamed cache databases"
 								>
 									<i className="bi bi-recycle me-2"></i>Cleanup Old Caches
 								</button>
 							)}
-							<button type="button" className="btn btn-outline-danger ms-3" onClick={handleClearCache}>
+							<button type="button" className="btn btn-outline-danger ms-2" onClick={handleClearCache}>
 								<i className="bi bi-trash me-2"></i>Clear Cache
 							</button>
 						</div>

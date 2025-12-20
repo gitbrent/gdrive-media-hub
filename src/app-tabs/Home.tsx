@@ -17,7 +17,10 @@ const Home: React.FC = () => {
 		return (
 			<section id="contHome" className="m-5">
 				<div id="loginCont" className="text-center cursor-link bg-black p-4 rounded" onClick={() => signIn()}>
-					<img src="/app-logo.png" alt="GoogleDriveLogo" className="w-25" />
+					<div className="d-flex justify-content-center align-items-center gap-3">
+						<img src="/google-drive.png" alt="Google Drive Logo" className="w-25" />
+						<img src="/app-logo.png" alt="App Logo" className="w-25" />
+					</div>
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
