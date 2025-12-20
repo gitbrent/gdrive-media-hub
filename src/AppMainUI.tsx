@@ -26,7 +26,14 @@ export default function AppMainUI() {
 		return (
 			<section id="contHome" className="m-5">
 				<div id="loginCont" className="text-center bg-black p-5 pb-4 rounded">
-					<img src="/app-logo.png" alt="GoogleDriveLogo" className="w-25" />
+					<div className="row w-auto justify-content-center align-items-center">
+						<div className='col-auto'>
+							<img src="/google-drive.png" alt="Google Drive Logo" style={{ maxWidth: 100 }} />
+						</div>
+						<div className='col-auto'>
+							<img src="/app-logo.png" alt="App Logo" style={{ maxWidth: 100 }} />
+						</div>
+					</div>
 					<div className="my-3">
 						<div className="display-6">Google Drive</div>
 						<div className="display-6">Media Viewer</div>
