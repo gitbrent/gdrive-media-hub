@@ -2,11 +2,15 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20251220-1120'
+export const APP_BLD = '20251220-1150'
 export const APP_VER = '1.2.0-WIP'
 
-/** Debug mode - shows development-only features like force signin and upload testing */
-export const DEBUG = import.meta.env.DEV
+/** Debug mode - shows development-only UI/features */
+export const DEBUG = (() => {
+	const urlParams = new URLSearchParams(window.location.search)
+	const mode = urlParams.get('mode')
+	return import.meta.env.DEV || mode === 'debug'
+})()
 
 // ============================================================================
 
