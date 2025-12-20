@@ -1,7 +1,20 @@
-import { IFileListCache, IGapiFile, log } from '../App.props'
+import { IFileListCache, IGapiFile, log, APP_VER } from '../App.props'
 import { getCurrentUserProfile } from '../api-google'
 
-const CACHE_DBASE_VER = 6
+/**
+ * Convert semantic version string (e.g., "1.2.0-WIP") to an integer for IndexedDB
+ * Format: major*100 + minor*10 + patch
+ * Example: "1.2.0" -> 120, "2.5.3" -> 253
+ */
+function getDbVersionFromAppVersion(): number {
+	const versionMatch = APP_VER.match(/^(\d+)\.(\d+)\.(\d+)/)
+	if (!versionMatch) return 1 // Fallback if version format is unexpected
+
+	const [, major, minor, patch] = versionMatch
+	return parseInt(major) * 100 + parseInt(minor) * 10 + parseInt(patch)
+}
+
+export const CACHE_DBASE_VER = getDbVersionFromAppVersion()
 const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence we break into 10k chunks
 
 // PRIVATE
