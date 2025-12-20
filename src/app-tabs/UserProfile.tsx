@@ -3,6 +3,7 @@ import { DEBUG, APP_BLD, APP_VER } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
+import { loadCacheFromIndexedDB } from '../api/CacheService'
 
 interface Props {
 	handleClearFileCache?: () => void
@@ -14,6 +15,60 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 	const { mediaFiles, userProfile, cacheTimestamp } = useContext(DataContext)
 	const [uploading, setUploading] = useState(false)
 	const [uploadStatus, setUploadStatus] = useState<string>('')
+	const [showCacheData, setShowCacheData] = useState(false)
+	const [cacheData, setCacheData] = useState<string>('')
+	const [loadingCache, setLoadingCache] = useState(false)
+
+	// --------------------------------------------------------------------------------------------
+
+	const handleToggleCacheData = async () => {
+		if (!showCacheData) {
+			// Load the cache data
+			setLoadingCache(true)
+			try {
+				// Get all IndexedDB databases
+				const databases = await indexedDB.databases()
+				
+				const cache = await loadCacheFromIndexedDB()
+
+				// Truncate gapiFiles array to show only first and last items
+				if (cache.gapiFiles && cache.gapiFiles.length > 2) {
+					const firstItem = cache.gapiFiles[0]
+					const lastItem = cache.gapiFiles[cache.gapiFiles.length - 1]
+					const snippedCount = cache.gapiFiles.length - 2
+
+					const truncatedCache = {
+						currentUser: userProfile?.getName(),
+						currentUserEmail: userProfile?.getEmail(),
+						allIndexedDBs: databases.map(db => ({ name: db.name, version: db.version })),
+						cacheData: {
+							...cache,
+							gapiFiles: [
+								firstItem,
+								`(SNIP! ${snippedCount} items not shown)`,
+								lastItem
+							]
+						}
+					}
+					setCacheData(JSON.stringify(truncatedCache, null, 2))
+				} else {
+					const fullCache = {
+						currentUser: userProfile?.getName(),
+						currentUserEmail: userProfile?.getEmail(),
+						allIndexedDBs: databases.map(db => ({ name: db.name, version: db.version })),
+						cacheData: cache
+					}
+					setCacheData(JSON.stringify(fullCache, null, 2))
+				}
+			} catch (error) {
+				console.error('Error loading cache:', error)
+				setCacheData(JSON.stringify({ error: 'Failed to load cache data', message: String(error) }, null, 2))
+			} finally {
+				setLoadingCache(false)
+			}
+		}
+		setShowCacheData(!showCacheData)
+	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -92,7 +147,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 	function renderProfile(): JSX.Element {
 		return (
 			<div className="row mt-4">
-				<div className="col">
+				<div className="col" data-desc="User Profile">
 					{isSignedIn &&
 						<div className="card h-100">
 							<div className={`card-header ${userProfile?.getName() ? 'text-bg-success' : 'text-bg-warning'}`}>
@@ -115,7 +170,7 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 						</div>
 					}
 				</div>
-				<div className="col">
+				<div className="col" data-desc="Cache Info">
 					<div className="card h-100">
 						<div className="card-header text-bg-primary">
 							<h5 className="mb-0">Media Database</h5>
@@ -134,10 +189,18 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 						</div>
 						<div className="card-footer text-center">
 							<button type="button" className="btn btn-outline-danger" onClick={handleClearFileCache}>Clear Cache</button>
+							<button
+								type="button"
+								className="btn btn-outline-info ms-2"
+								onClick={handleToggleCacheData}
+								disabled={loadingCache}
+							>
+								{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
+							</button>
 						</div>
 					</div>
 				</div>
-				<div className="col">
+				<div className="col" data-desc="App Info">
 					<div className="card h-100">
 						<div className="card-header text-bg-info">
 							<h5 className="mb-0">Application Info</h5>
@@ -161,9 +224,33 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 		)
 	}
 
-	function renderUploadSection(): JSX.Element {
+	function showCacheDataSection(): JSX.Element {
 		return (
-			<div className={`row mt-4 ${!DEBUG ? 'd-none' : ''}`}>
+			<div className="card mt-3">
+				<div className="card-header text-bg-secondary">
+					<h6 className="mb-0">Cache Data (IndexedDB)</h6>
+				</div>
+				<div className="card-body bg-dark p-0" style={{ maxHeight: '500px', overflow: 'auto' }}>
+					<pre className="mb-0 p-3" style={{
+						backgroundColor: '#1e1e1e',
+						color: '#d4d4d4',
+						fontSize: '12px',
+						lineHeight: '1.5',
+						fontFamily: 'Consolas, "Courier New", monospace'
+					}}>
+						<code>{cacheData}</code>
+					</pre>
+				</div>
+			</div>
+		)
+	}
+
+	// --------------------------------------------------------------------------------------------
+
+	function renderUploadSection(): JSX.Element {
+		// NOTE: UNUSED - for testing uploads during development
+		return (
+			<div className="row mt-4 d-none">
 				<div className="col">
 					<div className="card">
 						<div className="card-header text-bg-warning">
@@ -209,7 +296,8 @@ const UserProfile: React.FC<Props> = ({ handleClearFileCache, isBusyGapiLoad }) 
 			{isBusyGapiLoad ? <AlertLoading /> : (
 				<>
 					{renderProfile()}
-					{isSignedIn && renderUploadSection()}
+					{isSignedIn && DEBUG && renderUploadSection()}
+					{showCacheData && showCacheDataSection()}
 				</>
 			)}
 		</section>
