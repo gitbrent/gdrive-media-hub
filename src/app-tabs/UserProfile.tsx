@@ -305,14 +305,14 @@ const UserProfile: React.FC = () => {
 							{DEBUG && (
 								<button
 									type="button"
-									className="btn btn-outline-warning mx-2"
+									className="btn btn-outline-warning me-2"
 									onClick={handleCleanupOldCaches}
 									title="Remove old misnamed cache databases"
 								>
 									<i className="bi bi-recycle me-2"></i>Cleanup Old Caches
 								</button>
 							)}
-							<button type="button" className="btn btn-outline-danger ms-2" onClick={handleClearCache}>
+							<button type="button" className="btn btn-outline-danger" onClick={handleClearCache}>
 								<i className="bi bi-trash me-2"></i>Clear Cache
 							</button>
 						</div>
