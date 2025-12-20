@@ -6,6 +6,10 @@
 
 import { IDirectory, IGapiFile, IGapiFolder, IMediaFile } from "../App.props";
 
+// Configuration: Maximum number of files to fetch from Google Drive
+export const MAX_FILES_TO_FETCH = 2000
+export const PAGE_SIZE = 1000 // Google Drive API max is 1000 per request
+
 // == FILES ===================================================================
 
 export const createFile = async (name: string, content: string): Promise<gapi.client.Response<gapi.client.drive.File>> => {
@@ -49,28 +53,27 @@ export const createFile = async (name: string, content: string): Promise<gapi.cl
 
 export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 	try {
-		const response = await gapi.client.drive.files.list({
-			q: "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')",
-			fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
-			pageSize: 1000,
-		});
+		let files: gapi.client.drive.File[] = []
+		let pageToken: string | undefined = undefined
 
-		let files = response.result.files || [];
-
-		// TODO: poor-mans paging (just grab 2000)
-		const pageToken = response.result.nextPageToken
-
-		if (files && pageToken) {
+		// Fetch all files in pages
+		while (true) {
 			const response = await gapi.client.drive.files.list({
 				q: "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')",
 				fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
-				pageSize: 1000,
-				pageToken: pageToken,
+				pageSize: PAGE_SIZE,
+				...(pageToken && { pageToken }),
 			})
+
 			files = files.concat(response.result.files || [])
+			pageToken = response.result.nextPageToken
+
+			// Stop if no more pages or reached limit
+			if (!pageToken || files.length >= MAX_FILES_TO_FETCH) break
 		}
 
-		return files || [];
+		console.log(`[driveService] Fetched ${files.length} files (limit: ${MAX_FILES_TO_FETCH})`)
+		return files
 	} catch (error) {
 		console.error('Error fetching files:', error);
 		throw error;
