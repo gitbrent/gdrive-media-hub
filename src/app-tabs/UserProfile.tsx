@@ -1,9 +1,10 @@
 import { useContext, useState } from 'react'
-import { DEBUG, APP_BLD, APP_VER } from '../App.props'
+import { DEBUG, APP_BLD, APP_VER, formatBytes } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
-import { loadCacheFromIndexedDB, doClearFileCache, cleanupOldCaches } from '../api/CacheService'
+import { loadCacheFromIndexedDB, doClearFileCache, cleanupOldCaches, CACHE_DBASE_VER } from '../api/CacheService'
+import { getCurrentUserProfile } from '../api-google'
 
 const UserProfile: React.FC = () => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
@@ -152,10 +153,10 @@ const UserProfile: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
-	function renderProfile(): JSX.Element {
+	function renderUserAndAppInfo(): JSX.Element {
 		return (
 			<div className="row mt-4">
-				<div className="col" data-desc="User Profile">
+				<div className="col-12 col-md-6" data-desc="User Profile">
 					{isSignedIn &&
 						<div className="card h-100">
 							<div className={`card-header ${userProfile?.getName() ? 'text-bg-success' : 'text-bg-warning'}`}>
@@ -178,47 +179,7 @@ const UserProfile: React.FC = () => {
 						</div>
 					}
 				</div>
-				<div className="col" data-desc="Cache Info">
-					<div className="card h-100">
-						<div className="card-header text-bg-primary">
-							<h5 className="mb-0">Media Database</h5>
-						</div>
-						<div className="card-body bg-black p-4">
-							<div className="row align-items-center mt-0">
-								<div className="col"><h4 className="fw-light mb-0">File Count</h4></div>
-								<div className="col-auto"><h2 className="fw-light mb-0">{mediaFiles?.length}</h2></div>
-							</div>
-							<div className="row align-items-center mt-4">
-								<div className="col"><h4 className="fw-light mb-0">Time Stamp</h4></div>
-								<div className="col-auto" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : 'N/A'}>
-									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleString() : 'No cache'}
-								</div>
-							</div>
-						</div>
-						<div className="card-footer text-center">
-							<button type="button" className="btn btn-outline-danger" onClick={doClearFileCache}>Clear Cache</button>
-							<button
-								type="button"
-								className="btn btn-outline-info ms-2"
-								onClick={handleToggleCacheData}
-								disabled={loadingCache}
-							>
-								{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
-							</button>
-							{DEBUG && (
-								<button
-									type="button"
-									className="btn btn-outline-warning ms-2"
-									onClick={handleCleanupOldCaches}
-									title="Remove old misnamed cache databases"
-								>
-									Cleanup Old Caches
-								</button>
-							)}
-						</div>
-					</div>
-				</div>
-				<div className="col" data-desc="App Info">
+				<div className="col-12 col-md-6" data-desc="App Info">
 					<div className="card h-100">
 						<div className="card-header text-bg-info">
 							<h5 className="mb-0">Application Info</h5>
@@ -242,6 +203,100 @@ const UserProfile: React.FC = () => {
 		)
 	}
 
+	function renderMediaDatabase(): JSX.Element {
+		const profile = getCurrentUserProfile()
+		const dbName = `${profile?.getName()}-File-Cache`
+		const totalSize = mediaFiles?.reduce((sum, file) => sum + (parseInt(file.size || '0')), 0) || 0
+		const imageCount = mediaFiles?.filter(f => f.mimeType?.startsWith('image/')).length || 0
+		const videoCount = mediaFiles?.filter(f => f.mimeType?.startsWith('video/')).length || 0
+
+		return (
+			<div className="row mt-4">
+				<div className="col-12">
+					<div className="card">
+						<div className="card-header text-bg-primary">
+							<div className="row align-items-center">
+								<div className="col">
+									<h5 className="mb-0">Media Database Cache</h5>
+								</div>
+								<div className="col-auto">
+									<span className="badge bg-light text-dark">{cacheTimestamp ? 'Active' : 'Empty'}</span>
+								</div>
+							</div>
+						</div>
+						<div className="card-body bg-black p-4">
+							<div className="row g-4">
+								<div className="col-12 col-md-6 col-lg-3">
+									<div className="text-center p-3 bg-dark rounded">
+										<h6 className="text-uppercase text-secondary mb-0">Database Name</h6>
+										<h4 className="fw-light text-warning text-truncate mt-2 mb-0" title={dbName}>
+											{dbName}
+										</h4>
+										<div className="badge text-bg-warning">IndexedDB v{CACHE_DBASE_VER}</div>
+									</div>
+								</div>								<div className="col-12 col-md-6 col-lg-3">
+									<div className="text-center p-3 bg-dark rounded">
+										<h6 className="text-uppercase text-secondary mb-0">Total Files</h6>
+										<h2 className="fw-light text-primary mb-0">{mediaFiles?.length || 0}</h2>
+										<div className="badge text-bg-primary">
+											{imageCount} images · {videoCount} videos
+										</div>
+									</div>
+								</div>
+								<div className="col-12 col-md-6 col-lg-3">
+									<div className="text-center p-3 bg-dark rounded">
+										<h6 className="text-uppercase text-secondary mb-0">Total Size</h6>
+										<h2 className="fw-light text-info mb-0">{formatBytes(totalSize)}</h2>
+										<div className="badge text-bg-info">
+											Avg: {mediaFiles?.length ? formatBytes(totalSize / mediaFiles.length) : '0 B'}
+										</div>
+									</div>
+								</div>
+								<div className="col-12 col-md-6 col-lg-3">
+									<div className="text-center p-3 bg-dark rounded">
+										<h6 className="text-uppercase text-secondary mb-0">Last Updated</h6>
+										<h2 className="fw-light text-success mb-0">
+											{cacheTimestamp ? new Date(cacheTimestamp).toLocaleDateString() : 'Never'}
+										</h2>
+										<div className="badge text-bg-success" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : ''}>
+											{cacheTimestamp ? new Date(cacheTimestamp).toLocaleTimeString() : 'No cache'}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="card-footer text-center">
+							<button
+								type="button"
+								className="btn btn-outline-info me-3"
+								onClick={handleToggleCacheData}
+								disabled={loadingCache}
+							>
+								<i className="bi bi-code-square me-2"></i>
+								{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
+							</button>
+							{DEBUG && (
+								<button
+									type="button"
+									className="btn btn-outline-warning mx-3"
+									onClick={handleCleanupOldCaches}
+									title="Remove old misnamed cache databases"
+								>
+									<i className="bi bi-recycle me-2"></i>Cleanup Old Caches
+								</button>
+							)}
+							<button type="button" className="btn btn-outline-danger ms-3" onClick={doClearFileCache}>
+								<i className="bi bi-trash me-2"></i>Clear Cache
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	// --------------------------------------------------------------------------------------------
+
 	function showCacheDataSection(): JSX.Element {
 		return (
 			<div className="card mt-3">
@@ -262,8 +317,6 @@ const UserProfile: React.FC = () => {
 			</div>
 		)
 	}
-
-	// --------------------------------------------------------------------------------------------
 
 	function renderUploadSection(): JSX.Element {
 		// NOTE: UNUSED - for testing uploads during development
@@ -308,12 +361,15 @@ const UserProfile: React.FC = () => {
 		)
 	}
 
+	// --------------------------------------------------------------------------------------------
+
 	return (
 		<section>
 			<h3>User Profile</h3>
 			{isLoading ? <AlertLoading /> : (
 				<>
-					{renderProfile()}
+					{renderUserAndAppInfo()}
+					{renderMediaDatabase()}
 					{isSignedIn && DEBUG && renderUploadSection()}
 					{showCacheData && showCacheDataSection()}
 				</>
