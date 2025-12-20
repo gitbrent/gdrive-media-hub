@@ -209,21 +209,21 @@ const FileBrowser: React.FC = () => {
 							</div>
 						</div>
 						<div className="col-12 col-md-auto text-center h4 fw-light mb-0">
-							<span className="text-nowrap text-success">
+							<span className="text-nowrap text-warning">
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
 							</span>
-							<span className="text-nowrap text-info ms-3">
+							<span className="text-nowrap text-success ms-3">
 								{currFolderContents.filter(item => isImage(item)).length}
-								<i className="bi-image-fill ms-2" />
+								<i className="bi-image ms-2" />
 							</span>
-							<span className="text-nowrap text-warning ms-3">
+							<span className="text-nowrap text-primary ms-3">
 								{currFolderContents.filter(item => isGif(item)).length}
-								<i className="bi-play-circle-fill ms-2" />
+								<i className="bi-play-btn ms-2" />
 							</span>
-							<span className="text-nowrap text-warning ms-3">
+							<span className="text-nowrap text-info ms-3">
 								{currFolderContents.filter(item => isVideo(item)).length}
-								<i className="bi-play-btn-fill ms-2" />
+								<i className="bi-camera-video ms-2" />
 							</span>
 						</div>
 					</div>

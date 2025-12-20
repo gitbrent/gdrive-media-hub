@@ -178,7 +178,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			)
 		} else if (isFolder(item)) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-success figure-icon'>
+				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-warning figure-icon'>
 					<i className={isFolderLoading ? 'bi-hourglass-split' : 'bi-folder'} />
 					<figcaption>{item.name}</figcaption>
 				</figure>
@@ -187,14 +187,14 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			if (isLoadingFile) {
 				return (
 					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
-						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-play-btn-fill" />}
+						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-camera-video" />}
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-warning figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
-						<i className="bi-play-btn-fill" />
+					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
+						<i className="bi-camera-video" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
@@ -213,7 +213,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+					<figure key={`${index}${item.id}`} title={item.name} className="text-muted figure-icon">
 						<i className="bi-hourglass-split" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
