@@ -22,8 +22,7 @@ const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence 
 function getDatabaseName() {
 	const profile = getCurrentUserProfile()
 	const userName = profile?.getName()
-	console.log('Database name for user:', userName)
-
+	//
 	return `${userName}-File-Cache`
 }
 
