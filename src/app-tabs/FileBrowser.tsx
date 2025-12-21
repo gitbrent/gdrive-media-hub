@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder, LOG_LEVEL } from '../App.props'
+import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder, LOG_LEVEL, formatBytes } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { getRootFolderId, fetchFolderContents } from '../api-google'
 import { DataContext } from '../api-google/DataContext'
@@ -400,10 +400,10 @@ const FileBrowser: React.FC = () => {
 											<i className="bi-images text-white kpi-icon"></i>
 										</div>
 										<div>
-											<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Total Files</div>
+											<div className="text-white-50 text-uppercase small">Total Files</div>
 										</div>
 									</div>
-									<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{mediaFiles.length}</div>
+									<div className="text-white fw-bold kpi-title mb-0 fs-1">{mediaFiles.length}</div>
 								</div>
 							</div>
 							<i className="bi-images kpi-card-icon-bg"></i>
@@ -418,35 +418,33 @@ const FileBrowser: React.FC = () => {
 											<i className="bi-funnel text-white kpi-icon"></i>
 										</div>
 										<div>
-											<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Files Shown</div>
+											<div className="text-white-50 text-uppercase small">Files Shown</div>
 										</div>
 									</div>
-									<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{debugInfo.afterNameFilter}</div>
+									<div className="text-white fw-bold kpi-title mb-0 fs-1">{debugInfo.afterNameFilter}</div>
 								</div>
 							</div>
 							<i className="bi-funnel kpi-card-icon-bg"></i>
 						</div>
 					</div>
-					{isRecursiveSearch && (
-						<div className="col">
-							<div className="card border-0 shadow-lg kpi-card kpi-card-blue">
-								<div className="card-body kpi-card-body">
-									<div className="d-flex align-items-center justify-content-between">
-										<div className="hstack gap-2">
-											<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-												<i className="bi-folder text-white kpi-icon"></i>
-											</div>
-											<div>
-												<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Recursive Folders</div>
-											</div>
+					<div className="col">
+						<div className="card border-0 shadow-lg kpi-card kpi-card-red">
+							<div className="card-body kpi-card-body">
+								<div className="d-flex align-items-center justify-content-between">
+									<div className="hstack gap-2">
+										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+											<i className="bi-floppy text-white kpi-icon"></i>
 										</div>
-										<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{debugInfo.descendantFolderCount}</div>
+										<div>
+											<div className="text-white-50 text-uppercase small">Space Shown</div>
+										</div>
 									</div>
+									<div className="text-white fw-bold kpi-title mb-0 fs-1 text-nowrap">{formatBytes(currFolderContents.reduce((total, item) => total + Number(item.size || 0), 0))}</div>
 								</div>
-								<i className="bi-folder kpi-card-icon-bg"></i>
 							</div>
+							<i className="bi-floppy kpi-card-icon-bg"></i>
 						</div>
-					)}
+					</div>
 				</div>
 			</>
 		)
