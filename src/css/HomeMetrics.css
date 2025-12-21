@@ -20,8 +20,13 @@
 	--gradient-blue: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
 	--gradient-green: linear-gradient(135deg, #059669 0%, #14b8a6 100%);
 
-	/* Chart Background */
-	--bg-chart-dark: #1a2332;
+	/* Chart Background - radial gradient with depth */
+	--bg-chart-dark: radial-gradient(
+		ellipse at center,
+		rgba(102, 126, 234, 0.15) 0%,
+		rgba(102, 126, 234, 0.08) 25%,
+		#030609 60%
+	);
 
 	/* Card Shadow Colors */
 	--shadow-purple: rgba(102, 126, 234, 0.4);
@@ -106,19 +111,43 @@
 }
 
 .kpi-subtitle {
-	opacity: 0.5;
+	opacity: 0.6;
 }
 
 /* ============================================================================
    Chart Cards
    ============================================================================ */
 .chart-card-dark {
-	background-color: var(--bg-chart-dark);
+	background: var(--bg-chart-dark) !important;
+	box-shadow: inset 0 0 60px rgba(102, 126, 234, 0.1);
+	position: relative;
 }
 
 .chart-legend-dot {
 	width: 10px;
 	height: 10px;
+}
+
+/* Override recharts default hover highlight */
+.recharts-bar-rectangle:hover,
+.recharts-rectangle:hover {
+	filter: brightness(1.15) !important;
+	opacity: 1 !important;
+}
+
+.recharts-active-shape {
+	filter: brightness(1.15) !important;
+}
+
+/* Remove the light gray hover cursor overlay */
+.recharts-tooltip-cursor {
+	fill: rgba(255, 255, 255, 0.4) !important;
+	opacity: 0.5 !important;
+}
+
+/* Remove default active bar background */
+.recharts-active-bar {
+	filter: brightness(1.15) !important;
 }
 
 /* ============================================================================
@@ -136,7 +165,7 @@
 }
 
 .file-type-badge-value {
-	font-size: 0.9rem;
+	color: white;
 }
 
 /* ============================================================================

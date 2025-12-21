@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20251220-1410'
+export const APP_BLD = '20251220-1845'
 export const APP_VER = '1.3.0-WIP'
 
 /** Debug mode - shows development-only UI/features */
@@ -182,6 +182,7 @@ export interface IFileAnalysis {
 	total_size: number
 	file_types: Record<string, number>
 	file_years: Record<string, number>
+	file_types_by_year: Record<string, Record<string, number>>
 	common_names: Record<string, number>
 	size_categories: Record<string, number>
 }
