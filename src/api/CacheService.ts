@@ -49,6 +49,10 @@ export const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boo
 			}
 			// Create new store
 			db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+		}
+
+		open.onsuccess = () => {
+			const db = open.result
 			const tx = db.transaction('GapiFileCache', 'readwrite')
 			const store = tx.objectStore('GapiFileCache')
 
