@@ -15,6 +15,8 @@ type SortOrder = 'asc' | 'desc'
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 
 const FileBrowser: React.FC = () => {
+	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
+	//
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
@@ -36,8 +38,6 @@ const FileBrowser: React.FC = () => {
 		filesWithParents: number;
 		filesWithoutParents: number;
 	}>({ currentFolderId: '', descendantFolderCount: 0, sourceItemCount: 0, afterRecursiveFilter: 0, afterNameFilter: 0, filesWithParents: 0, filesWithoutParents: 0 })
-	//
-	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -235,7 +235,10 @@ const FileBrowser: React.FC = () => {
 		})
 
 		setCurrFolderContents(filteredContents)
-	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess, currentFolderPath, mediaTypeFilter])
+	}, [
+		mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField,
+		sortOrder, hasRootAccess, currentFolderPath, mediaTypeFilter
+	])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
