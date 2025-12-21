@@ -197,9 +197,9 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 						const itemWithLineage = item as ItemWithLineage
 
 						return (
-							<tr key={index} className='border-bottom border-dark-subtle'>
+							<tr key={index} className='border-bottom border-dark-subtle file-list-row'>
 								<td>
-									<div className={mimeTextClass}>
+									<div className={`file-list-icon-wrapper ${mimeTextClass}`}>
 										<i className={
 											isFolder(item) && isFolderLoading
 												? 'fs-4 bi-arrow-repeat'
@@ -223,7 +223,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 											style={{ cursor: 'pointer' }}>
 											{item.name}
 											{itemWithLineage._lineagePath && (
-												<div style={{ fontSize: '0.75rem', opacity: 0.7, fontWeight: 'normal' }}>
+												<div className='file-list-path'>
 													{itemWithLineage._lineagePath}
 												</div>
 											)}
@@ -232,7 +232,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 											<div className={mimeTextClass} onClick={() => handleFileClick(item)} style={{ cursor: 'pointer' }}>
 												{item.name}
 												{itemWithLineage._lineagePath && (
-													<div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+													<div className='file-list-path'>
 														{itemWithLineage._lineagePath}
 													</div>
 												)}

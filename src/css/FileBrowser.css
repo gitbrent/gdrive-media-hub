@@ -664,3 +664,37 @@ figure.figure-icon i {
 	background: rgba(255, 255, 255, 0.3);
 	border-radius: 2px;
 }
+/* ================================================================================ */
+/* FILE LIST TABLE STYLES */
+/* ================================================================================ */
+
+.file-list-icon-wrapper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+	/* copied below from btn-modern.active */
+	background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(102, 126, 234, 0.2));
+	color: #fff;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.file-list-row {
+	transition: background-color 0.2s ease;
+}
+
+.file-list-row:hover {
+	background-color: rgba(102, 126, 234, 0.08);
+}
+
+.file-list-path {
+	font-size: 0.7rem;
+	color: rgba(255, 255, 255, 0.5);
+	margin-top: 0.25rem;
+	font-weight: normal;
+}
