@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder } from '../App.props'
+import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder, LOG_LEVEL } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { getRootFolderId, fetchFolderContents } from '../api-google'
 import { DataContext } from '../api-google/DataContext'
@@ -231,6 +231,206 @@ const FileBrowser: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
+	function renderSearchResultsInfo(): JSX.Element {
+		return (
+			<>
+				{DEBUG && LOG_LEVEL === 3 && (
+					<div className="mb-3" style={{
+						background: 'linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)',
+						borderRadius: '16px',
+						padding: '20px',
+						boxShadow: '0 8px 32px rgba(109, 40, 217, 0.4)',
+						border: '1px solid rgba(139, 92, 246, 0.2)'
+					}}>
+						<div className="d-flex align-items-center mb-3">
+							<div style={{
+								background: 'rgba(255, 255, 255, 0.2)',
+								borderRadius: '12px',
+								padding: '8px 12px',
+								backdropFilter: 'blur(10px)'
+							}}>
+								<i className="bi-bug-fill me-2" style={{ color: '#fff' }}></i>
+								<strong style={{ color: '#fff', fontSize: '1.1rem' }}>Debug Dashboard</strong>
+							</div>
+						</div>
+						<div className="row g-3">
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'rgba(255, 255, 255, 0.15)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.2)',
+									transition: 'transform 0.2s',
+									cursor: 'pointer'
+								}} className="hover-lift">
+									<div className="d-flex align-items-center justify-content-between">
+										<span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem' }}>Recursive Search</span>
+										<span className="badge" style={{
+											background: isRecursiveSearch ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' : 'rgba(255, 255, 255, 0.2)',
+											padding: '6px 12px',
+											fontSize: '0.75rem'
+										}}>{isRecursiveSearch ? 'ON' : 'OFF'}</span>
+									</div>
+								</div>
+							</div>
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'rgba(255, 255, 255, 0.15)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.2)'
+								}}>
+									<div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem', marginBottom: '6px' }}>Search Word</div>
+									<div style={{ color: '#fff', fontWeight: '600' }}>{optSchWord || '(none)'}</div>
+								</div>
+							</div>
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'rgba(255, 255, 255, 0.15)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.2)'
+								}}>
+									<div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem', marginBottom: '6px' }}>Descendant Folders</div>
+									<div className="d-flex align-items-center">
+										<i className="bi-folder2-open me-2" style={{ color: '#ffd700', fontSize: '1.2rem' }}></i>
+										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.descendantFolderCount}</span>
+									</div>
+								</div>
+							</div>
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(59, 130, 246, 0.3)',
+									boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
+								}}>
+									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Total Media Files</div>
+									<div className="d-flex align-items-center">
+										<i className="bi-collection-play-fill me-2" style={{ color: '#60a5fa', fontSize: '1.2rem' }}></i>
+										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{mediaFiles.length}</span>
+									</div>
+								</div>
+							</div>
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(16, 185, 129, 0.3)',
+									boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
+								}}>
+									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>With Parents</div>
+									<div className="d-flex align-items-center">
+										<i className="bi-check-circle-fill me-2" style={{ color: '#34d399', fontSize: '1.2rem' }}></i>
+										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithParents}</span>
+									</div>
+								</div>
+							</div>
+							<div className="col-md-4 col-sm-6">
+								<div style={{
+									background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(239, 68, 68, 0.3)',
+									boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+								}}>
+									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Without Parents</div>
+									<div className="d-flex align-items-center">
+										<i className="bi-x-circle-fill me-2" style={{ color: '#f87171', fontSize: '1.2rem' }}></i>
+										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithoutParents}</span>
+									</div>
+								</div>
+							</div>
+							<div className="col-12">
+								<div style={{
+									background: 'rgba(255, 255, 255, 0.1)',
+									borderRadius: '12px',
+									padding: '12px',
+									backdropFilter: 'blur(10px)',
+									border: '1px solid rgba(255, 255, 255, 0.15)'
+								}}>
+									<div className="d-flex flex-wrap gap-3 align-items-center justify-content-around text-center">
+										<div>
+											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>Source Items</div>
+											<div style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{debugInfo.sourceItemCount}</div>
+										</div>
+										<i className="bi-arrow-right" style={{ color: 'rgba(255, 255, 255, 0.5)' }}></i>
+										<div>
+											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>After Recursive</div>
+											<div style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{debugInfo.afterRecursiveFilter}</div>
+										</div>
+										<i className="bi-arrow-right" style={{ color: 'rgba(255, 255, 255, 0.5)' }}></i>
+										<div>
+											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>After Name Filter</div>
+											<div style={{ color: '#10b981', fontWeight: '700', fontSize: '1.2rem' }}>{debugInfo.afterNameFilter}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+				{DEBUG && LOG_LEVEL !== 3 && (
+					<div className="metrics-container mb-3">
+						<div className="d-flex align-items-center justify-content-center gap-4 flex-wrap">
+							<div className="metric-card hover-grow">
+								<div className="d-flex align-items-center gap-2">
+									<div className="metric-icon purple d-flex align-items-center justify-content-center">
+										<i className="bi-images text-white fs-4"></i>
+									</div>
+									<div>
+										<div className="metric-label">Total</div>
+										<div className="text-white fw-bold fs-4 lh-1">{mediaFiles.length}</div>
+									</div>
+								</div>
+							</div>
+
+							<div className="metric-divider"></div>
+
+							<div className="metric-card hover-grow">
+								<div className="d-flex align-items-center gap-2">
+									<div className="metric-icon green d-flex align-items-center justify-content-center">
+										<i className="bi-funnel text-white fs-4"></i>
+									</div>
+									<div>
+										<div className="metric-label">Shown</div>
+										<div className="text-white fw-bold fs-4 lh-1">{debugInfo.afterNameFilter}</div>
+									</div>
+								</div>
+							</div>
+
+							{isRecursiveSearch && (
+								<>
+									<div className="metric-divider"></div>
+
+									<div className="metric-card hover-grow">
+										<div className="d-flex align-items-center gap-2">
+											<div className="metric-icon blue d-flex align-items-center justify-content-center">
+												<i className="bi-folder text-white fs-4"></i>
+											</div>
+											<div>
+												<div className="metric-label">Folders</div>
+												<div className="text-white fw-bold fs-4 lh-1">{debugInfo.descendantFolderCount}</div>
+											</div>
+										</div>
+									</div>
+								</>
+							)}
+						</div>
+					</div>
+				)}
+			</>
+		)
+	}
+
 	function renderTopBar(): JSX.Element {
 		return (
 			<nav className="navbar mb-3">
@@ -341,23 +541,6 @@ const FileBrowser: React.FC = () => {
 						Showing files created by this app. Full folder browsing requires additional permissions.
 					</div>
 				)}
-				{DEBUG && (
-					<div className="alert alert-dark mb-3" role="alert">
-						<strong className="d-block mb-2"><i className="bi-bug me-2"></i>Debug Info</strong>
-						<div className="small">
-							<div>Recursive Search: <span className="badge bg-secondary">{isRecursiveSearch ? 'ON' : 'OFF'}</span></div>
-							<div>Search Word: <span className="badge bg-secondary">{optSchWord || '(none)'}</span></div>
-							<div>Current Folder ID: <code className="text-warning">{debugInfo.currentFolderId || '(none)'}</code></div>
-							<div>Descendant Folders Found: <span className="badge bg-info">{debugInfo.descendantFolderCount}</span></div>
-							<div>Total mediaFiles: <span className="badge bg-primary">{mediaFiles.length}</span></div>
-							<div>Files with parents: <span className="badge bg-success">{debugInfo.filesWithParents}</span></div>
-							<div>Files without parents: <span className="badge bg-danger">{debugInfo.filesWithoutParents}</span></div>
-							<div>Source Items (before filter): <span className="badge bg-primary">{debugInfo.sourceItemCount}</span></div>
-							<div>After Recursive Filter: <span className="badge bg-primary">{debugInfo.afterRecursiveFilter}</span></div>
-							<div>After Name Filter: <span className="badge bg-success">{debugInfo.afterNameFilter}</span></div>
-						</div>
-					</div>
-				)}
 				{viewMode === 'grid' ?
 					<section className="bg-black h-100">
 						<GridView
@@ -380,6 +563,7 @@ const FileBrowser: React.FC = () => {
 	return (
 		<section>
 			{renderTopBar()}
+			{optSchWord && renderSearchResultsInfo()}
 			{isLoading ? <AlertLoading /> : renderBrowser()}
 		</section>
 	)
