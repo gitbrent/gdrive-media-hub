@@ -18,11 +18,12 @@ const FileBrowser: React.FC = () => {
 	const [currFolderContents, setCurrFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
 	const [currentFolderPath, setCurrentFolderPath] = useState<BreadcrumbSegment[]>([])
 	const [optSchWord, setOptSchWord] = useState('')
-	const [isGlobalSearch, setIsGlobalSearch] = useState(false)
+	const [isRecursiveSearch, setIsRecursiveSearch] = useState(false)
 	const [isFolderLoading, setIsFolderLoading] = useState(false)
 	const [viewMode, setViewMode] = useState<ViewMode>('list')
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
+	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
 	const [hasRootAccess, setHasRootAccess] = useState(true)
 	//
 	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
@@ -116,9 +117,9 @@ const FileBrowser: React.FC = () => {
 			mimeType: string;
 		}
 
-		// If no root access, always use mediaFiles; otherwise use origFolderContents unless global search
+		// If no root access, always use mediaFiles; otherwise use origFolderContents unless recursive search
 		const sourceItems = !hasRootAccess ? [...mediaFiles]
-			: (isGlobalSearch && optSchWord ? [...mediaFiles] : [...origFolderContents])
+			: (isRecursiveSearch && optSchWord ? [...mediaFiles] : [...origFolderContents])
 
 		const sortedContents = sourceItems.sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
 			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
@@ -147,7 +148,7 @@ const FileBrowser: React.FC = () => {
 		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 
 		setCurrFolderContents(filteredContents)
-	}, [mediaFiles, origFolderContents, isGlobalSearch, optSchWord, sortField, sortOrder, hasRootAccess])
+	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -161,54 +162,78 @@ const FileBrowser: React.FC = () => {
 			<nav className="navbar mb-3">
 				<form className="container-fluid px-0">
 					<div className="row w-100 align-items-center justify-content-between">
-						<div className="col-4 col-md-auto">
+						<div className="col-12 col-md-auto">
 							<div className="btn-group" role="group" aria-label="view switcher">
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
 									aria-label="list view"
 									onClick={() => setViewMode('list')}>
-									<i className="bi-card-list me-2" />List
+									<i className="bi-card-list" /><span className="ms-2 d-none d-lg-inline">List</span>
 								</button>
 								<button
 									type="button"
 									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
 									aria-label="grid view"
 									onClick={() => setViewMode('grid')}>
-									<i className="bi-grid me-2" />Grid
+									<i className="bi-grid" /><span className="ms-2 d-none d-lg-inline">Grid</span>
 								</button>
 							</div>
 						</div>
-						<div className="col-8 col-md-auto">
+						{viewMode === 'grid' && (
+							<div className="col-12 col-md-auto mt-2 mt-md-0">
+								<div className="btn-group" role="group" aria-label="tile size options">
+									<button type="button" aria-label="small tiles"
+										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'small' ? 'active' : ''}`}
+										title="Small tiles"
+										onClick={() => setTileSize('small')}>
+										<i className="bi-grid-3x3-gap" />
+									</button>
+									<button type="button" aria-label="medium tiles"
+										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'medium' ? 'active' : ''}`}
+										title="Medium tiles"
+										onClick={() => setTileSize('medium')}>
+										<i className="bi-grid" />
+									</button>
+									<button type="button" aria-label="large tiles"
+										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'large' ? 'active' : ''}`}
+										title="Large tiles"
+										onClick={() => setTileSize('large')}>
+										<i className="bi-grid-1x2" />
+									</button>
+								</div>
+							</div>
+						)}
+						<div className="col-12 col-md-auto mt-2 mt-md-0">
 							<div className="btn-group" role="group" aria-label="sort options">
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'name' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('name')}>
-									<i className="bi-alphabet-uppercase me-2 d-none d-lg-inline" />Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-alphabet-uppercase" /><span className="ms-2 d-none d-lg-inline">Name</span> {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'size' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('size')}>
-									<i className="bi-hdd me-2 d-none d-lg-inline" />Size {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-hdd" /><span className="ms-2 d-none d-lg-inline">Size</span> {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
 									className={`btn btn-outline-secondary text-nowrap ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
 									onClick={() => toggleSortOrder('modifiedByMeTime')}>
-									<i className="bi-clock-history me-2 d-none d-lg-inline" />Modified {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
+									<i className="bi-clock" /><span className="ms-2 d-none d-lg-inline">Modified</span> {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
 								</button>
 							</div>
 						</div>
-						<div className="col-12 col-md">
+						<div className="col col-md mt-2 mt-md-0">
 							<div className="input-group">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<div className="input-group-text">
-									<input className="form-check-input mt-0" type="checkbox" id="globalSearchCheck" value="" checked={isGlobalSearch} onChange={(ev) => setIsGlobalSearch(ev.currentTarget.checked)} aria-label="Checkbox for global search" />
-									<label className="form-check-label ms-2 text-white-50 nouserselect" htmlFor="globalSearchCheck">Global</label>
+									<input className="form-check-input mt-0" type="checkbox" id="recursiveSearchCheck" value="" checked={isRecursiveSearch} onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)} aria-label="Checkbox for recursive search" />
+									<label className="form-check-label ms-2 text-white-50 nouserselect" htmlFor="recursiveSearchCheck">Recursive</label>
 								</div>
 								<input type="search" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="grp-search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
 						</div>
-						<div className="col-12 col-md-auto text-center h4 fw-light mb-0">
+						<div className="col-auto col-md-auto mt-2 mt-md-0 text-center h4 fw-light mb-0">
 							<span className="text-nowrap text-warning">
 								{currFolderContents.filter(item => isFolder(item)).length}
 								<i className="bi-folder-fill ms-2" />
@@ -248,6 +273,7 @@ const FileBrowser: React.FC = () => {
 							currFolderContents={currFolderContents}
 							isFolderLoading={isFolderLoading}
 							handleFolderClick={handleFolderClick}
+							tileSize={tileSize}
 						/>
 					</section>
 					: <FileBrowViewList
