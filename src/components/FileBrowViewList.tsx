@@ -199,7 +199,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 						return (
 							<tr key={index} className='border-bottom border-dark-subtle file-list-row'>
 								<td>
-									<div className={`file-list-icon-wrapper ${mimeTextClass}`}>
+									<div className="file-list-icon-wrapper text-body-secondary">
 										<i className={
 											isFolder(item) && isFolderLoading
 												? 'fs-4 bi-arrow-repeat'
@@ -308,7 +308,6 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 				) :
 					<div />
 			}
-
 			<div className='table-responsive'>{renderTable()}</div>
 		</section>
 	)
