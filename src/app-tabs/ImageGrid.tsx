@@ -99,7 +99,7 @@ export default function ImageGrid() {
 									title="show gifs"
 									aria-label="show gifs"
 									onClick={() => setMediaTypeFilter('gif')}>
-									<i className="bi-play-circle" /><span className="ms-2 d-none d-lg-inline">GIF</span>
+									<i className="bi-play-btn" /><span className="ms-2 d-none d-lg-inline">GIF</span>
 								</button>
 								<button
 									type="button"
@@ -107,7 +107,7 @@ export default function ImageGrid() {
 									title="show videos"
 									aria-label="show videos"
 									onClick={() => setMediaTypeFilter('video')}>
-									<i className="bi-play-btn-fill" /><span className="ms-2 d-none d-lg-inline">Video</span>
+									<i className="bi-camera-video" /><span className="ms-2 d-none d-lg-inline">Video</span>
 								</button>
 							</div>
 						</div>

@@ -12,6 +12,7 @@ import '../css/FileBrowser.css'
 type ViewMode = 'grid' | 'list'
 type SortField = 'name' | 'size' | 'modifiedByMeTime'
 type SortOrder = 'asc' | 'desc'
+type MediaType = 'all' | 'image' | 'gif' | 'video'
 
 const FileBrowser: React.FC = () => {
 	const [origFolderContents, setOrigFolderContents] = useState<Array<IGapiFile | IGapiFolder>>([])
@@ -24,6 +25,7 @@ const FileBrowser: React.FC = () => {
 	const [sortField, setSortField] = useState<SortField>('name')
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
+	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
 	const [hasRootAccess, setHasRootAccess] = useState(true)
 	const [debugInfo, setDebugInfo] = useState<{
 		currentFolderId: string;
@@ -205,8 +207,19 @@ const FileBrowser: React.FC = () => {
 			return 0
 		})
 
-		// Filter results
-		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+		// Filter results - first by media type, then by search word
+		const filteredContents = sortedContents
+			.filter((item) => {
+				// Always show folders
+				if (isFolder(item)) return true
+				// Apply media type filter
+				if (mediaTypeFilter === 'all') return true
+				if (mediaTypeFilter === 'image') return isImage(item)
+				if (mediaTypeFilter === 'gif') return isGif(item)
+				if (mediaTypeFilter === 'video') return isVideo(item)
+				return false
+			})
+			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 
 		// Update debug info
 		const filesWithParents = mediaFiles.filter(f => f.parents && f.parents.length > 0).length
@@ -222,7 +235,7 @@ const FileBrowser: React.FC = () => {
 		})
 
 		setCurrFolderContents(filteredContents)
-	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess, currentFolderPath])
+	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess, currentFolderPath, mediaTypeFilter])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -502,8 +515,44 @@ const FileBrowser: React.FC = () => {
 								</button>
 							</div>
 						</div>
+						<div className="col-12 col-md-auto mt-2 mt-md-0">
+							<div className="btn-group" role="group" aria-label="media type filter">
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'all' ? 'active' : ''}`}
+									title="show all"
+									aria-label="show all"
+									onClick={() => setMediaTypeFilter('all')}>
+									<i className="bi-files" /><span className="ms-2 d-none d-lg-inline">All</span>
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'image' ? 'active' : ''}`}
+									title="show images"
+									aria-label="show images"
+									onClick={() => setMediaTypeFilter('image')}>
+									<i className="bi-image" /><span className="ms-2 d-none d-lg-inline">Image</span>
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'gif' ? 'active' : ''}`}
+									title="show gifs"
+									aria-label="show gifs"
+									onClick={() => setMediaTypeFilter('gif')}>
+									<i className="bi-play-btn" /><span className="ms-2 d-none d-lg-inline">GIF</span>
+								</button>
+								<button
+									type="button"
+									className={`btn btn-outline-secondary ${mediaTypeFilter === 'video' ? 'active' : ''}`}
+									title="show videos"
+									aria-label="show videos"
+									onClick={() => setMediaTypeFilter('video')}>
+									<i className="bi-camera-video" /><span className="ms-2 d-none d-lg-inline">Video</span>
+								</button>
+							</div>
+						</div>
 						<div className="col col-md mt-2 mt-md-0">
-							<div className="input-group">
+							<div className="input-group flex-nowrap">
 								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
 								<div className="input-group-text">
 									<input className="form-check-input mt-0" type="checkbox" id="recursiveSearchCheck" value="" checked={isRecursiveSearch} onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)} aria-label="Checkbox for recursive search" />
@@ -511,24 +560,6 @@ const FileBrowser: React.FC = () => {
 								</div>
 								<input type="search" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="grp-search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
 							</div>
-						</div>
-						<div className="col-auto col-md-auto mt-2 mt-md-0 text-center h4 fw-light mb-0">
-							<span className="text-nowrap text-warning">
-								{currFolderContents.filter(item => isFolder(item)).length}
-								<i className="bi-folder-fill ms-2" />
-							</span>
-							<span className="text-nowrap text-success ms-3">
-								{currFolderContents.filter(item => isImage(item)).length}
-								<i className="bi-image ms-2" />
-							</span>
-							<span className="text-nowrap text-primary ms-3">
-								{currFolderContents.filter(item => isGif(item)).length}
-								<i className="bi-play-btn ms-2" />
-							</span>
-							<span className="text-nowrap text-info ms-3">
-								{currFolderContents.filter(item => isVideo(item)).length}
-								<i className="bi-camera-video ms-2" />
-							</span>
 						</div>
 					</div>
 				</form>
@@ -539,11 +570,37 @@ const FileBrowser: React.FC = () => {
 	function renderBrowser(): JSX.Element {
 		return (
 			<section>
-				{hasRootAccess && <Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} className="pb-2" />}
 				{!hasRootAccess && (
 					<div className="alert alert-info mb-3" role="alert">
 						<i className="bi-info-circle me-2"></i>
 						Showing files created by this app. Full folder browsing requires additional permissions.
+					</div>
+				)}
+				{hasRootAccess && (
+					<div className='row align-items-center mb-2'>
+						<div className='col'>
+							<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
+						</div>
+						<div className='col-auto'>
+							<div className="bg-dark-subtle rounded-3 px-3 py-2 d-flex align-items-center h-100">
+								<span className="text-nowrap text-warning">
+									{currFolderContents.filter(item => isFolder(item)).length}
+									<i className="bi-folder-fill ms-2" />
+								</span>
+								<span className="text-nowrap text-success ms-3">
+									{currFolderContents.filter(item => isImage(item)).length}
+									<i className="bi-image ms-2" />
+								</span>
+								<span className="text-nowrap text-primary ms-3">
+									{currFolderContents.filter(item => isGif(item)).length}
+									<i className="bi-play-btn ms-2" />
+								</span>
+								<span className="text-nowrap text-info ms-3">
+									{currFolderContents.filter(item => isVideo(item)).length}
+									<i className="bi-camera-video ms-2" />
+								</span>
+							</div>
+						</div>
 					</div>
 				)}
 				{viewMode === 'grid' ?
