@@ -258,7 +258,7 @@ const FileBrowser: React.FC = () => {
 						boxShadow: '0 8px 32px rgba(109, 40, 217, 0.4)',
 						border: '1px solid rgba(139, 92, 246, 0.2)'
 					}}>
-						<div className="d-flex align-items-center mb-3">
+						<div className="hstack gap-3 mb-3">
 							<div style={{
 								background: 'rgba(255, 255, 255, 0.2)',
 								borderRadius: '12px',
@@ -311,8 +311,7 @@ const FileBrowser: React.FC = () => {
 									border: '1px solid rgba(255, 255, 255, 0.2)'
 								}}>
 									<div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem', marginBottom: '6px' }}>Descendant Folders</div>
-									<div className="d-flex align-items-center">
-										<i className="bi-folder2-open me-2" style={{ color: '#ffd700', fontSize: '1.2rem' }}></i>
+									<div className="hstack gap-2">
 										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.descendantFolderCount}</span>
 									</div>
 								</div>
@@ -327,8 +326,7 @@ const FileBrowser: React.FC = () => {
 									boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
 								}}>
 									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Total Media Files</div>
-									<div className="d-flex align-items-center">
-										<i className="bi-collection-play-fill me-2" style={{ color: '#60a5fa', fontSize: '1.2rem' }}></i>
+									<div className="hstack gap-2">
 										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{mediaFiles.length}</span>
 									</div>
 								</div>
@@ -343,8 +341,7 @@ const FileBrowser: React.FC = () => {
 									boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
 								}}>
 									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>With Parents</div>
-									<div className="d-flex align-items-center">
-										<i className="bi-check-circle-fill me-2" style={{ color: '#34d399', fontSize: '1.2rem' }}></i>
+									<div className="hstack gap-2">
 										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithParents}</span>
 									</div>
 								</div>
@@ -359,8 +356,7 @@ const FileBrowser: React.FC = () => {
 									boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
 								}}>
 									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Without Parents</div>
-									<div className="d-flex align-items-center">
-										<i className="bi-x-circle-fill me-2" style={{ color: '#f87171', fontSize: '1.2rem' }}></i>
+									<div className="hstack gap-2">
 										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithoutParents}</span>
 									</div>
 								</div>
@@ -399,13 +395,15 @@ const FileBrowser: React.FC = () => {
 						<div className="card border-0 shadow-lg kpi-card kpi-card-purple">
 							<div className="card-body kpi-card-body">
 								<div className="d-flex align-items-center justify-content-between">
-									<div>
-										<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Total Files</div>
-										<div className="text-white fw-bold kpi-title mb-0">{mediaFiles.length}</div>
+									<div className="hstack gap-2">
+										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+											<i className="bi-images text-white kpi-icon"></i>
+										</div>
+										<div>
+											<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Total Files</div>
+										</div>
 									</div>
-									<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-										<i className="bi-images text-white kpi-icon"></i>
-									</div>
+									<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{mediaFiles.length}</div>
 								</div>
 							</div>
 							<i className="bi-images kpi-card-icon-bg"></i>
@@ -415,13 +413,15 @@ const FileBrowser: React.FC = () => {
 						<div className="card border-0 shadow-lg kpi-card kpi-card-green">
 							<div className="card-body kpi-card-body">
 								<div className="d-flex align-items-center justify-content-between">
-									<div>
-										<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Shown</div>
-										<div className="text-white fw-bold kpi-title mb-0">{debugInfo.afterNameFilter}</div>
+									<div className="hstack gap-2">
+										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+											<i className="bi-funnel text-white kpi-icon"></i>
+										</div>
+										<div>
+											<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Files Shown</div>
+										</div>
 									</div>
-									<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-										<i className="bi-funnel text-white kpi-icon"></i>
-									</div>
+									<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{debugInfo.afterNameFilter}</div>
 								</div>
 							</div>
 							<i className="bi-funnel kpi-card-icon-bg"></i>
@@ -432,13 +432,15 @@ const FileBrowser: React.FC = () => {
 							<div className="card border-0 shadow-lg kpi-card kpi-card-blue">
 								<div className="card-body kpi-card-body">
 									<div className="d-flex align-items-center justify-content-between">
-										<div>
-											<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Folders</div>
-											<div className="text-white fw-bold kpi-title mb-0">{debugInfo.descendantFolderCount}</div>
+										<div className="hstack gap-2">
+											<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+												<i className="bi-folder text-white kpi-icon"></i>
+											</div>
+											<div>
+												<div className="text-white-50 text-uppercase small" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Recursive Folders</div>
+											</div>
 										</div>
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-folder text-white kpi-icon"></i>
-										</div>
+										<div className="text-white fw-bold kpi-title mb-0" style={{ fontSize: '2.5rem' }}>{debugInfo.descendantFolderCount}</div>
 									</div>
 								</div>
 								<i className="bi-folder kpi-card-icon-bg"></i>
@@ -583,7 +585,7 @@ const FileBrowser: React.FC = () => {
 							<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
 						</div>
 						<div className='col-auto'>
-							<div className="bg-dark-subtle rounded-3 px-3 py-2 d-flex align-items-center h-100">
+							<div className="bg-dark-subtle rounded-3 px-3 py-2 hstack h-100">
 								<span className="text-nowrap text-warning">
 									{currFolderContents.filter(item => isFolder(item)).length}
 									<i className="bi-folder-fill ms-2" />
@@ -626,7 +628,7 @@ const FileBrowser: React.FC = () => {
 	return (
 		<section>
 			{renderTopBar()}
-			{optSchWord && renderSearchResultsInfo()}
+			{renderSearchResultsInfo()}
 			{isLoading ? <AlertLoading /> : renderBrowser()}
 		</section>
 	)
