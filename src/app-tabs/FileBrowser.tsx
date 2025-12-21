@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { BreadcrumbSegment, IGapiFile, IGapiFolder } from '../App.props'
+import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { getRootFolderId, fetchFolderContents } from '../api-google'
 import { DataContext } from '../api-google/DataContext'
@@ -25,6 +25,15 @@ const FileBrowser: React.FC = () => {
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
 	const [hasRootAccess, setHasRootAccess] = useState(true)
+	const [debugInfo, setDebugInfo] = useState<{
+		currentFolderId: string;
+		descendantFolderCount: number;
+		sourceItemCount: number;
+		afterRecursiveFilter: number;
+		afterNameFilter: number;
+		filesWithParents: number;
+		filesWithoutParents: number;
+	}>({ currentFolderId: '', descendantFolderCount: 0, sourceItemCount: 0, afterRecursiveFilter: 0, afterNameFilter: 0, filesWithParents: 0, filesWithoutParents: 0 })
 	//
 	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
 
@@ -117,9 +126,61 @@ const FileBrowser: React.FC = () => {
 			mimeType: string;
 		}
 
+		/**
+		 * Get all descendant folder IDs from a starting folder (recursively)
+		 */
+		const getDescendantFolderIds = (startFolderId: string): Set<string> => {
+			const descendantIds = new Set<string>([startFolderId])
+			const foldersToProcess = [startFolderId]
+
+			while (foldersToProcess.length > 0) {
+				const currentFolderId = foldersToProcess.shift()!
+
+				// Find all folders that have currentFolderId as a parent
+				const childFolders = mediaFiles.filter(file =>
+					isFolder(file) &&
+					file.parents?.includes(currentFolderId)
+				)
+
+				childFolders.forEach(folder => {
+					if (!descendantIds.has(folder.id)) {
+						descendantIds.add(folder.id)
+						foldersToProcess.push(folder.id)
+					}
+				})
+			}
+
+			return descendantIds
+		}
+
 		// If no root access, always use mediaFiles; otherwise use origFolderContents unless recursive search
-		const sourceItems = !hasRootAccess ? [...mediaFiles]
+		let sourceItems = !hasRootAccess ? [...mediaFiles]
 			: (isRecursiveSearch && optSchWord ? [...mediaFiles] : [...origFolderContents])
+
+		const sourceItemCount = sourceItems.length
+		let descendantFolderIds: Set<string> | null = null
+		let currentFolderId = ''
+
+		// Calculate descendant folders for debug info (always when we have root access)
+		if (hasRootAccess && currentFolderPath.length > 0) {
+			currentFolderId = currentFolderPath[currentFolderPath.length - 1].folderId
+			descendantFolderIds = getDescendantFolderIds(currentFolderId)
+
+			// Also count immediate child folders from origFolderContents (since mediaFiles may not have folders)
+			const immediateFolders = origFolderContents.filter(item => isFolder(item))
+			immediateFolders.forEach(folder => {
+				descendantFolderIds!.add(folder.id)
+			})
+		}
+
+		// Filter for recursive search: only show files in current folder or its descendants
+		if (isRecursiveSearch && hasRootAccess && optSchWord && currentFolderPath.length > 0 && descendantFolderIds) {
+			sourceItems = sourceItems.filter(item =>
+				item.parents?.some(parentId => descendantFolderIds!.has(parentId))
+			)
+		}
+
+		const afterRecursiveFilter = sourceItems.length
 
 		const sortedContents = sourceItems.sort((a: ICommonFileFolderProperties, b: ICommonFileFolderProperties) => {
 			const isFolderA = a.mimeType === 'application/vnd.google-apps.folder'
@@ -147,8 +208,21 @@ const FileBrowser: React.FC = () => {
 		// Filter results
 		const filteredContents = sortedContents.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
 
+		// Update debug info
+		const filesWithParents = mediaFiles.filter(f => f.parents && f.parents.length > 0).length
+		const filesWithoutParents = mediaFiles.filter(f => !f.parents || f.parents.length === 0).length
+		setDebugInfo({
+			currentFolderId,
+			descendantFolderCount: descendantFolderIds ? descendantFolderIds.size : 0,
+			sourceItemCount,
+			afterRecursiveFilter,
+			afterNameFilter: filteredContents.length,
+			filesWithParents,
+			filesWithoutParents
+		})
+
 		setCurrFolderContents(filteredContents)
-	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess])
+	}, [mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField, sortOrder, hasRootAccess, currentFolderPath])
 
 	const toggleSortOrder = (field: SortField) => {
 		setSortField(field)
@@ -265,6 +339,23 @@ const FileBrowser: React.FC = () => {
 					<div className="alert alert-info mb-3" role="alert">
 						<i className="bi-info-circle me-2"></i>
 						Showing files created by this app. Full folder browsing requires additional permissions.
+					</div>
+				)}
+				{DEBUG && (
+					<div className="alert alert-dark mb-3" role="alert">
+						<strong className="d-block mb-2"><i className="bi-bug me-2"></i>Debug Info</strong>
+						<div className="small">
+							<div>Recursive Search: <span className="badge bg-secondary">{isRecursiveSearch ? 'ON' : 'OFF'}</span></div>
+							<div>Search Word: <span className="badge bg-secondary">{optSchWord || '(none)'}</span></div>
+							<div>Current Folder ID: <code className="text-warning">{debugInfo.currentFolderId || '(none)'}</code></div>
+							<div>Descendant Folders Found: <span className="badge bg-info">{debugInfo.descendantFolderCount}</span></div>
+							<div>Total mediaFiles: <span className="badge bg-primary">{mediaFiles.length}</span></div>
+							<div>Files with parents: <span className="badge bg-success">{debugInfo.filesWithParents}</span></div>
+							<div>Files without parents: <span className="badge bg-danger">{debugInfo.filesWithoutParents}</span></div>
+							<div>Source Items (before filter): <span className="badge bg-primary">{debugInfo.sourceItemCount}</span></div>
+							<div>After Recursive Filter: <span className="badge bg-primary">{debugInfo.afterRecursiveFilter}</span></div>
+							<div>After Name Filter: <span className="badge bg-success">{debugInfo.afterNameFilter}</span></div>
+						</div>
 					</div>
 				)}
 				{viewMode === 'grid' ?
