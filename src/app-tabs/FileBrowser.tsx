@@ -10,7 +10,7 @@ import GridView from '../components/GridView'
 import '../css/FileBrowser.css'
 
 type ViewMode = 'grid' | 'list'
-type SortField = 'name' | 'size' | 'modifiedByMeTime'
+type SortField = 'name' | 'size' | 'modifiedByMeTime' | 'createdTime'
 type SortOrder = 'asc' | 'desc'
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 
@@ -125,6 +125,7 @@ const FileBrowser: React.FC = () => {
 			name: string;
 			size?: string;
 			modifiedByMeTime: string;
+			createdTime?: string;
 			mimeType: string;
 		}
 
@@ -194,7 +195,7 @@ const FileBrowser: React.FC = () => {
 				return 1
 			}
 			// If both are folders or both are not folders, then sort based on the sortField and sortOrder
-			if (sortField === 'name' || sortField === 'modifiedByMeTime') {
+			if (sortField === 'name' || sortField === 'modifiedByMeTime' || sortField === 'createdTime') {
 				const fieldA = a[sortField] || ''
 				const fieldB = b[sortField] || ''
 				return sortOrder === 'asc' ? fieldA.localeCompare(fieldB) : fieldB.localeCompare(fieldA)
@@ -239,11 +240,6 @@ const FileBrowser: React.FC = () => {
 		mediaFiles, origFolderContents, isRecursiveSearch, optSchWord, sortField,
 		sortOrder, hasRootAccess, currentFolderPath, mediaTypeFilter
 	])
-
-	const toggleSortOrder = (field: SortField) => {
-		setSortField(field)
-		setSortOrder((prevOrder) => (prevOrder === 'asc' ? 'desc' : 'asc'))
-	}
 
 	// --------------------------------------------------------------------------------------------
 
@@ -451,115 +447,169 @@ const FileBrowser: React.FC = () => {
 	}
 
 	function renderTopBar(): JSX.Element {
+		const isSearchActive = optSchWord.length > 0 || isRecursiveSearch;
+		const hasActiveFilters = mediaTypeFilter !== 'all' || sortField !== 'name' || sortOrder !== 'asc';
+
 		return (
-			<nav className="navbar mb-3">
+			<nav className="modern-navbar mb-3">
 				<form className="container-fluid px-0">
-					<div className="row w-100 align-items-center justify-content-between">
-						<div className="col-12 col-md-auto">
-							<div className="btn-group" role="group" aria-label="view switcher">
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${viewMode === 'list' ? 'active' : ''}`}
-									aria-label="list view"
-									onClick={() => setViewMode('list')}>
-									<i className="bi-card-list" /><span className="ms-2 d-none d-lg-inline">List</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${viewMode === 'grid' ? 'active' : ''}`}
-									aria-label="grid view"
-									onClick={() => setViewMode('grid')}>
-									<i className="bi-grid" /><span className="ms-2 d-none d-lg-inline">Grid</span>
-								</button>
+					<div className="row w-100 align-items-end justify-content-between g-2">
+						{/* VIEW MODE SECTION */}
+						<div className="col-12 col-sm-auto">
+							<div className="control-group view-group">
+								<label className="control-label">View</label>
+								<div className="btn-group-modern" role="group" aria-label="view switcher">
+									<button
+										type="button"
+										className={`btn-modern ${viewMode === 'list' ? 'active' : ''}`}
+										aria-label="list view"
+										title="List View"
+										onClick={() => setViewMode('list')}>
+										<i className="bi-card-list" />
+										<span className="d-none d-sm-inline">List</span>
+									</button>
+									<button
+										type="button"
+										className={`btn-modern ${viewMode === 'grid' ? 'active' : ''}`}
+										aria-label="grid view"
+										title="Grid View"
+										onClick={() => setViewMode('grid')}>
+										<i className="bi-grid" />
+										<span className="d-none d-sm-inline">Grid</span>
+									</button>
+								</div>
 							</div>
 						</div>
+
+						{/* TILE SIZE SECTION - Show only in grid mode */}
 						{viewMode === 'grid' && (
-							<div className="col-12 col-md-auto mt-2 mt-md-0">
-								<div className="btn-group" role="group" aria-label="tile size options">
-									<button type="button" aria-label="small tiles"
-										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'small' ? 'active' : ''}`}
-										title="Small tiles"
-										onClick={() => setTileSize('small')}>
-										<i className="bi-grid-3x3-gap" />
-									</button>
-									<button type="button" aria-label="medium tiles"
-										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'medium' ? 'active' : ''}`}
-										title="Medium tiles"
-										onClick={() => setTileSize('medium')}>
-										<i className="bi-grid" />
-									</button>
-									<button type="button" aria-label="large tiles"
-										className={`btn btn-outline-secondary text-nowrap ${tileSize === 'large' ? 'active' : ''}`}
-										title="Large tiles"
-										onClick={() => setTileSize('large')}>
-										<i className="bi-grid-1x2" />
-									</button>
+							<div className="col-12 col-sm-auto">
+								<div className="control-group size-group">
+									<label className="control-label">Size</label>
+									<div className="btn-group-modern" role="group" aria-label="tile size options">
+										<button type="button" aria-label="small tiles"
+											className={`btn-modern-icon ${tileSize === 'small' ? 'active' : ''}`}
+											title="Small tiles"
+											onClick={() => setTileSize('small')}>
+											<i className="bi-grid-3x3-gap" />
+										</button>
+										<button type="button" aria-label="medium tiles"
+											className={`btn-modern-icon ${tileSize === 'medium' ? 'active' : ''}`}
+											title="Medium tiles"
+											onClick={() => setTileSize('medium')}>
+											<i className="bi-grid" />
+										</button>
+										<button type="button" aria-label="large tiles"
+											className={`btn-modern-icon ${tileSize === 'large' ? 'active' : ''}`}
+											title="Large tiles"
+											onClick={() => setTileSize('large')}>
+											<i className="bi-grid-1x2" />
+										</button>
+									</div>
 								</div>
 							</div>
 						)}
-						<div className="col-12 col-md-auto mt-2 mt-md-0">
-							<div className="btn-group" role="group" aria-label="sort options">
-								<button type="button" aria-label="sort by name"
-									className={`btn btn-outline-secondary text-nowrap ${sortField === 'name' ? 'active' : ''}`}
-									onClick={() => toggleSortOrder('name')}>
-									<i className="bi-alphabet-uppercase" /><span className="ms-2 d-none d-lg-inline">Name</span> {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
-								</button>
-								<button type="button" aria-label="sort by size"
-									className={`btn btn-outline-secondary text-nowrap ${sortField === 'size' ? 'active' : ''}`}
-									onClick={() => toggleSortOrder('size')}>
-									<i className="bi-hdd" /><span className="ms-2 d-none d-lg-inline">Size</span> {sortField === 'size' && (sortOrder === 'asc' ? '↑' : '↓')}
-								</button>
-								<button type="button" aria-label="sort by modified"
-									className={`btn btn-outline-secondary text-nowrap ${sortField === 'modifiedByMeTime' ? 'active' : ''}`}
-									onClick={() => toggleSortOrder('modifiedByMeTime')}>
-									<i className="bi-clock" /><span className="ms-2 d-none d-lg-inline">Modified</span> {sortField === 'modifiedByMeTime' && (sortOrder === 'asc' ? '↑' : '↓')}
-								</button>
-							</div>
-						</div>
-						<div className="col-12 col-md-auto mt-2 mt-md-0">
-							<div className="btn-group" role="group" aria-label="media type filter">
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'all' ? 'active' : ''}`}
-									title="show all"
-									aria-label="show all"
-									onClick={() => setMediaTypeFilter('all')}>
-									<i className="bi-files" /><span className="ms-2 d-none d-lg-inline">All</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'image' ? 'active' : ''}`}
-									title="show images"
-									aria-label="show images"
-									onClick={() => setMediaTypeFilter('image')}>
-									<i className="bi-image" /><span className="ms-2 d-none d-lg-inline">Image</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'gif' ? 'active' : ''}`}
-									title="show gifs"
-									aria-label="show gifs"
-									onClick={() => setMediaTypeFilter('gif')}>
-									<i className="bi-play-btn" /><span className="ms-2 d-none d-lg-inline">GIF</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'video' ? 'active' : ''}`}
-									title="show videos"
-									aria-label="show videos"
-									onClick={() => setMediaTypeFilter('video')}>
-									<i className="bi-camera-video" /><span className="ms-2 d-none d-lg-inline">Video</span>
-								</button>
-							</div>
-						</div>
-						<div className="col col-md mt-2 mt-md-0">
-							<div className="input-group flex-nowrap">
-								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<div className="input-group-text">
-									<input className="form-check-input mt-0" type="checkbox" id="recursiveSearchCheck" value="" checked={isRecursiveSearch} onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)} aria-label="Checkbox for recursive search" />
-									<label className="form-check-label ms-2 text-white-50 nouserselect" htmlFor="recursiveSearchCheck">Recursive</label>
+
+						{/* SORT SECTION */}
+						<div className="col-12 col-sm-auto">
+							<div className="control-group sort-group">
+								<label className="control-label">Sort</label>
+								<div className="sort-controls">
+									<select
+										className="sort-select"
+										value={sortField}
+										onChange={(e) => setSortField(e.target.value as SortField)}
+										aria-label="Sort field">
+										<option value="name">Name</option>
+										<option value="size">Size</option>
+										<option value="modifiedByMeTime">Modified</option>
+										<option value="createdTime">Created</option>
+									</select>
+									<button
+										type="button"
+										className="sort-order-btn"
+										onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+										aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
+										title={`Click to sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}>
+										<i className={`bi bi-arrow-${sortOrder === 'asc' ? 'up' : 'down'}`} />
+									</button>
 								</div>
-								<input type="search" className="form-control" placeholder="Search" aria-label="Search" aria-describedby="grp-search" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
+							</div>
+						</div>
+
+						{/* FILTER SECTION */}
+						<div className="col-12 col-sm-auto">
+							<div className={`control-group filter-group ${hasActiveFilters ? 'has-active' : ''}`}>
+								<label className="control-label">Type</label>
+								<div className="filter-buttons">
+									<button
+										type="button"
+										className={`btn-filter ${mediaTypeFilter === 'all' ? 'active' : ''}`}
+										title="Show all"
+										aria-label="show all"
+										onClick={() => setMediaTypeFilter('all')}>
+										<i className="bi-files" />
+										<span className="d-none d-lg-inline">All</span>
+									</button>
+									<button
+										type="button"
+										className={`btn-filter ${mediaTypeFilter === 'image' ? 'active' : ''}`}
+										title="Show images"
+										aria-label="show images"
+										onClick={() => setMediaTypeFilter('image')}>
+										<i className="bi-image" />
+										<span className="d-none d-lg-inline">Image</span>
+									</button>
+									<button
+										type="button"
+										className={`btn-filter ${mediaTypeFilter === 'gif' ? 'active' : ''}`}
+										title="Show gifs"
+										aria-label="show gifs"
+										onClick={() => setMediaTypeFilter('gif')}>
+										<i className="bi-play-btn" />
+										<span className="d-none d-lg-inline">GIF</span>
+									</button>
+									<button
+										type="button"
+										className={`btn-filter ${mediaTypeFilter === 'video' ? 'active' : ''}`}
+										title="Show videos"
+										aria-label="show videos"
+										onClick={() => setMediaTypeFilter('video')}>
+										<i className="bi-camera-video" />
+										<span className="d-none d-lg-inline">Video</span>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* SEARCH SECTION */}
+						<div className={`col mt-2 mt-sm-0 search-wrapper ${isSearchActive ? 'active' : ''}`}>
+							<div className="control-group">
+								<label className="control-label">Search</label>
+								<div className="modern-search">
+									<div className="search-icon">
+										<i className="bi-search"></i>
+									</div>
+									<input
+										type="search"
+										className="search-input"
+										placeholder="Search files..."
+										aria-label="Search"
+										value={optSchWord}
+										onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }}
+									/>
+									<div className="recursive-toggle">
+										<input
+											className="form-check-input"
+											type="checkbox"
+											id="recursiveSearchCheck"
+											checked={isRecursiveSearch}
+											onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)}
+											aria-label="Checkbox for recursive search"
+										/>
+										<label className="form-check-label" htmlFor="recursiveSearchCheck" title="Search subfolders"><i className="bi bi-arrow-repeat"></i></label>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
