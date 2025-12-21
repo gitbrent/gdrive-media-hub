@@ -5,6 +5,7 @@ import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
 import { loadCacheFromIndexedDB, doClearFileCache, cleanupOldCaches, CACHE_DBASE_VER } from '../api/CacheService'
 import { getCurrentUserProfile } from '../api-google'
+import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
 
 const UserProfile: React.FC = () => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
@@ -52,7 +53,6 @@ const UserProfile: React.FC = () => {
 			try {
 				// Get all IndexedDB databases
 				const databases = await indexedDB.databases()
-
 				const cache = await loadCacheFromIndexedDB()
 
 				// Truncate gapiFiles array to show only first and last items
@@ -233,9 +233,9 @@ const UserProfile: React.FC = () => {
 	function renderMediaDatabase(): JSX.Element {
 		const profile = getCurrentUserProfile()
 		const dbName = `${profile?.getName()}-File-Cache`
-		const totalSize = mediaFiles?.reduce((sum, file) => sum + (parseInt(file.size || '0')), 0) || 0
-		const imageCount = mediaFiles?.filter(f => f.mimeType?.startsWith('image/')).length || 0
-		const videoCount = mediaFiles?.filter(f => f.mimeType?.startsWith('video/')).length || 0
+		const analysis = getFileAnalysis(mediaFiles)
+		const imageCount = analysis.file_types['image'] || 0
+		const videoCount = analysis.file_types['video'] || 0
 
 		return (
 			<div className="row mt-4">
@@ -264,7 +264,7 @@ const UserProfile: React.FC = () => {
 								</div>								<div className="col-12 col-md-6 col-lg-3">
 									<div className="text-center p-3 bg-dark rounded">
 										<h6 className="text-uppercase text-secondary mb-0">Total Files</h6>
-										<h2 className="fw-light text-primary mb-0">{mediaFiles?.length || 0}</h2>
+										<h2 className="fw-light text-primary mb-0">{analysis.total_files}</h2>
 										<div className="badge text-bg-primary">
 											{imageCount} images · {videoCount} videos
 										</div>
@@ -273,9 +273,9 @@ const UserProfile: React.FC = () => {
 								<div className="col-12 col-md-6 col-lg-3">
 									<div className="text-center p-3 bg-dark rounded">
 										<h6 className="text-uppercase text-secondary mb-0">Total Size</h6>
-										<h2 className="fw-light text-info mb-0">{formatBytes(totalSize)}</h2>
+										<h2 className="fw-light text-info mb-0">{formatBytes(analysis.total_size)}</h2>
 										<div className="badge text-bg-info">
-											Avg: {mediaFiles?.length ? formatBytes(totalSize / mediaFiles.length) : '0 B'}
+											Avg: {analysis.total_files ? formatBytes(analysis.total_size / analysis.total_files) : '0 B'}
 										</div>
 									</div>
 								</div>
