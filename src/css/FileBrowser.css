@@ -168,19 +168,11 @@ figure.figure-icon i {
 
 /* Metrics Display Styles */
 .metrics-container {
-	/*
-	background: linear-gradient(135deg, #be185d 0%, #881337 100%);
-	*/
-	background: radial-gradient(
-		ellipse at center,
-		rgba(96, 165, 250, 0.15) 0%,
-		rgba(96, 165, 250, 0.05) 40%,
-		#0f172a 100%
-	);
+	background: var(--bg-radial-blue);
 	border-radius: 16px;
 	padding: 16px 24px;
-	box-shadow: 0 4px 24px rgba(96, 165, 250, 0.1);
-	border: 1px solid rgba(96, 165, 250, 0.2);
+	box-shadow: 0 4px 24px var(--shadow-blue);
+	border: 1px solid var(--border-blue);
 }
 
 .metric-card {
@@ -203,15 +195,15 @@ figure.figure-icon i {
 }
 
 .metric-icon.purple {
-	background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+	background: var(--gradient-purple);
 }
 
 .metric-icon.green {
-	background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+	background: var(--gradient-green);
 }
 
 .metric-icon.blue {
-	background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+	background: var(--gradient-blue);
 }
 
 .metric-label {

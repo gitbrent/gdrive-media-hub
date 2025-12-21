@@ -5,6 +5,49 @@
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
 
+// ============================================================================
+// Shared Color Palette & Design Tokens
+// ============================================================================
+:root {
+	/* Chart Colors - Standardized Data Viz Palette (Tailwind 400/500 mix for Dark Mode) */
+	--color-chart-1: #60a5fa; /* Blue 400 */
+	--color-chart-2: #a78bfa; /* Violet 400 */
+	--color-chart-3: #f472b6; /* Pink 400 */
+	--color-chart-4: #fb923c; /* Orange 400 */
+	--color-chart-5: #2dd4bf; /* Teal 400 */
+	--color-chart-6: #facc15; /* Yellow 400 */
+	--color-chart-7: #f87171; /* Red 400 */
+	--color-chart-8: #818cf8; /* Indigo 400 */
+	--color-chart-9: #34d399; /* Emerald 400 */
+	--color-chart-10: #22d3ee; /* Cyan 400 */
+
+	/* KPI Card Gradients - Modern & Subtle */
+	--gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+	--gradient-red: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+	--gradient-blue: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+	--gradient-green: linear-gradient(135deg, #10b981 0%, #047857 100%);
+
+	/* Radial Gradient Background - for cards/containers with depth */
+	--bg-radial-blue: radial-gradient(
+		ellipse at center,
+		rgba(96, 165, 250, 0.15) 0%,
+		rgba(96, 165, 250, 0.05) 40%,
+		#0f172a 100%
+	);
+
+	/* Card Shadow Colors */
+	--shadow-purple: rgba(139, 92, 246, 0.25);
+	--shadow-red: rgba(239, 68, 68, 0.25);
+	--shadow-blue: rgba(59, 130, 246, 0.25);
+	--shadow-green: rgba(16, 185, 129, 0.25);
+
+	/* Border colors for gradient consistency */
+	--border-purple: rgba(139, 92, 246, 0.3);
+	--border-red: rgba(239, 68, 68, 0.3);
+	--border-blue: rgba(96, 165, 250, 0.3);
+	--border-green: rgba(16, 185, 129, 0.3);
+}
+
 // breadcrumbs
 $breadcrumb-bg: null;
 //$breadcrumb-font-size: 1.25rem; // "fs-5"
