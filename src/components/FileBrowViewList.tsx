@@ -4,6 +4,10 @@ import { VideoViewerOverlay, ImageViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isMedia, isVideo } from '../utils/mimeTypes'
 import { DataContext } from '../api-google/DataContext'
 
+interface ItemWithLineage extends IGapiFile, IGapiFolder {
+	_lineagePath?: string
+}
+
 interface Props {
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	isFolderLoading: boolean
@@ -190,6 +194,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 						const mimeTextClass = isFolder(item) ? 'text-warning' : isImage(item) ? 'text-success' : isGif(item) ? 'text-primary' : isVideo(item) ? 'text-info' : 'text-muted'
 						const sizeInBytes = Number(item.size || 0)
 						const sizePercent = maxFileSize > 0 ? (sizeInBytes / maxFileSize) * 100 : 0
+						const itemWithLineage = item as ItemWithLineage
 
 						return (
 							<tr key={index} className='border-bottom border-dark-subtle'>
@@ -217,10 +222,20 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 											onClick={() => !isFolderLoading && handleFolderClick(item.id, item.name)}
 											style={{ cursor: 'pointer' }}>
 											{item.name}
+											{itemWithLineage._lineagePath && (
+												<div style={{ fontSize: '0.75rem', opacity: 0.7, fontWeight: 'normal' }}>
+													{itemWithLineage._lineagePath}
+												</div>
+											)}
 										</div>
 										: isMedia(item) ?
 											<div className={mimeTextClass} onClick={() => handleFileClick(item)} style={{ cursor: 'pointer' }}>
 												{item.name}
+												{itemWithLineage._lineagePath && (
+													<div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+														{itemWithLineage._lineagePath}
+													</div>
+												)}
 											</div>
 											:
 											<div className='text-muted'>{item.name}</div>

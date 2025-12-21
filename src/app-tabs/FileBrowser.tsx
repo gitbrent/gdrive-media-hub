@@ -130,7 +130,67 @@ const FileBrowser: React.FC = () => {
 		}
 
 		/**
+		 * Build a map of folder IDs to folder names for lineage lookup
+		 */
+		const buildFolderNameMap = (): Record<string, string> => {
+			const map: Record<string, string> = {}
+			const allFolders = [
+				...mediaFiles.filter(file => isFolder(file)),
+				...origFolderContents.filter(file => isFolder(file))
+			]
+
+			// Deduplicate by ID
+			const uniqueFolders = allFolders.filter((folder, index, arr) =>
+				arr.findIndex(f => f.id === folder.id) === index
+			)
+
+			uniqueFolders.forEach(folder => {
+				map[folder.id] = folder.name
+			})
+
+			// Add "My Drive" or "My Files" as root
+			if (currentFolderPath.length > 0) {
+				map[currentFolderPath[0].folderId] = currentFolderPath[0].folderName
+			}
+
+			return map
+		}
+
+		/**
+		 * Get the full lineage path for an item by traversing its parents array
+		 */
+		const getLineagePath = (item: IGapiFile | IGapiFolder): string => {
+			const pathSegments: string[] = []
+
+			const buildPath = (folderId: string, visited = new Set<string>()): void => {
+				// Prevent infinite loops
+				if (visited.has(folderId)) return
+				visited.add(folderId)
+
+				const folderName = folderNameMap[folderId]
+				if (folderName) {
+					pathSegments.unshift(folderName)
+				}
+
+				// Find the parent of this folder and recurse
+				const allItems = [...mediaFiles, ...origFolderContents]
+				const folderItem = allItems.find(f => f.id === folderId)
+				if (folderItem?.parents && folderItem.parents.length > 0) {
+					buildPath(folderItem.parents[0], visited)
+				}
+			}
+
+			// Start with the item's parent(s)
+			if (item.parents && item.parents.length > 0) {
+				buildPath(item.parents[0])
+			}
+
+			return pathSegments.length > 0 ? pathSegments.join(' > ') : ''
+		}
+
+		/**
 		 * Get all descendant folder IDs from a starting folder (recursively)
+		 * Scans parents array to find folders at all levels
 		 */
 		const getDescendantFolderIds = (startFolderId: string): Set<string> => {
 			const descendantIds = new Set<string>([startFolderId])
@@ -139,13 +199,25 @@ const FileBrowser: React.FC = () => {
 			while (foldersToProcess.length > 0) {
 				const currentFolderId = foldersToProcess.shift()!
 
-				// Find all folders that have currentFolderId as a parent
-				const childFolders = mediaFiles.filter(file =>
+				// Find all folders that have currentFolderId as a parent (from mediaFiles)
+				const childFoldersFromMedia = mediaFiles.filter(file =>
 					isFolder(file) &&
 					file.parents?.includes(currentFolderId)
 				)
 
-				childFolders.forEach(folder => {
+				// Also find folders from origFolderContents (for immediate children)
+				const childFoldersFromOrig = origFolderContents.filter(file =>
+					isFolder(file) &&
+					file.parents?.includes(currentFolderId)
+				)
+
+				// Combine and deduplicate
+				const allChildFolders = [...childFoldersFromMedia, ...childFoldersFromOrig]
+				const uniqueChildFolders = allChildFolders.filter((folder, index, arr) =>
+					arr.findIndex(f => f.id === folder.id) === index
+				)
+
+				uniqueChildFolders.forEach(folder => {
 					if (!descendantIds.has(folder.id)) {
 						descendantIds.add(folder.id)
 						foldersToProcess.push(folder.id)
@@ -155,6 +227,9 @@ const FileBrowser: React.FC = () => {
 
 			return descendantIds
 		}
+
+		// Build folder name map for lineage lookup
+		const folderNameMap = buildFolderNameMap()
 
 		// If no root access, always use mediaFiles; otherwise use origFolderContents unless recursive search
 		let sourceItems = !hasRootAccess ? [...mediaFiles]
@@ -221,6 +296,10 @@ const FileBrowser: React.FC = () => {
 				return false
 			})
 			.filter((item) => { return !optSchWord || item.name.toLowerCase().indexOf(optSchWord.toLowerCase()) > -1 })
+			.map((item) => ({
+				...item,
+				_lineagePath: getLineagePath(item)
+			} as (IGapiFile | IGapiFolder) & { _lineagePath?: string }))
 
 		// Update debug info
 		const filesWithParents = mediaFiles.filter(f => f.parents && f.parents.length > 0).length
