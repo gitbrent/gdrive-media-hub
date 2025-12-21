@@ -7,7 +7,7 @@
 import { IDirectory, IGapiFile, IGapiFolder, IMediaFile } from "../App.props";
 
 // Configuration: Maximum number of files to fetch from Google Drive
-export const MAX_FILES_TO_FETCH = 2000
+export const MAX_FILES_TO_FETCH = 3000
 export const PAGE_SIZE = 1000 // Google Drive API max is 1000 per request
 
 // == FILES ===================================================================
