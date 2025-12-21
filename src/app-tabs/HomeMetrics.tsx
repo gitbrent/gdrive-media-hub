@@ -20,8 +20,19 @@ interface HomeMetricsProps {
 	analysis: IFileAnalysis
 }
 
-// Bootstrap color palette
-const COLORS = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#ffc107', '#198754', '#20c997', '#0dcaf0']
+// Standardized Data Viz Palette (Tailwind 400 series for Dark Mode)
+const COLORS = [
+	'#60a5fa', // Blue
+	'#a78bfa', // Violet
+	'#f472b6', // Pink
+	'#fb923c', // Orange
+	'#2dd4bf', // Teal
+	'#facc15', // Yellow
+	'#f87171', // Red
+	'#818cf8', // Indigo
+	'#34d399', // Emerald
+	'#22d3ee', // Cyan
+]
 
 // Custom tooltip style
 interface TooltipProps {
@@ -33,13 +44,13 @@ interface TooltipProps {
 const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
 	if (active && payload && payload.length) {
 		return (
-			<div className="card text-white border-secondary shadow-lg" style={{ opacity: 0.98, minWidth: '200px', backgroundColor: '#1a1d23' }}>
-				<div className="card-header text-white py-2" style={{ backgroundColor: '#2d3139' }}>
+			<div className="card text-white border-secondary shadow-lg" style={{ opacity: 0.98, minWidth: '200px', backgroundColor: '#1e293b' }}>
+				<div className="card-header text-white py-2" style={{ backgroundColor: '#334155' }}>
 					<strong className="small">{label}</strong>
 				</div>
 				<ul className="list-group list-group-flush">
 					{payload.map((entry, index) => (
-						<li key={index} className="list-group-item text-white border-secondary py-2 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#1a1d23' }}>
+						<li key={index} className="list-group-item text-white border-secondary py-2 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#1e293b' }}>
 							<span className="small">{entry.name}</span>
 							<span className="badge rounded-pill" style={{ backgroundColor: entry.color, color: '#fff' }}>
 								{entry.value}
@@ -105,7 +116,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	// ============================================================================
 
 	const renderKpiCards = () => (
-		<div className="row g-3 mb-4">
+		<div className="row g-4 mb-4">
 			<div className="col-12 col-sm-6 col-lg-3" data-description="Total Files">
 				<div className="card text-white h-100 kpi-card kpi-card-purple">
 					<div className="kpi-card-icon-bg">
@@ -121,7 +132,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 						<h2 className="mb-1 fw-bold kpi-title">{total_files.toLocaleString()}</h2>
 						<div className="d-flex justify-content-between align-items-center">
 							<small className="kpi-subtitle">{Object.keys(file_types).length} types</small>
-							<small className="kpi-subtitle">↗ 100%</small>
 						</div>
 					</div>
 				</div>
@@ -166,22 +176,21 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 					</div>
 				</div>
 			</div>
-			<div className="col-12 col-sm-6 col-lg-3" data-description="Total Storage">
+			<div className="col-12 col-sm-6 col-lg-3" data-description="Total Storage Used">
 				<div className="card text-white h-100 kpi-card kpi-card-red">
 					<div className="kpi-card-icon-bg">
-						<i className="bi bi-hdd-fill"></i>
+						<i className="bi bi-floppy"></i>
 					</div>
 					<div className="card-body kpi-card-body">
 						<div className="d-flex align-items-center mb-2">
 							<div className="rounded-circle d-flex align-items-center justify-content-center me-2 kpi-icon-circle">
-								<i className="bi bi-hdd-fill kpi-icon"></i>
+								<i className="bi bi-floppy kpi-icon"></i>
 							</div>
 							<h6 className="mb-0 opacity-90 small">Total Storage Used</h6>
 						</div>
 						<h2 className="mb-1 fw-bold kpi-title">{formatBytes(total_size)}</h2>
 						<div className="d-flex justify-content-between align-items-center">
 							<small className="kpi-subtitle">{formatBytes(avgFileSize)} avg</small>
-							<small className="kpi-subtitle">↗ 100%</small>
 						</div>
 					</div>
 				</div>
@@ -323,7 +332,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		)
 
 		return (
-			<div className="row g-3">
+			<div className="row g-4">
 				{renderMiniPieChart(
 					storageEfficiencyData,
 					'Storage Efficiency',
