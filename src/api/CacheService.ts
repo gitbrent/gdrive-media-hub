@@ -43,13 +43,12 @@ export const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boo
 
 		open.onupgradeneeded = () => {
 			const db = open.result
-			if (!db.objectStoreNames.contains('GapiFileCache')) {
-				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			// Clear old store if it exists to force fresh data with new schema (e.g., parents field)
+			if (db.objectStoreNames.contains('GapiFileCache')) {
+				db.deleteObjectStore('GapiFileCache')
 			}
-		}
-
-		open.onsuccess = () => {
-			const db = open.result
+			// Create new store
+			db.createObjectStore('GapiFileCache', { keyPath: 'id' })
 			const tx = db.transaction('GapiFileCache', 'readwrite')
 			const store = tx.objectStore('GapiFileCache')
 
