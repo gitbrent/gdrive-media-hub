@@ -394,60 +394,58 @@ const FileBrowser: React.FC = () => {
 						</div>
 					</div>
 				)}
-				{DEBUG && LOG_LEVEL !== 3 && (
-					<div className="row g-3 mb-3">
-						<div className="col">
-							<div className="card border-0 shadow-lg kpi-card kpi-card-purple">
-								<div className="card-body kpi-card-body">
-									<div className="d-flex align-items-center justify-content-between">
-										<div>
-											<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Total Files</div>
-											<div className="text-white fw-bold kpi-title mb-0">{mediaFiles.length}</div>
-										</div>
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-images text-white kpi-icon"></i>
-										</div>
+				<div className="row g-3 mb-3">
+					<div className="col">
+						<div className="card border-0 shadow-lg kpi-card kpi-card-purple">
+							<div className="card-body kpi-card-body">
+								<div className="d-flex align-items-center justify-content-between">
+									<div>
+										<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Total Files</div>
+										<div className="text-white fw-bold kpi-title mb-0">{mediaFiles.length}</div>
+									</div>
+									<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+										<i className="bi-images text-white kpi-icon"></i>
 									</div>
 								</div>
-								<i className="bi-images kpi-card-icon-bg"></i>
 							</div>
+							<i className="bi-images kpi-card-icon-bg"></i>
 						</div>
-						<div className="col">
-							<div className="card border-0 shadow-lg kpi-card kpi-card-green">
-								<div className="card-body kpi-card-body">
-									<div className="d-flex align-items-center justify-content-between">
-										<div>
-											<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Shown</div>
-											<div className="text-white fw-bold kpi-title mb-0">{debugInfo.afterNameFilter}</div>
-										</div>
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-funnel text-white kpi-icon"></i>
-										</div>
-									</div>
-								</div>
-								<i className="bi-funnel kpi-card-icon-bg"></i>
-							</div>
-						</div>
-						{isRecursiveSearch && (
-							<div className="col">
-								<div className="card border-0 shadow-lg kpi-card kpi-card-blue">
-									<div className="card-body kpi-card-body">
-										<div className="d-flex align-items-center justify-content-between">
-											<div>
-												<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Folders</div>
-												<div className="text-white fw-bold kpi-title mb-0">{debugInfo.descendantFolderCount}</div>
-											</div>
-											<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-												<i className="bi-folder text-white kpi-icon"></i>
-											</div>
-										</div>
-									</div>
-									<i className="bi-folder kpi-card-icon-bg"></i>
-								</div>
-							</div>
-						)}
 					</div>
-				)}
+					<div className="col">
+						<div className="card border-0 shadow-lg kpi-card kpi-card-green">
+							<div className="card-body kpi-card-body">
+								<div className="d-flex align-items-center justify-content-between">
+									<div>
+										<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Shown</div>
+										<div className="text-white fw-bold kpi-title mb-0">{debugInfo.afterNameFilter}</div>
+									</div>
+									<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+										<i className="bi-funnel text-white kpi-icon"></i>
+									</div>
+								</div>
+							</div>
+							<i className="bi-funnel kpi-card-icon-bg"></i>
+						</div>
+					</div>
+					{isRecursiveSearch && (
+						<div className="col">
+							<div className="card border-0 shadow-lg kpi-card kpi-card-blue">
+								<div className="card-body kpi-card-body">
+									<div className="d-flex align-items-center justify-content-between">
+										<div>
+											<div className="text-white-50 text-uppercase small mb-1" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Folders</div>
+											<div className="text-white fw-bold kpi-title mb-0">{debugInfo.descendantFolderCount}</div>
+										</div>
+										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
+											<i className="bi-folder text-white kpi-icon"></i>
+										</div>
+									</div>
+								</div>
+								<i className="bi-folder kpi-card-icon-bg"></i>
+							</div>
+						</div>
+					)}
+				</div>
 			</>
 		)
 	}
