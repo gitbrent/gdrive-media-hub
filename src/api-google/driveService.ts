@@ -7,7 +7,7 @@
 import { IDirectory, IGapiFile, IGapiFolder, IMediaFile } from "../App.props";
 
 // Configuration: Maximum number of files to fetch from Google Drive
-export const MAX_FILES_TO_FETCH = 2000
+export const MAX_FILES_TO_FETCH = 3000
 export const PAGE_SIZE = 1000 // Google Drive API max is 1000 per request
 
 // == FILES ===================================================================
@@ -60,7 +60,7 @@ export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 		while (true) {
 			const response = await gapi.client.drive.files.list({
 				q: "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')",
-				fields: 'nextPageToken, files(id, name, mimeType, size, createdTime, modifiedByMeTime)',
+				fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime)',
 				pageSize: PAGE_SIZE,
 				...(pageToken && { pageToken }),
 			})

@@ -83,7 +83,7 @@ export default function ImageGrid() {
 									title="show all"
 									aria-label="show all"
 									onClick={() => setMediaTypeFilter('all')}>
-									<i className="bi-files me-2 d-none d-lg-inline" />All
+									<i className="bi-files" /><span className="ms-2 d-none d-lg-inline">All</span>
 								</button>
 								<button
 									type="button"
@@ -91,7 +91,7 @@ export default function ImageGrid() {
 									title="show images"
 									aria-label="show images"
 									onClick={() => setMediaTypeFilter('image')}>
-									<i className="bi-image me-2 d-none d-lg-inline" />Image
+									<i className="bi-image" /><span className="ms-2 d-none d-lg-inline">Image</span>
 								</button>
 								<button
 									type="button"
@@ -99,7 +99,7 @@ export default function ImageGrid() {
 									title="show gifs"
 									aria-label="show gifs"
 									onClick={() => setMediaTypeFilter('gif')}>
-									<i className="bi-play-circle me-2 d-none d-lg-inline" />GIF
+									<i className="bi-play-btn" /><span className="ms-2 d-none d-lg-inline">GIF</span>
 								</button>
 								<button
 									type="button"
@@ -107,7 +107,7 @@ export default function ImageGrid() {
 									title="show videos"
 									aria-label="show videos"
 									onClick={() => setMediaTypeFilter('video')}>
-									<i className="bi-play-btn-fill me-2 d-none d-lg-inline" />Video
+									<i className="bi-camera-video" /><span className="ms-2 d-none d-lg-inline">Video</span>
 								</button>
 							</div>
 						</div>
@@ -116,17 +116,17 @@ export default function ImageGrid() {
 								<button type="button" aria-label="sort by name"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
-									<i className="bi-alphabet-uppercase me-2 d-none d-lg-inline" />Name {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-alphabet-uppercase" /><span className="ms-2 d-none d-lg-inline">Name</span> {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by size"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
-									<i className="bi-hdd me-2 d-none d-lg-inline" />Size {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-hdd" /><span className="ms-2 d-none d-lg-inline">Size</span> {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 								<button type="button" aria-label="sort by modified"
 									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
 									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
-									<i className="bi-clock me-2 d-none d-lg-inline" />Modified {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
+									<i className="bi-clock" /><span className="ms-2 d-none d-lg-inline">Modified</span> {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
 								</button>
 							</div>
 						</div>

@@ -22,8 +22,7 @@ const CHUNK_SIZE = 10000 // Anything over ~18000 is not storable on iPad, hence 
 function getDatabaseName() {
 	const profile = getCurrentUserProfile()
 	const userName = profile?.getName()
-	console.log('Database name for user:', userName)
-
+	//
 	return `${userName}-File-Cache`
 }
 
@@ -44,9 +43,12 @@ export const saveCacheToIndexedDB = (fileListCache: IFileListCache): Promise<boo
 
 		open.onupgradeneeded = () => {
 			const db = open.result
-			if (!db.objectStoreNames.contains('GapiFileCache')) {
-				db.createObjectStore('GapiFileCache', { keyPath: 'id' })
+			// Clear old store if it exists to force fresh data with new schema (e.g., parents field)
+			if (db.objectStoreNames.contains('GapiFileCache')) {
+				db.deleteObjectStore('GapiFileCache')
 			}
+			// Create new store
+			db.createObjectStore('GapiFileCache', { keyPath: 'id' })
 		}
 
 		open.onsuccess = () => {

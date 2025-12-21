@@ -5,6 +5,7 @@ export interface IFileAnalysis {
 	total_size: number;
 	file_types: Record<string, number>;
 	file_years: Record<string, number>;
+	file_types_by_year: Record<string, Record<string, number>>;
 	common_names: Record<string, number>;
 	size_categories: Record<string, number>;
 }
@@ -16,6 +17,7 @@ export const getFileAnalysis = (gapiFiles: IMediaFile[]): IFileAnalysis => {
 		total_size: 0,
 		file_types: {} as Record<string, number>,
 		file_years: {} as Record<string, number>,
+		file_types_by_year: {} as Record<string, Record<string, number>>,
 		common_names: {} as Record<string, number>,
 		size_categories: {
 			Tiny: 0,
@@ -57,6 +59,12 @@ export const getFileAnalysis = (gapiFiles: IMediaFile[]): IFileAnalysis => {
 		const mimeType = file.mimeType?.split('/').pop()
 		if (mimeType) {
 			analysis.file_types[mimeType] = (analysis.file_types[mimeType] || 0) + 1
+
+			// Track file types by year
+			if (!analysis.file_types_by_year[year]) {
+				analysis.file_types_by_year[year] = {}
+			}
+			analysis.file_types_by_year[year][mimeType] = (analysis.file_types_by_year[year][mimeType] || 0) + 1
 		}
 
 		// D: Bucket FILES by COMMON-NAME

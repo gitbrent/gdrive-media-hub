@@ -1,11 +1,15 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { IGapiFolder, IMediaFile, log } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
 import { DataContext } from '../api-google/DataContext'
 import 'photoswipe/dist/photoswipe.css'
+
+interface ItemWithLineage extends IGapiFile {
+	_lineagePath?: string
+}
 
 interface Props {
 	currFolderContents: Array<IMediaFile | IGapiFolder>
@@ -168,6 +172,8 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
 		const figCaption = SHOW_CAPTIONS ? <figcaption>{item.name}</figcaption> : <span />
+		const itemWithLineage = item as ItemWithLineage
+		const itemTitle = itemWithLineage._lineagePath ? `${itemWithLineage._lineagePath}\n${item.name}` : item.name
 
 		if ('blobUrlError' in item && item.blobUrlError) {
 			return (
@@ -178,7 +184,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			)
 		} else if (isFolder(item)) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.name} onClick={() => handleFolderClick(item.id, item.name)} className='text-warning figure-icon'>
+				<figure key={`${index}${item.id}`} title={itemTitle} onClick={() => handleFolderClick(item.id, item.name)} className='text-warning figure-icon'>
 					<i className={isFolderLoading ? 'bi-hourglass-split' : 'bi-folder'} />
 					<figcaption>{item.name}</figcaption>
 				</figure>
@@ -186,14 +192,14 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		} else if (isVideo(item)) {
 			if (isLoadingFile) {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon">
+					<figure key={`${index}${item.id}`} title={itemTitle} className="text-info figure-icon">
 						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-camera-video" />}
 						<figcaption>{item.name}</figcaption>
 					</figure>
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-info figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
+					<figure key={`${index}${item.id}`} title={itemTitle} className="text-info figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
 						<i className="bi-camera-video" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
@@ -205,7 +211,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					<Item {...item} key={`${index}${item.id}`}>
 						{({ ref, open }) => (
 							<figure>
-								<img ref={ref} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={item.name} alt={item.name} />
+								<img ref={ref} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={itemTitle} alt={item.name} />
 								{figCaption}
 							</figure>
 						)}
@@ -213,7 +219,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={item.name} className="text-muted figure-icon">
+					<figure key={`${index}${item.id}`} title={itemTitle} className="text-muted figure-icon">
 						<i className="bi-hourglass-split" />
 						<figcaption>{item.name}</figcaption>
 					</figure>
