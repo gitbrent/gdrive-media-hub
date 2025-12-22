@@ -82,6 +82,70 @@ export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 
 // == FOLDERS =================================================================
 
+export interface FolderHierarchy {
+	id: string
+	name: string
+	parents: string[]
+}
+
+export const getAllFolders = async (): Promise<FolderHierarchy[]> => {
+	try {
+		let allFolders: FolderHierarchy[] = []
+		let pageToken: string | undefined = undefined
+
+		// Fetch all folders in pages
+		while (true) {
+			const response = await gapi.client.drive.files.list({
+				q: "trashed=false and mimeType = 'application/vnd.google-apps.folder'",
+				fields: 'nextPageToken, files(id, name, parents)',
+				pageSize: PAGE_SIZE,
+				...(pageToken && { pageToken }),
+			})
+
+			const folders = (response.result.files || []) as FolderHierarchy[]
+			allFolders = allFolders.concat(folders)
+			pageToken = response.result.nextPageToken
+
+			if (!pageToken) break
+		}
+
+		console.log(`[driveService] Fetched ${allFolders.length} folders`)
+		return allFolders
+	} catch (error) {
+		console.error('Error fetching folders:', error)
+		throw error
+	}
+}
+
+export const getFolderNames = async (folderIds: string[]): Promise<Map<string, string>> => {
+	try {
+		const folderNameMap = new Map<string, string>()
+
+		// Filter out duplicates
+		const uniqueIds = Array.from(new Set(folderIds))
+
+		for (const folderId of uniqueIds) {
+			try {
+				const response = await gapi.client.drive.files.get({
+					fileId: folderId,
+					fields: 'id, name'
+				})
+				if (response.result.name) {
+					folderNameMap.set(folderId, response.result.name)
+				}
+			} catch (error) {
+				console.warn(`Could not fetch name for folder ${folderId}:`, error)
+				folderNameMap.set(folderId, 'Unknown Folder')
+			}
+		}
+
+		return folderNameMap
+	} catch (error) {
+		console.error('Error fetching folder names:', error)
+		throw error
+	}
+}
+
 export const getRootFolderId = async (): Promise<string | undefined> => {
 	try {
 		const response = await gapi.client.drive.files.get({
