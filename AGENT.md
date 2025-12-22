@@ -37,6 +37,17 @@ This document outlines coding standards and best practices for contributions to 
 - Text: `text-center`, `text-white/50`, `font-bold`, `text-sm`, `uppercase`
 - Sizing: `w-full`, `h-full`, `flex-grow`, `flex-shrink-0`
 
+### Tailwind v4 Canonical Classes
+
+This project uses **Tailwind CSS v4.1**. Use the canonical class names:
+
+- **Gradients**: Use `bg-linear-to-*` (not `bg-gradient-to-*`)
+  - `bg-linear-to-br from-purple-600 to-purple-800` - bottom-right gradient
+  - `bg-linear-to-r from-blue-500 to-cyan-500` - left-to-right gradient
+  - `bg-linear-to-t from-red-500 to-orange-500` - bottom-to-top gradient
+- **Borders**: Use canonical color names consistently
+- See [Tailwind CSS v4 docs](https://tailwindcss.com/docs/v4) for updated class names
+
 ### daisyUI Components
 
 Use daisyUI components for UI elements:
