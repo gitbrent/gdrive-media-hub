@@ -23,45 +23,45 @@ const MetricCards: React.FC<MetricCardsProps> = ({ analysis }) => {
 		: ['N/A', 0]
 
 	return (
-		<div className="grid grid-cols-1 gap-6 mb-6 sm:grid-cols-2 lg:grid-cols-4">
-			{/* Total Files - Purple */}
-			<div className="stat bg-linear-to-br from-purple-600 to-purple-800 text-white rounded-2xl">
+		<div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-4">
+			{/* Total Files - Emerald */}
+			<div className="stat bg-linear-to-br from-emerald-500 to-emerald-600 text-white rounded-2xl">
 				<div className="stat-figure opacity-30 text-5xl">
 					<i className="bi bi-images"></i>
 				</div>
-				<div className="stat-title text-purple-300">Total Files Loaded</div>
+				<div className="stat-title text-emerald-200">Total Files Loaded</div>
 				<div className="stat-value">{total_files.toLocaleString()}</div>
-				<div className="stat-desc text-purple-300">{Object.keys(file_types).length} types</div>
+				<div className="stat-desc text-emerald-300">{Object.keys(file_types).length} types</div>
 			</div>
 
-			{/* Largest Size Group - Green */}
-			<div className="stat bg-linear-to-br from-green-600 to-green-800 text-white rounded-2xl">
-				<div className="stat-figure opacity-30 text-5xl">
-					<i className="bi bi-box-fill"></i>
-				</div>
-				<div className="stat-title text-green-300">Largest Size Group</div>
-				<div className="stat-value">{largestCategory[0]}</div>
-				<div className="stat-desc text-green-300">{largestCategory[1].toLocaleString()} files · {Math.round(largestCategory[1] / total_files * 100)}%</div>
-			</div>
-
-			{/* Most Common Type - Blue */}
-			<div className="stat bg-linear-to-br from-blue-600 to-blue-800 text-white rounded-2xl">
+			{/* Most Common Type - Indigo */}
+			<div className="stat bg-linear-to-br from-indigo-400 to-indigo-500 text-white rounded-2xl">
 				<div className="stat-figure opacity-30 text-5xl">
 					<i className="bi bi-trophy-fill"></i>
 				</div>
-				<div className="stat-title text-blue-300">Most Common Type</div>
+				<div className="stat-title text-indigo-200">Most Common Type</div>
 				<div className="stat-value">{mostCommonType[0]}</div>
-				<div className="stat-desc text-blue-300">{mostCommonType[1].toLocaleString()} files · {Math.round(mostCommonType[1] / total_files * 100)}%</div>
+				<div className="stat-desc text-indigo-300">{mostCommonType[1].toLocaleString()} files · {Math.round(mostCommonType[1] / total_files * 100)}%</div>
 			</div>
 
-			{/* Total Storage - Red */}
-			<div className="stat bg-linear-to-br from-red-600 to-red-800 text-white rounded-2xl">
+			{/* Largest Size Group - Violet */}
+			<div className="stat bg-linear-to-br from-violet-500 to-violet-600 text-white rounded-2xl">
+				<div className="stat-figure opacity-30 text-5xl">
+					<i className="bi bi-box-fill"></i>
+				</div>
+				<div className="stat-title text-violet-200">Largest Size Group</div>
+				<div className="stat-value">{largestCategory[0]}</div>
+				<div className="stat-desc text-violet-300">{largestCategory[1].toLocaleString()} files · {Math.round(largestCategory[1] / total_files * 100)}%</div>
+			</div>
+
+			{/* Total Storage - Rose */}
+			<div className="stat bg-linear-to-br from-rose-400 to-rose-500 text-white rounded-2xl">
 				<div className="stat-figure opacity-30 text-5xl">
 					<i className="bi bi-floppy"></i>
 				</div>
-				<div className="stat-title text-red-300">Total Storage Used</div>
+				<div className="stat-title text-rose-200">Total Storage Used</div>
 				<div className="stat-value text-2xl">{formatBytes(total_size)}</div>
-				<div className="stat-desc text-red-300">{formatBytes(avgFileSize)} avg file size</div>
+				<div className="stat-desc text-rose-300">{formatBytes(avgFileSize)} avg file size</div>
 			</div>
 		</div>
 	)
