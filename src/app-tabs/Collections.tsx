@@ -48,27 +48,26 @@ const Collections: React.FC = () => {
 		const prefixMap = new Map<string, IMediaFile[]>()
 
 		mediaFiles.forEach(file => {
-			// Extract prefix patterns (before numbers, dates, or common separators)
-			const patterns = [
-				// Match up to first number or date: "Japan-2023" -> "Japan"
-				file.name.match(/^([A-Za-z\s\-_]+?)(?=[-_\s]*\d)/)?.[1],
-				// Match up to first dash/underscore: "Cool-Stuff-001" -> "Cool"
-				file.name.match(/^([A-Za-z]+)(?=[-_])/)?.[1],
-				// Match first word: "Vacation Photos 2023" -> "Vacation"
-				file.name.match(/^([A-Za-z]+)/)?.[1],
-			]
+			// Extract all meaningful words (3+ characters) from the filename
+			// Remove file extension first, then split by separators
+			const nameWithoutExt = file.name.replace(/\.[^.]+$/, '') // Remove file extension
+			const words = nameWithoutExt
+				.split(/[\s\-_]+/) // Split by spaces, dashes, underscores
+				.filter(word => /^[A-Za-z]+$/.test(word) && word.length >= 3) // Only alphabetic words, 3+ chars
 
-			// Find the first matching pattern and use only that one
-			for (const pattern of patterns) {
-				if (pattern && pattern.length >= 3) {
-					const normalizedPattern = pattern.trim().toLowerCase()
-					if (!prefixMap.has(normalizedPattern)) {
-						prefixMap.set(normalizedPattern, [])
+			// Add file to collection for each significant word found
+			const addedPatterns = new Set<string>()
+			words.forEach(word => {
+				const normalizedWord = word.toLowerCase()
+				// Avoid adding the same word twice
+				if (!addedPatterns.has(normalizedWord)) {
+					if (!prefixMap.has(normalizedWord)) {
+						prefixMap.set(normalizedWord, [])
 					}
-					prefixMap.get(normalizedPattern)!.push(file)
-					break // Only use the first matching pattern
+					prefixMap.get(normalizedWord)!.push(file)
+					addedPatterns.add(normalizedWord)
 				}
-			}
+			})
 		})
 
 		// Convert to array and filter by minimum count
