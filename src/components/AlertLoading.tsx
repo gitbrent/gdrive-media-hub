@@ -1,5 +1,4 @@
 import React from 'react'
-import '../css/AlertLoading.css'
 
 interface AlertLoadingProps {
 	title?: string;
@@ -8,17 +7,11 @@ interface AlertLoadingProps {
 
 const AlertLoading: React.FC<AlertLoadingProps> = ({ title = 'loading...' }) => {
 	return (
-		<section className="loading-container">
-			<div className="loading-card">
-				<div className="loading-spinner-wrapper">
-					<div className="loading-spinner">
-						<div className="spinner-ring"></div>
-						<div className="spinner-ring"></div>
-						<div className="spinner-ring"></div>
-					</div>
-				</div>
-				<div className="loading-content">
-					<h3 className="loading-title" role="status">{title}</h3>
+		<section className="flex justify-center items-center min-h-80 w-full">
+			<div className="card w-96 bg-base-100 shadow-xl">
+				<div className="card-body items-center text-center">
+					<span className="loading loading-spinner loading-lg"></span>
+					<h3 role="status" className="card-title capitalize mt-4">{title}</h3>
 				</div>
 			</div>
 		</section>
