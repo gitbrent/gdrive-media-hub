@@ -9,15 +9,6 @@ export default defineConfig({
 		port: 3000,
 		strictPort: true, // Recommended to ensure Google API callback doesn't break
 	},
-	css: {
-		preprocessorOptions: {
-			scss: {
-				//api: 'modern-compiler', // REQUIRED for Vite 7: Specify the modern API
-				silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
-				quietDeps: true, // Add this line to suppress warnings (above needed for bootstrap SCSS Dart messages)
-			},
-		},
-	},
 	/* following is suppress: `node_modules/gapi-script/gapiScript.js (44:36): Use of eval in "node_modules/gapi-script/gapiScript.js" is [...].` */
 	build: {
 		rollupOptions: {

@@ -4,20 +4,20 @@ This document outlines coding standards and best practices for contributions to 
 
 ## Layout & Styling Philosophy
 
-### Use Bootstrap Classes, Not Inline Styles
+### Use Tailwind CSS + daisyUI Classes, Not Inline Styles
 
-- **Always** use Bootstrap utility classes for layout, spacing, and basic styling
+- **Always** use Tailwind utility classes and daisyUI components for layout, spacing, and basic styling
 - **Never** use inline `style={{}}` props for layout-related CSS (flexbox, grid, padding, margin, etc.)
 - Inline styles are acceptable **only** for:
   - Dynamic values based on props or state
-  - One-off custom styling not covered by Bootstrap or project CSS
+  - One-off custom styling not covered by Tailwind or project CSS
   - Font sizes or custom measurements that change programmatically
 
 **Good:**
 
 ```tsx
-<div className="hstack gap-3 p-4 mb-3">
-  <div className="flex-grow-1">Content</div>
+<div className="flex items-center gap-3 p-4 mb-3">
+  <div className="flex-grow">Content</div>
 </div>
 ```
 
@@ -25,18 +25,28 @@ This document outlines coding standards and best practices for contributions to 
 
 ```tsx
 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px' }}>
-  {/* Avoid - use Bootstrap instead */}
+  {/* Avoid - use Tailwind instead */}
 </div>
 ```
 
-### Bootstrap Layout Utilities (Preferred)
+### Tailwind Layout Utilities (Preferred)
 
-- `hstack` / `vstack` - horizontal/vertical flexbox stacks with built-in gap
-- `d-flex` - when you need `justify-content-between` or special flex properties
-- `row` / `col` - responsive grid layouts
+- `flex` + `items-center` + `justify-between` - flexbox layouts
+- `grid` + `grid-cols-*` - grid layouts
 - Spacing: `mb-3`, `p-4`, `px-2`, `gap-2`, etc.
-- Text: `text-center`, `text-white-50`, `fw-bold`, `small`, `text-uppercase`
-- Sizing: `w-100`, `h-100`, `flex-grow-1`, `flex-shrink-0`
+- Text: `text-center`, `text-white/50`, `font-bold`, `text-sm`, `uppercase`
+- Sizing: `w-full`, `h-full`, `flex-grow`, `flex-shrink-0`
+
+### daisyUI Components
+
+Use daisyUI components for UI elements:
+
+- `btn` - buttons with variants: `btn-primary`, `btn-success`, `btn-outline`
+- `card` - container component with `card-body`
+- `navbar` - navigation bars
+- `alert` - alert messages
+- `badge` - badges and tags
+- `input`, `select`, `textarea` - form controls
 
 ## Color System
 
@@ -124,10 +134,10 @@ KPI cards use the following pattern:
 
 ### Icon + Text Combinations
 
-Use `hstack gap-2` for horizontal alignment of icons with text:
+Use `flex items-center gap-2` for horizontal alignment of icons with text:
 
 ```tsx
-<div className="hstack gap-2">
+<div className="flex items-center gap-2">
   <i className="bi-folder-fill"></i>
   <div>Label text</div>
 </div>
@@ -135,31 +145,30 @@ Use `hstack gap-2` for horizontal alignment of icons with text:
 
 ## Typography
 
-### Bootstrap Text Classes
+### Tailwind Text Classes
 
-- `text-white-50` - muted white text
-- `text-uppercase` - uppercase styling
-- `small` - smaller font size
-- `fw-bold` - bold weight
+- `text-white/50` - muted white text (50% opacity)
+- `uppercase` - uppercase styling
+- `text-sm` - smaller font size
+- `font-bold` - bold weight
 - `text-center` - center alignment
-
-**⚠️ Deprecated:** `.text-muted` will be replaced by `.text-body-secondary` in Bootstrap v6. Use `text-body-secondary` for new code.
+- `text-xs`, `text-base`, `text-lg`, `text-xl`, etc. - font sizes
 
 **Custom Typography:**
 
-- Use Bootstrap classes whenever possible
+- Use Tailwind classes whenever possible
 - For font-size adjustments: `style={{ fontSize: '0.75rem' }}` is acceptable
 - Letter spacing: `style={{ letterSpacing: '0.5px' }}` is acceptable for semantic adjustments
 
 ## Spacing
 
-Use Bootstrap spacing scale (0-5, where each unit = 0.25rem):
+Use Tailwind spacing scale (0-96, where each unit = 0.25rem):
 
-- `p-1` to `p-5` - padding
-- `m-1` to `m-5` - margin
+- `p-1` to `p-24` - padding
+- `m-1` to `m-24` - margin
 - `px-2`, `py-3` - directional padding/margin
-- `gap-1` to `gap-5` - gaps in flexbox layouts
-- `mb-0` - remove bottom margin (common Bootstrap reset)
+- `gap-1` to `gap-24` - gaps in flexbox/grid layouts
+- `mb-0` - remove bottom margin
 
 ## Animations & Effects
 
@@ -242,22 +251,22 @@ transition: transform 0.2s, box-shadow 0.2s;
 - Use `style={{}}` for layout properties
 - Forget `gap` when using flexbox
 - Mix inline styles and CSS classes inconsistently
-- Create utility classes that duplicate Bootstrap
-- Forget responsive utility prefixes (`d-none`, `d-md-block`)
+- Create utility classes that duplicate Tailwind
+- Forget responsive utility prefixes (`hidden`, `md:block`)
 
 ### ✅ Do
 
 - Use CSS variables for colors
-- Use Bootstrap utility classes for layout
-- Prefer `hstack`/`vstack` over `d-flex`
+- Use Tailwind utility classes for layout
+- Prefer `flex` with modifiers over inline styles
 - Keep styling consistent with design system
 - Use semantic HTML and proper ARIA labels
 - Test responsive behavior
 
 ## Resources
 
-- [Bootstrap 5 Utilities](https://getbootstrap.com/docs/5.3/utilities/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [daisyUI Components](https://daisyui.com/components/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
-- [Tailwind Color Reference](https://tailwindcss.com/docs/customizing-colors) (for understanding our palette)
 - Local: `src/css/style.scss` - CSS variable definitions
-- Local: `src/css/HomeMetrics.css` - KPI card styling examples
+- Local: `tailwind.config.js` - Tailwind configuration with custom colors
