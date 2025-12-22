@@ -58,15 +58,17 @@ const Collections: React.FC = () => {
 				file.name.match(/^([A-Za-z]+)/)?.[1],
 			]
 
-			patterns.forEach(pattern => {
+			// Find the first matching pattern and use only that one
+			for (const pattern of patterns) {
 				if (pattern && pattern.length >= 3) {
 					const normalizedPattern = pattern.trim().toLowerCase()
 					if (!prefixMap.has(normalizedPattern)) {
 						prefixMap.set(normalizedPattern, [])
 					}
 					prefixMap.get(normalizedPattern)!.push(file)
+					break // Only use the first matching pattern
 				}
-			})
+			}
 		})
 
 		// Convert to array and filter by minimum count
