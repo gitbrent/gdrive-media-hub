@@ -7,12 +7,48 @@ import FileBrowViewList from '../components/FileBrowViewList'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import GridView from '../components/GridView'
-import '../css/FileBrowser.css'
 
 type ViewMode = 'grid' | 'list'
 type SortField = 'name' | 'size' | 'modifiedByMeTime' | 'createdTime'
 type SortOrder = 'asc' | 'desc'
 type MediaType = 'all' | 'image' | 'gif' | 'video'
+
+// ============================================================================
+// Metric Card Component
+// ============================================================================
+interface MetricCardProps {
+	label: string
+	value: string | number
+	icon: string
+	variant: 'purple' | 'green' | 'blue' | 'red' | 'yellow'
+}
+
+const variantClasses: Record<MetricCardProps['variant'], string> = {
+	purple: 'bg-linear-to-br from-purple-600 to-purple-800',
+	green: 'bg-linear-to-br from-green-600 to-green-800',
+	blue: 'bg-linear-to-br from-blue-600 to-blue-800',
+	red: 'bg-linear-to-br from-red-600 to-red-800',
+	yellow: 'bg-linear-to-br from-yellow-600 to-yellow-800',
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, variant }) => (
+	<div className="card bg-base-200 border-0 h-full rounded-2xl">
+		<div className={`card-body relative overflow-hidden ${variantClasses[variant]} text-white py-3 px-4 rounded-2xl`}>
+			<div className="absolute -top-1 -right-4 opacity-15 text-8xl">
+				<i className={`bi ${icon}`}></i>
+			</div>
+			<div className="relative z-10">
+				<div className="flex items-center gap-3 mb-2">
+					<div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center">
+						<i className={`bi ${icon} text-lg`}></i>
+					</div>
+					<h6 className="text-xs opacity-90 mb-0 uppercase tracking-wide">{label}</h6>
+				</div>
+				<h2 className="text-3xl font-bold mb-0">{value}</h2>
+			</div>
+		</div>
+	</div>
+)
 
 const FileBrowser: React.FC = () => {
 	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
@@ -326,200 +362,82 @@ const FileBrowser: React.FC = () => {
 		return (
 			<>
 				{DEBUG && LOG_LEVEL === 3 && (
-					<div className="mb-3" style={{
-						background: 'linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)',
-						borderRadius: '16px',
-						padding: '20px',
-						boxShadow: '0 8px 32px rgba(109, 40, 217, 0.4)',
-						border: '1px solid rgba(139, 92, 246, 0.2)'
-					}}>
-						<div className="hstack gap-3 mb-3">
-							<div style={{
-								background: 'rgba(255, 255, 255, 0.2)',
-								borderRadius: '12px',
-								padding: '8px 12px',
-								backdropFilter: 'blur(10px)'
-							}}>
-								<i className="bi-bug-fill me-2" style={{ color: '#fff' }}></i>
-								<strong style={{ color: '#fff', fontSize: '1.1rem' }}>Debug Dashboard</strong>
+					<div className="mb-4 p-5 rounded-2xl bg-linear-to-br from-purple-700 to-purple-900 shadow-2xl border border-purple-400/20">
+						<div className="flex gap-3 mb-3">
+							<div className="bg-white/20 rounded-xl px-3 py-2 backdrop-blur-md">
+								<i className="bi-bug-fill text-white mr-2"></i>
+								<strong className="text-white text-lg">Debug Dashboard</strong>
 							</div>
 						</div>
-						<div className="row g-3">
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'rgba(255, 255, 255, 0.15)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.2)',
-									transition: 'transform 0.2s',
-									cursor: 'pointer'
-								}} className="hover-lift">
-									<div className="d-flex align-items-center justify-content-between">
-										<span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem' }}>Recursive Search</span>
-										<span className="badge" style={{
-											background: isRecursiveSearch ? 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' : 'rgba(255, 255, 255, 0.2)',
-											padding: '6px 12px',
-											fontSize: '0.75rem'
-										}}>{isRecursiveSearch ? 'ON' : 'OFF'}</span>
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+							<div className="bg-white/15 rounded-xl p-3 backdrop-blur-md border border-white/20 transition-transform hover:-translate-y-1 cursor-pointer">
+								<div className="flex items-center justify-between">
+									<span className="text-white/80 text-sm">Recursive Search</span>
+									<span className={`badge text-xs px-3 py-1 rounded-full ${isRecursiveSearch ? 'bg-linear-to-r from-emerald-600 to-emerald-400' : 'bg-white/20'}`}>
+										{isRecursiveSearch ? 'ON' : 'OFF'}
+									</span>
+								</div>
+							</div>
+							<div className="bg-white/15 rounded-xl p-3 backdrop-blur-md border border-white/20">
+								<div className="text-white/80 text-sm mb-1">Search Word</div>
+								<div className="text-white font-semibold">{optSchWord || '(none)'}</div>
+							</div>
+							<div className="bg-white/15 rounded-xl p-3 backdrop-blur-md border border-white/20">
+								<div className="text-white/80 text-sm mb-1">Descendant Folders</div>
+								<div className="text-white font-bold text-xl">{debugInfo.descendantFolderCount}</div>
+							</div>
+							<div className="bg-linear-to-br from-blue-600 to-blue-800 rounded-xl p-3 backdrop-blur-md border border-blue-400/30 shadow-lg">
+								<div className="text-white/90 text-sm mb-1">Total Media Files</div>
+								<div className="text-white font-bold text-xl">{mediaFiles.length}</div>
+							</div>
+							<div className="bg-linear-to-br from-green-600 to-green-800 rounded-xl p-3 backdrop-blur-md border border-green-400/30 shadow-lg">
+								<div className="text-white/90 text-sm mb-1">With Parents</div>
+								<div className="text-white font-bold text-xl">{debugInfo.filesWithParents}</div>
+							</div>
+							<div className="bg-linear-to-br from-red-600 to-red-800 rounded-xl p-3 backdrop-blur-md border border-red-400/30 shadow-lg">
+								<div className="text-white/90 text-sm mb-1">Without Parents</div>
+								<div className="text-white font-bold text-xl">{debugInfo.filesWithoutParents}</div>
+							</div>
+							<div className="col-span-full bg-white/10 rounded-xl p-3 backdrop-blur-md border border-white/15">
+								<div className="flex flex-wrap gap-3 items-center justify-around text-center">
+									<div>
+										<div className="text-white/70 text-xs">Source Items</div>
+										<div className="text-white font-semibold text-lg">{debugInfo.sourceItemCount}</div>
 									</div>
-								</div>
-							</div>
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'rgba(255, 255, 255, 0.15)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.2)'
-								}}>
-									<div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem', marginBottom: '6px' }}>Search Word</div>
-									<div style={{ color: '#fff', fontWeight: '600' }}>{optSchWord || '(none)'}</div>
-								</div>
-							</div>
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'rgba(255, 255, 255, 0.15)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.2)'
-								}}>
-									<div style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.85rem', marginBottom: '6px' }}>Descendant Folders</div>
-									<div className="hstack gap-2">
-										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.descendantFolderCount}</span>
+									<i className="bi-arrow-right text-white/50"></i>
+									<div>
+										<div className="text-white/70 text-xs">After Recursive</div>
+										<div className="text-white font-semibold text-lg">{debugInfo.afterRecursiveFilter}</div>
 									</div>
-								</div>
-							</div>
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(59, 130, 246, 0.3)',
-									boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
-								}}>
-									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Total Media Files</div>
-									<div className="hstack gap-2">
-										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{mediaFiles.length}</span>
-									</div>
-								</div>
-							</div>
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(16, 185, 129, 0.3)',
-									boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)'
-								}}>
-									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>With Parents</div>
-									<div className="hstack gap-2">
-										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithParents}</span>
-									</div>
-								</div>
-							</div>
-							<div className="col-md-4 col-sm-6">
-								<div style={{
-									background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(239, 68, 68, 0.3)',
-									boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
-								}}>
-									<div style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.85rem', marginBottom: '6px' }}>Without Parents</div>
-									<div className="hstack gap-2">
-										<span style={{ color: '#fff', fontWeight: '700', fontSize: '1.3rem' }}>{debugInfo.filesWithoutParents}</span>
-									</div>
-								</div>
-							</div>
-							<div className="col-12">
-								<div style={{
-									background: 'rgba(255, 255, 255, 0.1)',
-									borderRadius: '12px',
-									padding: '12px',
-									backdropFilter: 'blur(10px)',
-									border: '1px solid rgba(255, 255, 255, 0.15)'
-								}}>
-									<div className="d-flex flex-wrap gap-3 align-items-center justify-content-around text-center">
-										<div>
-											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>Source Items</div>
-											<div style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{debugInfo.sourceItemCount}</div>
-										</div>
-										<i className="bi-arrow-right" style={{ color: 'rgba(255, 255, 255, 0.5)' }}></i>
-										<div>
-											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>After Recursive</div>
-											<div style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{debugInfo.afterRecursiveFilter}</div>
-										</div>
-										<i className="bi-arrow-right" style={{ color: 'rgba(255, 255, 255, 0.5)' }}></i>
-										<div>
-											<div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.75rem' }}>After Name Filter</div>
-											<div style={{ color: '#10b981', fontWeight: '700', fontSize: '1.2rem' }}>{debugInfo.afterNameFilter}</div>
-										</div>
+									<i className="bi-arrow-right text-white/50"></i>
+									<div>
+										<div className="text-white/70 text-xs">After Name Filter</div>
+										<div className="text-green-400 font-bold text-xl">{debugInfo.afterNameFilter}</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				)}
-				<div className="row g-3 mb-3">
-					<div className="col">
-						<div className="card border-0 shadow-lg kpi-card kpi-card-purple">
-							<div className="card-body kpi-card-body">
-								<div className="d-flex align-items-center justify-content-between">
-									<div className="hstack gap-2">
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-images text-white kpi-icon"></i>
-										</div>
-										<div>
-											<div className="text-white-50 text-uppercase small">Total Files</div>
-										</div>
-									</div>
-									<div className="text-white fw-bold kpi-title mb-0 fs-1">{mediaFiles.length}</div>
-								</div>
-							</div>
-							<i className="bi-images kpi-card-icon-bg"></i>
-						</div>
-					</div>
-					<div className="col">
-						<div className="card border-0 shadow-lg kpi-card kpi-card-green">
-							<div className="card-body kpi-card-body">
-								<div className="d-flex align-items-center justify-content-between">
-									<div className="hstack gap-2">
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-funnel text-white kpi-icon"></i>
-										</div>
-										<div>
-											<div className="text-white-50 text-uppercase small">Files Shown</div>
-										</div>
-									</div>
-									<div className="text-white fw-bold kpi-title mb-0 fs-1">{debugInfo.afterNameFilter}</div>
-								</div>
-							</div>
-							<i className="bi-funnel kpi-card-icon-bg"></i>
-						</div>
-					</div>
-					<div className="col">
-						<div className="card border-0 shadow-lg kpi-card kpi-card-red">
-							<div className="card-body kpi-card-body">
-								<div className="d-flex align-items-center justify-content-between">
-									<div className="hstack gap-2">
-										<div className="kpi-icon-circle rounded-circle d-flex align-items-center justify-content-center">
-											<i className="bi-floppy text-white kpi-icon"></i>
-										</div>
-										<div>
-											<div className="text-white-50 text-uppercase small">Space Shown</div>
-										</div>
-									</div>
-									<div className="text-white fw-bold kpi-title mb-0 fs-1 text-nowrap">{formatBytes(currFolderContents.reduce((total, item) => total + Number(item.size || 0), 0))}</div>
-								</div>
-							</div>
-							<i className="bi-floppy kpi-card-icon-bg"></i>
-						</div>
-					</div>
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+					<MetricCard
+						label="Total Files"
+						value={mediaFiles.length}
+						icon="bi-images"
+						variant="purple"
+					/>
+					<MetricCard
+						label="Files Shown"
+						value={debugInfo.afterNameFilter}
+						icon="bi-funnel"
+						variant="green"
+					/>
+					<MetricCard
+						label="Space Shown"
+						value={formatBytes(currFolderContents.reduce((total, item) => total + Number(item.size || 0), 0))}
+						icon="bi-floppy"
+						variant="red"
+					/>
 				</div>
 			</>
 		)
@@ -527,173 +445,160 @@ const FileBrowser: React.FC = () => {
 
 	function renderTopBar(): JSX.Element {
 		const isSearchActive = optSchWord.length > 0 || isRecursiveSearch;
-		const hasActiveFilters = mediaTypeFilter !== 'all' || sortField !== 'name' || sortOrder !== 'asc';
 
 		return (
-			<nav className="modern-navbar mb-3">
-				<form className="container-fluid px-0">
-					<div className="row w-100 align-items-end justify-content-between g-2">
-						{/* VIEW MODE SECTION */}
-						<div className="col-12 col-sm-auto">
-							<div className="control-group view-group">
-								<label className="control-label">View</label>
-								<div className="btn-group-modern" role="group" aria-label="view switcher">
-									<button
-										type="button"
-										className={`btn-modern ${viewMode === 'list' ? 'active' : ''}`}
-										aria-label="list view"
-										title="List View"
-										onClick={() => setViewMode('list')}>
-										<i className="bi-card-list" />
-										<span className="d-none d-sm-inline">List</span>
-									</button>
-									<button
-										type="button"
-										className={`btn-modern ${viewMode === 'grid' ? 'active' : ''}`}
-										aria-label="grid view"
-										title="Grid View"
-										onClick={() => setViewMode('grid')}>
-										<i className="bi-grid" />
-										<span className="d-none d-sm-inline">Grid</span>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						{/* TILE SIZE SECTION - Show only in grid mode */}
-						{viewMode === 'grid' && (
-							<div className="col-12 col-sm-auto">
-								<div className="control-group size-group">
-									<label className="control-label">Size</label>
-									<div className="btn-group-modern" role="group" aria-label="tile size options">
-										<button type="button" aria-label="small tiles"
-											className={`btn-modern-icon ${tileSize === 'small' ? 'active' : ''}`}
-											title="Small tiles"
-											onClick={() => setTileSize('small')}>
-											<i className="bi-grid-3x3-gap" />
-										</button>
-										<button type="button" aria-label="medium tiles"
-											className={`btn-modern-icon ${tileSize === 'medium' ? 'active' : ''}`}
-											title="Medium tiles"
-											onClick={() => setTileSize('medium')}>
-											<i className="bi-grid" />
-										</button>
-										<button type="button" aria-label="large tiles"
-											className={`btn-modern-icon ${tileSize === 'large' ? 'active' : ''}`}
-											title="Large tiles"
-											onClick={() => setTileSize('large')}>
-											<i className="bi-grid-1x2" />
-										</button>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* SORT SECTION */}
-						<div className="col-12 col-sm-auto">
-							<div className="control-group sort-group">
-								<label className="control-label">Sort</label>
-								<div className="sort-controls">
-									<select
-										className="sort-select"
-										value={sortField}
-										onChange={(e) => setSortField(e.target.value as SortField)}
-										aria-label="Sort field">
-										<option value="name">Name</option>
-										<option value="size">Size</option>
-										<option value="modifiedByMeTime">Modified</option>
-										<option value="createdTime">Created</option>
-									</select>
-									<button
-										type="button"
-										className="sort-order-btn"
-										onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-										aria-label={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-										title={`Click to sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}>
-										<i className={`bi bi-arrow-${sortOrder === 'asc' ? 'up' : 'down'}`} />
-									</button>
-								</div>
-							</div>
-						</div>
-
-						{/* FILTER SECTION */}
-						<div className="col-12 col-sm-auto">
-							<div className={`control-group filter-group ${hasActiveFilters ? 'has-active' : ''}`}>
-								<label className="control-label">Type</label>
-								<div className="filter-buttons">
-									<button
-										type="button"
-										className={`btn-filter ${mediaTypeFilter === 'all' ? 'active' : ''}`}
-										title="Show all"
-										aria-label="show all"
-										onClick={() => setMediaTypeFilter('all')}>
-										<i className="bi-files" />
-										<span className="d-none d-lg-inline">All</span>
-									</button>
-									<button
-										type="button"
-										className={`btn-filter ${mediaTypeFilter === 'image' ? 'active' : ''}`}
-										title="Show images"
-										aria-label="show images"
-										onClick={() => setMediaTypeFilter('image')}>
-										<i className="bi-image" />
-										<span className="d-none d-lg-inline">Image</span>
-									</button>
-									<button
-										type="button"
-										className={`btn-filter ${mediaTypeFilter === 'gif' ? 'active' : ''}`}
-										title="Show gifs"
-										aria-label="show gifs"
-										onClick={() => setMediaTypeFilter('gif')}>
-										<i className="bi-play-btn" />
-										<span className="d-none d-lg-inline">GIF</span>
-									</button>
-									<button
-										type="button"
-										className={`btn-filter ${mediaTypeFilter === 'video' ? 'active' : ''}`}
-										title="Show videos"
-										aria-label="show videos"
-										onClick={() => setMediaTypeFilter('video')}>
-										<i className="bi-camera-video" />
-										<span className="d-none d-lg-inline">Video</span>
-									</button>
-								</div>
-							</div>
-						</div>
-
-						{/* SEARCH SECTION */}
-						<div className={`col mt-2 mt-sm-0 search-wrapper ${isSearchActive ? 'active' : ''}`}>
-							<div className="control-group">
-								<label className="control-label">Search</label>
-								<div className="modern-search">
-									<div className="search-icon">
-										<i className="bi-search"></i>
-									</div>
-									<input
-										type="search"
-										className="search-input"
-										placeholder="Search files..."
-										aria-label="Search"
-										value={optSchWord}
-										onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }}
-									/>
-									<div className="recursive-toggle">
-										<input
-											className="form-check-input"
-											type="checkbox"
-											id="recursiveSearchCheck"
-											checked={isRecursiveSearch}
-											onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)}
-											aria-label="Checkbox for recursive search"
-										/>
-										<label className="form-check-label" htmlFor="recursiveSearchCheck" title="Search subfolders"><i className="bi bi-arrow-repeat"></i></label>
-									</div>
-								</div>
-							</div>
+			<div className="mb-4 p-4 rounded-2xl backdrop-blur-xl bg-linear-to-br from-base-300/90 to-base-200/90 border border-primary/10 shadow-xl">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+					{/* VIEW MODE SECTION */}
+					<div className="lg:col-span-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">View</span>
+						</label>
+						<div className="btn-group w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${viewMode === 'list' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setViewMode('list')}
+								title="List View">
+								<i className="bi-card-list" />
+								<span className="hidden sm:inline">List</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${viewMode === 'grid' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setViewMode('grid')}
+								title="Grid View">
+								<i className="bi-grid" />
+								<span className="hidden sm:inline">Grid</span>
+							</button>
 						</div>
 					</div>
-				</form>
-			</nav>
+
+					{/* TILE SIZE SECTION - Show only in grid mode */}
+					{viewMode === 'grid' && (
+						<div className="lg:col-span-2">
+							<label className="label pb-1">
+								<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Size</span>
+							</label>
+							<div className="btn-group w-full">
+								<button
+									type="button"
+									className={`btn btn-sm flex-1 ${tileSize === 'small' ? 'btn-primary' : 'btn-ghost'}`}
+									onClick={() => setTileSize('small')}
+									title="Small tiles">
+									<i className="bi-grid-3x3-gap" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-sm flex-1 ${tileSize === 'medium' ? 'btn-primary' : 'btn-ghost'}`}
+									onClick={() => setTileSize('medium')}
+									title="Medium tiles">
+									<i className="bi-grid" />
+								</button>
+								<button
+									type="button"
+									className={`btn btn-sm flex-1 ${tileSize === 'large' ? 'btn-primary' : 'btn-ghost'}`}
+									onClick={() => setTileSize('large')}
+									title="Large tiles">
+									<i className="bi-grid-1x2" />
+								</button>
+							</div>
+						</div>
+					)}
+
+					{/* SORT SECTION */}
+					<div className="lg:col-span-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Sort</span>
+						</label>
+						<div className="join w-full">
+							<select
+								className="select select-sm select-bordered join-item flex-1"
+								value={sortField}
+								onChange={(e) => setSortField(e.target.value as SortField)}>
+								<option value="name">Name</option>
+								<option value="size">Size</option>
+								<option value="modifiedByMeTime">Modified</option>
+								<option value="createdTime">Created</option>
+							</select>
+							<button
+								type="button"
+								className="btn btn-sm btn-bordered join-item"
+								onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+								title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}>
+								<i className={`bi bi-arrow-${sortOrder === 'asc' ? 'up' : 'down'}`} />
+							</button>
+						</div>
+					</div>
+
+					{/* FILTER SECTION */}
+					<div className="lg:col-span-3">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Type</span>
+						</label>
+						<div className="btn-group w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('all')}
+								title="Show all">
+								<i className="bi-files" />
+								<span className="hidden lg:inline">All</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'image' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('image')}
+								title="Show images">
+								<i className="bi-image" />
+								<span className="hidden lg:inline">Image</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'gif' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('gif')}
+								title="Show gifs">
+								<i className="bi-play-btn" />
+								<span className="hidden lg:inline">GIF</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'video' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('video')}
+								title="Show videos">
+								<i className="bi-camera-video" />
+								<span className="hidden lg:inline">Video</span>
+							</button>
+						</div>
+					</div>
+
+					{/* SEARCH SECTION */}
+					<div className="lg:col-span-3">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+						</label>
+						<div className={`input input-sm input-bordered flex items-center gap-2 transition-all ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
+							<i className="bi-search opacity-50"></i>
+							<input
+								type="search"
+								className="grow"
+								placeholder="Search files..."
+								value={optSchWord}
+								onChange={(ev) => setOptSchWord(ev.currentTarget.value)}
+							/>
+							<label className="label cursor-pointer gap-2 pl-2 border-l border-base-300">
+								<i className="bi-arrow-repeat text-xs" title="Search subfolders"></i>
+								<input
+									type="checkbox"
+									className="checkbox checkbox-xs checkbox-primary"
+									checked={isRecursiveSearch}
+									onChange={(ev) => setIsRecursiveSearch(ev.currentTarget.checked)}
+								/>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
 		)
 	}
 
@@ -702,39 +607,39 @@ const FileBrowser: React.FC = () => {
 			<section>
 				{!hasRootAccess && (
 					<div className="alert alert-info mb-3" role="alert">
-						<i className="bi-info-circle me-2"></i>
+						<i className="bi-info-circle mr-2"></i>
 						Showing files created by this app. Full folder browsing requires additional permissions.
 					</div>
 				)}
 				{hasRootAccess && (
-					<div className='row align-items-center mb-2'>
-						<div className='col'>
+					<div className='flex flex-col md:flex-row items-start md:items-center gap-3 mb-3'>
+						<div className='flex-1'>
 							<Breadcrumbs path={currentFolderPath} onNavigate={handleBreadcrumbClick} />
 						</div>
-						<div className='col-auto'>
-							<div className="bg-dark-subtle rounded-3 px-3 py-2 hstack h-100">
-								<span className="text-nowrap text-warning">
+						<div className='shrink-0'>
+							<div className="bg-base-200 rounded-xl px-4 py-2 flex items-center gap-3 h-full shadow-sm">
+								<span className="flex items-center gap-2 text-warning whitespace-nowrap">
 									{currFolderContents.filter(item => isFolder(item)).length}
-									<i className="bi-folder-fill ms-2" />
+									<i className="bi-folder-fill" />
 								</span>
-								<span className="text-nowrap text-success ms-3">
+								<span className="flex items-center gap-2 text-success whitespace-nowrap">
 									{currFolderContents.filter(item => isImage(item)).length}
-									<i className="bi-image ms-2" />
+									<i className="bi-image" />
 								</span>
-								<span className="text-nowrap text-primary ms-3">
+								<span className="flex items-center gap-2 text-primary whitespace-nowrap">
 									{currFolderContents.filter(item => isGif(item)).length}
-									<i className="bi-play-btn ms-2" />
+									<i className="bi-play-btn" />
 								</span>
-								<span className="text-nowrap text-info ms-3">
+								<span className="flex items-center gap-2 text-info whitespace-nowrap">
 									{currFolderContents.filter(item => isVideo(item)).length}
-									<i className="bi-camera-video ms-2" />
+									<i className="bi-camera-video" />
 								</span>
 							</div>
 						</div>
 					</div>
 				)}
 				{viewMode === 'grid' ?
-					<section className="bg-black h-100">
+					<section className="bg-black h-full">
 						<GridView
 							currFolderContents={currFolderContents}
 							isFolderLoading={isFolderLoading}
