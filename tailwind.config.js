@@ -40,32 +40,5 @@ export default {
 			},
 		},
 	},
-	plugins: [
-		require('daisyui'),
-	],
-	daisyui: {
-		themes: [
-			{
-				dark: {
-					...require("daisyui/src/theming/themes")["dark"],
-					// Customize dark theme to match your current design
-					"primary": "#60a5fa",
-					"secondary": "#a78bfa",
-					"accent": "#2dd4bf",
-					"neutral": "#1f2937",
-					"base-100": "#0f172a",
-					"base-200": "#1e293b",
-					"base-300": "#334155",
-					"info": "#3b82f6",
-					"success": "#10b981",
-					"warning": "#fb923c",
-					"error": "#ef4444",
-				},
-			},
-		],
-		darkTheme: "dark",
-		base: true,
-		styled: true,
-		utils: true,
-	},
+	plugins: [],
 }

@@ -11,6 +11,7 @@
 		"deploy": "tsc -b && vite build && firebase deploy"
 	},
 	"dependencies": {
+		"@tailwindcss/vite": "^4.1.18",
 		"gapi-script": "^1.2.0",
 		"jose": "^4.13.1",
 		"photoswipe": "^5.4.4",
@@ -22,7 +23,6 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.13.0",
-		"@tailwindcss/postcss": "^4.1.18",
 		"@types/gapi": "^0.0.47",
 		"@types/gapi.auth2": "^0.0.61",
 		"@types/gapi.client.drive-v3": "^0.0.5",

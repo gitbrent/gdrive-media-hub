@@ -1,9 +1,10 @@
 /* ============================================================================ */
-/* Tailwind CSS Base Styles */
+/* Tailwind CSS & DaisyUI Base Styles */
 /* ============================================================================ */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "daisyui" {
+	themes: synthwave;
+}
 
 /* ============================================================================ */
 /* Shared Color Palette & Design Tokens (now in tailwind.config.js) */

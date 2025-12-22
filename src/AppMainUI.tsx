@@ -11,7 +11,6 @@ import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
 import UserProfile from './app-tabs/UserProfile'
-import './css/AppMainUI.css'
 
 export default function AppMainUI() {
 	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
@@ -27,30 +26,30 @@ export default function AppMainUI() {
 	function renderLogin(): JSX.Element {
 		return (
 			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center bg-black p-5 pb-4 rounded">
-					<div className="row w-auto justify-content-center align-items-center">
-						<div className='col-auto'>
+				<div id="loginCont" className="text-center bg-base-300 p-5 pb-4 rounded-box">
+					<div className="flex flex-wrap w-auto justify-center items-center gap-4">
+						<div>
 							<img src="/google-drive.png" alt="Google Drive Logo" style={{ maxWidth: 100 }} />
 						</div>
-						<div className='col-auto'>
+						<div>
 							<img src="/app-logo.png" alt="App Logo" style={{ maxWidth: 100 }} />
 						</div>
 					</div>
 					<div className="my-3">
-						<div className="display-6">Google Drive</div>
-						<div className="display-6">Media Viewer</div>
+						<div className="text-4xl font-bold">Google Drive</div>
+						<div className="text-4xl font-bold">Media Viewer</div>
 					</div>
-					<button type="button" className='btn btn-lg bg-success w-100 mt-4' onClick={() => signIn(false)}>Sign In with Google</button>
-					<button type="button" className={`btn btn-sm btn-outline-warning w-100 mt-2 ${!DEBUG ? 'd-none' : ''}`} onClick={() => signIn(true)}>
+					<button type="button" className='btn btn-lg btn-success w-full mt-4' onClick={() => signIn(false)}>Sign In with Google</button>
+					<button type="button" className={`btn btn-sm btn-outline btn-warning w-full mt-2 ${!DEBUG ? 'hidden' : ''}`} onClick={() => signIn(true)}>
 						Force Re-authenticate (Dev Only)
 					</button>
 					<div className="mt-3">
-						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none small">Privacy Policy</a>
+						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-base-content/50 no-underline text-sm">Privacy Policy</a>
 					</div>
-					<div className={`${!DEBUG ? 'd-none' : ''} mt-4`}>
-						<div className="d-flex justify-content-center gap-2 mt-2">
-							<span className="badge text-bg-primary">{APP_VER}</span>
-							<span className="badge text-bg-secondary">{APP_BLD}</span>
+					<div className={`${!DEBUG ? 'hidden' : ''} mt-4`}>
+						<div className="flex justify-center gap-2 mt-2">
+							<span className="badge badge-primary">{APP_VER}</span>
+							<span className="badge badge-secondary">{APP_BLD}</span>
 						</div>
 					</div>
 				</div>
@@ -58,89 +57,135 @@ export default function AppMainUI() {
 		)
 	}
 
-	/**
-	 * @see https://getbootstrap.com/docs/5.3/utilities/background/
-	 */
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar navbar-expand-lg bg-dark-subtle2 bg-body-secondary sticky-top">
-				<div className="container-fluid">
-					<a className="navbar-brand" href="#">
-						<img src="/app-logo.png" alt="Drive" width="30" height="26" />
-					</a>
-					<button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-						<span className="navbar-toggler-icon"></span>
-					</button>
-					<div className="collapse navbar-collapse" id="navbarSupportedContent">
-						<ul className="navbar-nav me-auto mb-2 mb-lg-0">
-							<li className="nav-item">
-								<NavLink to="/" className="nav-link" title="home" aria-label="home">
+			<div className="navbar bg-base-200 sticky top-0 z-50">
+				<div className="navbar-start">
+					<div className="dropdown">
+						<div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
+							</svg>
+						</div>
+						<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
+							<li>
+								<NavLink to="/" end title="home" aria-label="home">
 									Home
 								</NavLink>
 							</li>
 							{userProfile &&
 								<>
-									<li className="nav-item">
-										<NavLink to="/collections" className="nav-link" title="collections" aria-label="collections">
+									<li>
+										<NavLink to="/collections" title="collections" aria-label="collections">
 											Collections
 										</NavLink>
 									</li>
-									<li className="nav-item">
-										<NavLink to="/folders" className="nav-link" title="folders" aria-label="folders">
+									<li>
+										<NavLink to="/folders" title="folders" aria-label="folders">
 											Folders
 										</NavLink>
 									</li>
-									<li className="nav-item">
-										<NavLink to="/file-browser" className="nav-link" title="file browser" aria-label="file browser">
+									<li>
+										<NavLink to="/file-browser" title="file browser" aria-label="file browser">
 											File Browser
 										</NavLink>
 									</li>
-									<li className="nav-item">
-										<NavLink to="/image-grid" className="nav-link" title="image grid" aria-label="image grid">
+									<li>
+										<NavLink to="/image-grid" title="image grid" aria-label="image grid">
 											Image Grid
 										</NavLink>
 									</li>
-									<li className="nav-item">
-										<NavLink to="/slide-show" className="nav-link" title="slide show" aria-label="slide show">
+									<li>
+										<NavLink to="/slide-show" title="slide show" aria-label="slide show">
 											Slide Show
 										</NavLink>
 									</li>
-									<li className="nav-item">
-										<NavLink to="/video-player" className="nav-link" title="video grid" aria-label="video grid">
+									<li>
+										<NavLink to="/video-player" title="video grid" aria-label="video grid">
 											Video Grid
 										</NavLink>
 									</li>
 								</>
 							}
 						</ul>
-						<div className="dropdown">
-							<a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-								{userProfile
-									? <img src={userProfile.getImageUrl()} alt="User Avatar" width="30" height="30" className="rounded-circle" />
-									: <i className="fs-4 bi bi-question-circle-fill" />
-								}
-							</a>
-							{userProfile ?
-								<ul className="dropdown-menu dropdown-menu-end">
-									<li>
-										<Link className="dropdown-item" to="/user-profile">Profile</Link>
-									</li>
-									<li><hr className="dropdown-divider" /></li>
-									<li>
-										<button className="dropdown-item" onClick={signOut}>Sign Out</button>
-									</li>
-								</ul>
-								:
-								<ul className="dropdown-menu dropdown-menu-end">
-									<li>
-										<a className="dropdown-item" href="#" onClick={() => { alert('TODO:') }}>Clear Cache</a>
-									</li>
-								</ul>
+					</div>
+					<Link className="btn btn-ghost text-xl" to="/">
+						<img src="/app-logo.png" alt="Drive" width="30" height="26" />
+					</Link>
+				</div>
+				<div className="navbar-center hidden lg:flex">
+					<ul className="menu menu-horizontal px-1">
+						<li>
+							<NavLink to="/" end title="home" aria-label="home">
+								Home
+							</NavLink>
+						</li>
+						{userProfile &&
+							<>
+								<li>
+									<NavLink to="/collections" title="collections" aria-label="collections">
+										Collections
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="/folders" title="folders" aria-label="folders">
+										Folders
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="/file-browser" title="file browser" aria-label="file browser">
+										File Browser
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="/image-grid" title="image grid" aria-label="image grid">
+										Image Grid
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="/slide-show" title="slide show" aria-label="slide show">
+										Slide Show
+									</NavLink>
+								</li>
+								<li>
+									<NavLink to="/video-player" title="video grid" aria-label="video grid">
+										Video Grid
+									</NavLink>
+								</li>
+							</>
+						}
+					</ul>
+				</div>
+				<div className="navbar-end">
+					<div className="dropdown dropdown-end">
+						<div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+							{userProfile
+								? <div className="w-10 rounded-full">
+									<img src={userProfile.getImageUrl()} alt="User Avatar" />
+								</div>
+								: <i className="text-2xl bi bi-question-circle-fill" />
 							}
 						</div>
+						{userProfile ?
+							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
+								<li>
+									<Link to="/user-profile">Profile</Link>
+								</li>
+								<li><hr className="my-1" /></li>
+								<li>
+									<button onClick={signOut}>Sign Out</button>
+								</li>
+							</ul>
+							:
+							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
+								<li>
+									<a href="#" onClick={() => { alert('TODO:') }}>Clear Cache</a>
+								</li>
+							</ul>
+						}
 					</div>
 				</div>
-			</nav>
+			</div>
 		)
 	}
 
