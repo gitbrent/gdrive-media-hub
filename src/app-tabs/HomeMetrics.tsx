@@ -40,12 +40,11 @@ const variantClasses: Record<KPIProps['variant'], string> = {
 
 const KPI: React.FC<KPIProps> = ({ title, value, icon, subtitle, secondaryText, variant }) => (
 	<div className="card bg-base-200 border-0 h-full rounded-2xl">
-		<div className={`card-body relative overflow-hidden ${variantClasses[variant]} text-white p-4 rounded-2xl`}>
+		<div className={`card-body relative overflow-hidden ${variantClasses[variant]} text-white py-2 px-4 rounded-2xl`}>
 			{/* Background Icon */}
-			<div className="absolute top-2 right-2 opacity-15 text-5xl">
+			<div className="absolute -top-1 -right-4 opacity-15 text-8xl">
 				<i className={`bi ${icon}`}></i>
 			</div>
-
 			{/* Content */}
 			<div className="relative z-10">
 				<div className="flex items-center gap-3 mb-2">
@@ -57,8 +56,8 @@ const KPI: React.FC<KPIProps> = ({ title, value, icon, subtitle, secondaryText, 
 				<h2 className="text-3xl font-bold mb-2">{value}</h2>
 				{(subtitle || secondaryText) && (
 					<div className="flex justify-between items-center text-xs opacity-60">
-						{subtitle && <span>{subtitle}</span>}
-						{secondaryText && <span>{secondaryText}</span>}
+						{subtitle && <span className='text-gray-300'>{subtitle}</span>}
+						{secondaryText && <span className='text-gray-300'>{secondaryText}</span>}
 					</div>
 				)}
 			</div>
