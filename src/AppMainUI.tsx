@@ -13,7 +13,7 @@ import VideoPlayer from './app-tabs/VideoPlayer'
 import UserProfile from './app-tabs/UserProfile'
 
 export default function AppMainUI() {
-	const { isSignedIn, signIn, signOut } = useContext(AuthContext)
+	const { isSignedIn, signIn } = useContext(AuthContext)
 	const { userProfile, refreshData } = useContext(DataContext)
 
 	useEffect(() => {
@@ -59,7 +59,7 @@ export default function AppMainUI() {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<div className="navbar bg-base-200 sticky top-0 z-50">
+			<div className="navbar bg-base-100 sticky top-0 z-50">
 				<div className="navbar-start">
 					<div className="dropdown">
 						<div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -186,13 +186,13 @@ export default function AppMainUI() {
 	}
 
 	return (
-		<section>
+		<section className="bg-base-200 w-full">
 			{!isSignedIn ?
 				renderLogin()
 				:
 				<>
 					{renderTopBar()}
-					<main className="p-4 pt-3">
+					<main className="p-4 md:p-6">
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/collections" element={<Collections />} />
