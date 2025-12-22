@@ -1,54 +1,33 @@
-import { useContext, useEffect, useState } from 'react'
-import { BreadcrumbSegment, DEBUG, IGapiFile, IGapiFolder, LOG_LEVEL, formatBytes } from '../App.props'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { BreadcrumbSegment, DEBUG, IFileAnalysis, IGapiFile, IGapiFolder, LOG_LEVEL } from '../App.props'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { getRootFolderId, fetchFolderContents } from '../api-google'
 import { DataContext } from '../api-google/DataContext'
+import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
 import FileBrowViewList from '../components/FileBrowViewList'
 import AlertLoading from '../components/AlertLoading'
 import Breadcrumbs from '../components/Breadcrumbs'
 import GridView from '../components/GridView'
+import MetricCards from './MetricCards'
 
 type ViewMode = 'grid' | 'list'
 type SortField = 'name' | 'size' | 'modifiedByMeTime' | 'createdTime'
 type SortOrder = 'asc' | 'desc'
 type MediaType = 'all' | 'image' | 'gif' | 'video'
 
-// ============================================================================
-// Metric Card Component
-// ============================================================================
-interface MetricCardProps {
-	label: string
-	value: string | number
-	icon: string
-	variant: 'purple' | 'green' | 'blue' | 'red' | 'yellow'
+// --------------------------------------------------------------------------------------------
+// Custom Hook: useFileAnalysis
+// --------------------------------------------------------------------------------------------
+
+const useFileAnalysis = (items: Array<IGapiFile | IGapiFolder>): IFileAnalysis => {
+	return useMemo(() => {
+		// Filter to only media files (exclude folders)
+		const mediaItems = items.filter(item => !isFolder(item)) as IGapiFile[]
+		return getFileAnalysis(mediaItems)
+	}, [items])
 }
 
-const variantClasses: Record<MetricCardProps['variant'], string> = {
-	purple: 'bg-linear-to-br from-purple-600 to-purple-800',
-	green: 'bg-linear-to-br from-green-600 to-green-800',
-	blue: 'bg-linear-to-br from-blue-600 to-blue-800',
-	red: 'bg-linear-to-br from-red-600 to-red-800',
-	yellow: 'bg-linear-to-br from-yellow-600 to-yellow-800',
-}
-
-const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, variant }) => (
-	<div className="card bg-base-200 border-0 h-full rounded-2xl">
-		<div className={`card-body relative overflow-hidden ${variantClasses[variant]} text-white py-3 px-4 rounded-2xl`}>
-			<div className="absolute -top-1 -right-4 opacity-15 text-8xl">
-				<i className={`bi ${icon}`}></i>
-			</div>
-			<div className="relative z-10">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center">
-						<i className={`bi ${icon} text-lg`}></i>
-					</div>
-					<h6 className="text-xs opacity-90 mb-0 uppercase tracking-wide">{label}</h6>
-				</div>
-				<h2 className="text-3xl font-bold mb-0">{value}</h2>
-			</div>
-		</div>
-	</div>
-)
+// --------------------------------------------------------------------------------------------
 
 const FileBrowser: React.FC = () => {
 	const { mediaFiles, isLoading, releaseAllBlobUrls } = useContext(DataContext)
@@ -74,6 +53,9 @@ const FileBrowser: React.FC = () => {
 		filesWithParents: number;
 		filesWithoutParents: number;
 	}>({ currentFolderId: '', descendantFolderCount: 0, sourceItemCount: 0, afterRecursiveFilter: 0, afterNameFilter: 0, filesWithParents: 0, filesWithoutParents: 0 })
+
+	// Calculate analysis based on current folder contents
+	const analysis = useFileAnalysis(currFolderContents)
 
 	// --------------------------------------------------------------------------------------------
 
@@ -419,26 +401,7 @@ const FileBrowser: React.FC = () => {
 						</div>
 					</div>
 				)}
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-					<MetricCard
-						label="Total Files"
-						value={mediaFiles.length}
-						icon="bi-images"
-						variant="purple"
-					/>
-					<MetricCard
-						label="Files Shown"
-						value={debugInfo.afterNameFilter}
-						icon="bi-funnel"
-						variant="green"
-					/>
-					<MetricCard
-						label="Space Shown"
-						value={formatBytes(currFolderContents.reduce((total, item) => total + Number(item.size || 0), 0))}
-						icon="bi-floppy"
-						variant="red"
-					/>
-				</div>
+				{/* Metrics shown via MetricCards component at top of render */}
 			</>
 		)
 	}
@@ -660,6 +623,7 @@ const FileBrowser: React.FC = () => {
 	return (
 		<section>
 			{renderTopBar()}
+			<MetricCards analysis={analysis} />
 			{renderSearchResultsInfo()}
 			{isLoading ? <AlertLoading /> : renderBrowser()}
 		</section>

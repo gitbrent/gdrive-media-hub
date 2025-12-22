@@ -1,5 +1,6 @@
 import React from 'react'
-import { IFileAnalysis, formatBytes } from '../App.props'
+import { IFileAnalysis } from '../App.props'
+import MetricCards from './MetricCards'
 import {
 	AreaChart,
 	Area,
@@ -18,52 +19,6 @@ import {
 interface HomeMetricsProps {
 	analysis: IFileAnalysis
 }
-
-// ============================================================================
-// KPI Card Component
-// ============================================================================
-interface KPIProps {
-	title: string
-	value: string | number
-	icon: string
-	subtitle?: string
-	secondaryText?: string
-	variant: 'purple' | 'green' | 'blue' | 'red'
-}
-
-const variantClasses: Record<KPIProps['variant'], string> = {
-	purple: 'bg-gradient-to-br from-purple-600 to-purple-800',
-	green: 'bg-gradient-to-br from-green-600 to-green-800',
-	blue: 'bg-gradient-to-br from-blue-600 to-blue-800',
-	red: 'bg-gradient-to-br from-red-600 to-red-800',
-}
-
-const KPI: React.FC<KPIProps> = ({ title, value, icon, subtitle, secondaryText, variant }) => (
-	<div className="card bg-base-200 border-0 h-full rounded-2xl">
-		<div className={`card-body relative overflow-hidden ${variantClasses[variant]} text-white py-2 px-4 rounded-2xl`}>
-			{/* Background Icon */}
-			<div className="absolute -top-1 -right-4 opacity-15 text-8xl">
-				<i className={`bi ${icon}`}></i>
-			</div>
-			{/* Content */}
-			<div className="relative z-10">
-				<div className="flex items-center gap-3 mb-2">
-					<div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center">
-						<i className={`bi ${icon} text-lg`}></i>
-					</div>
-					<h6 className="text-sm opacity-90 mb-0">{title}</h6>
-				</div>
-				<h2 className="text-3xl font-bold mb-2">{value}</h2>
-				{(subtitle || secondaryText) && (
-					<div className="flex justify-between items-center text-xs opacity-60">
-						{subtitle && <span className='text-gray-300'>{subtitle}</span>}
-						{secondaryText && <span className='text-gray-300'>{secondaryText}</span>}
-					</div>
-				)}
-			</div>
-		</div>
-	</div>
-)
 
 // Standardized Data Viz Palette (using CSS variables from style.scss)
 const COLORS = [
@@ -110,7 +65,7 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
 }
 
 const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
-	const { file_years, file_types, file_types_by_year, size_categories, total_files, total_size } = analysis
+	const { file_years, file_types, file_types_by_year, size_categories, total_files } = analysis
 
 	// Get top file types for the timeline
 	const topTypes = Object.entries(file_types)
@@ -143,12 +98,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	}))
 
 	// Calculate metrics
-	const avgFileSize = total_files > 0 ? total_size / total_files : 0
-
-	const largestCategory: [string, number] = Object.entries(size_categories).length > 0
-		? Object.entries(size_categories).reduce((a, b) => a[1] > b[1] ? a : b)
-		: ['N/A', 0]
-
 	const mostCommonType: [string, number] = Object.entries(file_types).length > 0
 		? Object.entries(file_types).reduce((a, b) => a[1] > b[1] ? a : b)
 		: ['N/A', 0]
@@ -159,41 +108,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		: 0
 
 	// ============================================================================
-
-	const renderKpiCards = () => (
-		<div className="grid grid-cols-1 gap-6 mb-6 sm:grid-cols-2 lg:grid-cols-4">
-			<KPI
-				title="Total Files Loaded"
-				value={total_files.toLocaleString()}
-				icon="bi-images"
-				subtitle={`${Object.keys(file_types).length} types`}
-				variant="purple"
-			/>
-			<KPI
-				title="Largest Size Group"
-				value={largestCategory[0]}
-				icon="bi-box-fill"
-				subtitle={`${largestCategory[1].toLocaleString()} files`}
-				secondaryText={`${Math.round(largestCategory[1] / total_files * 100)}%`}
-				variant="green"
-			/>
-			<KPI
-				title="Most Common Type"
-				value={mostCommonType[0]}
-				icon="bi-trophy-fill"
-				subtitle={`${mostCommonType[1].toLocaleString()} files`}
-				secondaryText={`${Math.round(mostCommonType[1] / total_files * 100)}%`}
-				variant="blue"
-			/>
-			<KPI
-				title="Total Storage Used"
-				value={formatBytes(total_size)}
-				icon="bi-floppy"
-				subtitle={`${formatBytes(avgFileSize)} avg`}
-				variant="red"
-			/>
-		</div>
-	)
 
 	const renderTimelineChart = () => (
 		<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg">
@@ -464,7 +378,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 
 	return (
 		<div>
-			{renderKpiCards()}
+			<MetricCards analysis={analysis}/>
 
 			{/* Charts Grid */}
 			<div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
