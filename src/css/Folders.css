@@ -1,0 +1,470 @@
+/* ================================================================================ */
+/* FOLDERS PAGE STYLES */
+/* ================================================================================ */
+
+.folders-container {
+	min-height: 100vh;
+	background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+	color: #fff;
+	padding: 2rem;
+}
+
+/* Hero Section */
+.folders-hero {
+	text-align: center;
+	margin-bottom: 3rem;
+	padding: 2rem 0;
+}
+
+.folders-main-title {
+	font-size: 3rem;
+	font-weight: 800;
+	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	margin-bottom: 1rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 1rem;
+	animation: fadeInUp 0.6s ease-out;
+}
+
+.folders-main-title i {
+	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.folders-subtitle {
+	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.6);
+	margin-bottom: 2rem;
+	animation: fadeInUp 0.6s ease-out 0.1s both;
+}
+
+/* Breadcrumb */
+.folders-breadcrumb {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-bottom: 2rem;
+	flex-wrap: wrap;
+	animation: fadeInUp 0.6s ease-out 0.15s both;
+}
+
+.breadcrumb-item {
+	background: rgba(50, 50, 70, 0.5);
+	border: 1px solid rgba(59, 130, 246, 0.2);
+	color: rgba(255, 255, 255, 0.7);
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.breadcrumb-item:hover:not(:disabled) {
+	background: rgba(59, 130, 246, 0.2);
+	border-color: rgba(59, 130, 246, 0.4);
+	color: #fff;
+}
+
+.breadcrumb-item.active {
+	background: rgba(59, 130, 246, 0.3);
+	border-color: rgba(59, 130, 246, 0.5);
+	color: #fff;
+	font-weight: 600;
+	cursor: default;
+}
+
+.breadcrumb-separator {
+	color: rgba(255, 255, 255, 0.3);
+	font-size: 0.8rem;
+}
+
+/* Search Bar */
+.folders-search {
+	max-width: 600px;
+	margin: 0 auto 3rem;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: rgba(50, 50, 70, 0.5);
+	border: 1px solid rgba(59, 130, 246, 0.2);
+	border-radius: 12px;
+	padding: 14px 20px;
+	transition: all 0.3s ease;
+	animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.folders-search:focus-within {
+	border-color: rgba(59, 130, 246, 0.5);
+	box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+	background: rgba(50, 50, 70, 0.7);
+}
+
+.folders-search .search-icon {
+	color: rgba(255, 255, 255, 0.4);
+	font-size: 1.2rem;
+	transition: color 0.3s ease;
+}
+
+.folders-search:focus-within .search-icon {
+	color: rgba(59, 130, 246, 0.8);
+}
+
+.folders-search .search-input {
+	background: transparent;
+	border: none;
+	outline: none;
+	color: #fff;
+	font-size: 1rem;
+	flex: 1;
+	font-weight: 500;
+}
+
+.folders-search .search-input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+/* Stats Cards */
+.folders-stats {
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
+	flex-wrap: wrap;
+	margin-bottom: 3rem;
+	animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+/* Folders Grid */
+.folders-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 1.5rem;
+	margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+	.folders-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Folder Cards */
+.folder-card {
+	position: relative;
+	border-radius: 16px;
+	padding: 1.25rem;
+	cursor: pointer;
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+	min-height: 140px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+	animation: cardFadeIn 0.5s ease-out both;
+}
+
+.folder-card::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.folder-card:hover {
+	transform: translateY(-8px) scale(1.02);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.folder-card:hover::before {
+	opacity: 1;
+}
+
+/* Card Sizes */
+.folder-card.large {
+	grid-column: span 2;
+	min-height: 180px;
+}
+
+.folder-card.medium {
+	min-height: 160px;
+}
+
+.folder-card.small {
+	min-height: 140px;
+}
+
+@media (max-width: 768px) {
+	.folder-card.large {
+		grid-column: span 1;
+	}
+}
+
+/* Card Content */
+.folder-card-content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.folder-header-row {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.folder-icon {
+	width: 60px;
+	height: 60px;
+	background: rgba(255, 255, 255, 0.2);
+	backdrop-filter: blur(10px);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	color: rgba(255, 255, 255, 0.95);
+	flex-shrink: 0;
+	transition: all 0.3s ease;
+}
+
+.folder-card:hover .folder-icon {
+	transform: scale(1.1);
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.folder-name {
+	font-size: 1.35rem;
+	font-weight: 700;
+	margin: 0;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	flex: 1;
+}
+
+.folder-stats {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-top: 0.25rem;
+}
+
+.stat-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.9rem;
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.stat-row i {
+	font-size: 0.95rem;
+	opacity: 0.8;
+	width: 16px;
+	text-align: center;
+}
+
+.stat-row.file-types {
+	display: flex;
+	gap: 0.75rem;
+	margin-top: 0.25rem;
+}
+
+.type-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	background: rgba(0, 0, 0, 0.25);
+	padding: 0.25rem 0.65rem;
+	border-radius: 12px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	backdrop-filter: blur(5px);
+}
+
+.type-badge i {
+	font-size: 0.85rem;
+	width: auto;
+}
+
+/* Card Overlay */
+.folder-overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(10px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	z-index: 2;
+}
+
+.folder-card:hover .folder-overlay {
+	opacity: 1;
+}
+
+.view-text {
+	color: #fff;
+	font-size: 1.2rem;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	transform: translateY(10px);
+	transition: transform 0.3s ease;
+}
+
+.folder-card:hover .view-text {
+	transform: translateY(0);
+}
+
+/* Folder Header (when viewing items) */
+.folder-header {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+	margin-bottom: 2rem;
+	padding-bottom: 1.5rem;
+	border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.btn-back {
+	background: rgba(50, 50, 70, 0.5);
+	border: 1px solid rgba(59, 130, 246, 0.2);
+	color: #fff;
+	padding: 0.75rem 1.5rem;
+	border-radius: 12px;
+	font-size: 1rem;
+	font-weight: 500;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+	background: rgba(59, 130, 246, 0.3);
+	border-color: rgba(59, 130, 246, 0.4);
+	transform: translateX(-4px);
+}
+
+.folder-title {
+	flex: 1;
+}
+
+.folder-title h2 {
+	font-size: 2rem;
+	font-weight: 700;
+	margin: 0 0 0.5rem 0;
+	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.folder-title h2 i {
+	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.folder-count {
+	color: rgba(255, 255, 255, 0.6);
+	font-size: 1rem;
+}
+
+/* No Folders State */
+.no-folders {
+	text-align: center;
+	padding: 4rem 2rem;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.no-folders i {
+	font-size: 4rem;
+	margin-bottom: 1rem;
+	opacity: 0.5;
+}
+
+.no-folders h3 {
+	font-size: 1.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.no-folders p {
+	font-size: 1rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes cardFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(30px) scale(0.95);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.folders-container {
+		padding: 1rem;
+	}
+
+	.folders-main-title {
+		font-size: 2rem;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.folders-subtitle {
+		font-size: 1rem;
+	}
+
+	.folders-stats {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.folder-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.btn-back {
+		width: 100%;
+		justify-content: center;
+	}
+}

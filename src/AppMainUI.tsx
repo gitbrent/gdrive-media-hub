@@ -5,6 +5,7 @@ import { DataContext } from './api-google/DataContext'
 import { DEBUG, APP_VER, APP_BLD } from './App.props'
 import Home from './app-tabs/Home'
 import Collections from './app-tabs/Collections'
+import Folders from './app-tabs/Folders'
 import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
@@ -85,6 +86,11 @@ export default function AppMainUI() {
 										</NavLink>
 									</li>
 									<li className="nav-item">
+										<NavLink to="/folders" className="nav-link" title="folders" aria-label="folders">
+											Folders
+										</NavLink>
+									</li>
+									<li className="nav-item">
 										<NavLink to="/file-browser" className="nav-link" title="file browser" aria-label="file browser">
 											File Browser
 										</NavLink>
@@ -149,6 +155,7 @@ export default function AppMainUI() {
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/collections" element={<Collections />} />
+							<Route path="/folders" element={<Folders />} />
 							<Route path="/file-browser" element={<FileBrowser />} />
 							<Route path="/image-grid" element={<ImageGrid />} />
 							<Route path="/slide-show" element={<Slideshow />} />
