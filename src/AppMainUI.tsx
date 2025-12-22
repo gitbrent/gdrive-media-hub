@@ -69,39 +69,39 @@ export default function AppMainUI() {
 						</div>
 						<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
 							<li>
-								<NavLink to="/" end title="home" aria-label="home">
+								<NavLink to="/" end title="home" aria-label="home" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 									Home
 								</NavLink>
 							</li>
 							{userProfile &&
 								<>
 									<li>
-										<NavLink to="/collections" title="collections" aria-label="collections">
+										<NavLink to="/collections" title="collections" aria-label="collections" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											Collections
 										</NavLink>
 									</li>
 									<li>
-										<NavLink to="/folders" title="folders" aria-label="folders">
+										<NavLink to="/folders" title="folders" aria-label="folders" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											Folders
 										</NavLink>
 									</li>
 									<li>
-										<NavLink to="/file-browser" title="file browser" aria-label="file browser">
+										<NavLink to="/file-browser" title="file browser" aria-label="file browser" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											File Browser
 										</NavLink>
 									</li>
 									<li>
-										<NavLink to="/image-grid" title="image grid" aria-label="image grid">
+										<NavLink to="/image-grid" title="image grid" aria-label="image grid" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											Image Grid
 										</NavLink>
 									</li>
 									<li>
-										<NavLink to="/slide-show" title="slide show" aria-label="slide show">
+										<NavLink to="/slide-show" title="slide show" aria-label="slide show" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											Slide Show
 										</NavLink>
 									</li>
 									<li>
-										<NavLink to="/video-player" title="video grid" aria-label="video grid">
+										<NavLink to="/video-player" title="video grid" aria-label="video grid" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 											Video Grid
 										</NavLink>
 									</li>
@@ -116,39 +116,39 @@ export default function AppMainUI() {
 				<div className="navbar-center hidden lg:flex">
 					<ul className="menu menu-horizontal px-1">
 						<li>
-							<NavLink to="/" end title="home" aria-label="home">
+							<NavLink to="/" end title="home" aria-label="home" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 								Home
 							</NavLink>
 						</li>
 						{userProfile &&
 							<>
 								<li>
-									<NavLink to="/collections" title="collections" aria-label="collections">
+									<NavLink to="/collections" title="collections" aria-label="collections" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Collections
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="/folders" title="folders" aria-label="folders">
+									<NavLink to="/folders" title="folders" aria-label="folders" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Folders
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="/file-browser" title="file browser" aria-label="file browser">
+									<NavLink to="/file-browser" title="file browser" aria-label="file browser" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										File Browser
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="/image-grid" title="image grid" aria-label="image grid">
+									<NavLink to="/image-grid" title="image grid" aria-label="image grid" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Image Grid
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="/slide-show" title="slide show" aria-label="slide show">
+									<NavLink to="/slide-show" title="slide show" aria-label="slide show" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Slide Show
 									</NavLink>
 								</li>
 								<li>
-									<NavLink to="/video-player" title="video grid" aria-label="video grid">
+									<NavLink to="/video-player" title="video grid" aria-label="video grid" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Video Grid
 									</NavLink>
 								</li>
@@ -167,19 +167,15 @@ export default function AppMainUI() {
 							}
 						</div>
 						{userProfile ?
-							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
+							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
 								<li>
 									<Link to="/user-profile">Profile</Link>
 								</li>
-								<li><hr className="my-1" /></li>
-								<li>
-									<button onClick={signOut}>Sign Out</button>
-								</li>
 							</ul>
 							:
-							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow bg-base-100 rounded-box w-52">
+							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
 								<li>
-									<a href="#" onClick={() => { alert('TODO:') }}>Clear Cache</a>
+									<a role="button" className="cursor-pointer" onClick={() => { alert('TODO:') }}>Clear Cache</a>
 								</li>
 							</ul>
 						}

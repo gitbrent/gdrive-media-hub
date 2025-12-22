@@ -61,11 +61,6 @@
 	background: transparent !important;
 }
 
-.navbar input.form-control,
-.navbar .btn-group button:not(.active) {
-	background-color: var(--bs-dark-bg-subtle);
-}
-
 .nouserselect {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
