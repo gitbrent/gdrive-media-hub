@@ -48,7 +48,7 @@ const KPI: React.FC<KPIProps> = ({ title, value, icon, subtitle, secondaryText, 
 			{/* Content */}
 			<div className="relative z-10">
 				<div className="flex items-center gap-3 mb-2">
-					<div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+					<div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center">
 						<i className={`bi ${icon} text-lg`}></i>
 					</div>
 					<h6 className="text-sm opacity-90 mb-0">{title}</h6>
@@ -65,18 +65,18 @@ const KPI: React.FC<KPIProps> = ({ title, value, icon, subtitle, secondaryText, 
 	</div>
 )
 
-// Standardized Data Viz Palette (Tailwind 400 series for Dark Mode)
+// Standardized Data Viz Palette (using CSS variables from style.scss)
 const COLORS = [
-	'#60a5fa', // Blue
-	'#a78bfa', // Violet
-	'#f472b6', // Pink
-	'#fb923c', // Orange
-	'#2dd4bf', // Teal
-	'#facc15', // Yellow
-	'#f87171', // Red
-	'#818cf8', // Indigo
-	'#34d399', // Emerald
-	'#22d3ee', // Cyan
+	'var(--color-chart-1)', // Blue
+	'var(--color-chart-2)', // Violet
+	'var(--color-chart-3)', // Pink
+	'var(--color-chart-4)', // Orange
+	'var(--color-chart-5)', // Teal
+	'var(--color-chart-6)', // Yellow
+	'var(--color-chart-7)', // Red
+	'var(--color-chart-8)', // Indigo
+	'var(--color-chart-9)', // Emerald
+	'var(--color-chart-10)', // Cyan
 ]
 
 // Custom tooltip style
@@ -161,7 +161,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	// ============================================================================
 
 	const renderKpiCards = () => (
-		<div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 lg:grid-cols-4">
+		<div className="grid grid-cols-1 gap-6 mb-6 sm:grid-cols-2 lg:grid-cols-4">
 			<KPI
 				title="Total Files Loaded"
 				value={total_files.toLocaleString()}
@@ -194,7 +194,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 			/>
 		</div>
 	)
-
 
 	const renderTimelineChart = () => (
 		<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg">
@@ -330,7 +329,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		)
 
 		return (
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 				{renderMiniPieChart(
 					storageEfficiencyData,
 					'Storage Efficiency',
@@ -464,11 +463,11 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	// ============================================================================
 
 	return (
-		<div className="mb-4">
+		<div>
 			{renderKpiCards()}
 
 			{/* Charts Grid */}
-			<div className="grid grid-cols-1 gap-4 mb-4 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
 				<div className="lg:col-span-2">
 					{renderTimelineChart()}
 				</div>
@@ -478,7 +477,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 			</div>
 
 			{/* Bottom Charts */}
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				{renderFileTypeChart()}
 				{renderSizeCategoriesChart()}
 			</div>

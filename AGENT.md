@@ -17,7 +17,7 @@ This document outlines coding standards and best practices for contributions to 
 
 ```tsx
 <div className="flex items-center gap-3 p-4 mb-3">
-  <div className="flex-grow">Content</div>
+  <div className="grow">Content</div>
 </div>
 ```
 
@@ -50,9 +50,9 @@ Use daisyUI components for UI elements:
 
 ## Color System
 
-### Use CSS Variables from style.scss
+### Use CSS Variables from style.css
 
-All colors should come from the root CSS variables defined in `src/css/style.scss`. **Do not hardcode color values.**
+All colors should come from the root CSS variables defined in `src/css/style.css`. **Do not hardcode color values.**
 
 **Available Color Palettes:**
 
@@ -170,6 +170,18 @@ Use Tailwind spacing scale (0-96, where each unit = 0.25rem):
 - `gap-1` to `gap-24` - gaps in flexbox/grid layouts
 - `mb-0` - remove bottom margin
 
+### Preferred Gap & Margin Between Components
+
+When spacing between major components or sections, **prefer using `-6` for both gap and margin** (equivalent to 1.5rem/24px). This provides consistent, visually balanced spacing throughout the layout:
+
+```tsx
+<div className="grid grid-cols-1 gap-6 mb-6">
+  {/* components */}
+</div>
+```
+
+This is more visually appealing and maintains better visual hierarchy than smaller gaps.
+
 ## Animations & Effects
 
 ### Hover Effects
@@ -209,8 +221,8 @@ transition: transform 0.2s, box-shadow 0.2s;
 ### File Structure
 
 - Component CSS in adjacent `.css` files (e.g., `Component.tsx` → `Component.css`)
-- Shared styles in `style.scss`
-- Use CSS variables from `style.scss` root instead of hardcoding
+- Shared styles in `style.css`
+- Use CSS variables from `style.css` root instead of hardcoding
 
 ### CSS Class Naming
 
@@ -268,5 +280,5 @@ transition: transform 0.2s, box-shadow 0.2s;
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [daisyUI Components](https://daisyui.com/components/)
 - [Bootstrap Icons](https://icons.getbootstrap.com/)
-- Local: `src/css/style.scss` - CSS variable definitions
+- Local: `src/css/style.css` - CSS variable definitions
 - Local: `tailwind.config.js` - Tailwind configuration with custom colors
