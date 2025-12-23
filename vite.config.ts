@@ -1,11 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import path from 'path'
 
 // https://vite.dev/config/
 // [BDE]: Use port 3000 like CRA as thats what google API is expecting
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src'),
+		},
+	},
 	server: {
 		port: 3000,
 		strictPort: true, // Recommended to ensure Google API callback doesn't break
