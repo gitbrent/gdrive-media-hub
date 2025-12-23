@@ -247,13 +247,14 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 									</td>
 									<td className='hidden lg:table-cell'>
 										{!isFolder(item) && (
-											<span className={`badge ${getTypeBadgeClass(item)} badge-sm`}>
+											<span className={`badge ${getTypeBadgeClass(item)} badge-soft badge-sm`}>
 												{getTypeLabel(item)}
 											</span>
 										)}
 									</td>
 									<td className='hidden md:table-cell'>
 										{!isFolder(item) && item.size && (
+											<div className='badge badge-ghost'>
 											<div className='flex items-center gap-2'>
 												<progress
 													className={`progress ${getSizeProgressColor(sizeInBytes)} w-20 h-2`}
@@ -263,6 +264,7 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 												<small className='text-base-content/60 whitespace-nowrap text-xs'>
 													{formatBytesToMB(sizeInBytes)}
 												</small>
+											</div>
 											</div>
 										)}
 									</td>
