@@ -48,6 +48,10 @@ This project uses **Tailwind CSS v4.1**. Use the canonical class names:
 - **Borders**: Use canonical color names consistently
 - See [Tailwind CSS v4 docs](https://tailwindcss.com/docs/v4) for updated class names
 
+### Never Animate Icons
+
+Do **not** add animation classes like `animate-spin` or `animate-bounce` to icons. Use static icons instead, especially for loading/status indicators. Animations on icons can cause visual strain and distract from the actual content.
+
 ### daisyUI Components
 
 Use daisyUI components for UI elements:
