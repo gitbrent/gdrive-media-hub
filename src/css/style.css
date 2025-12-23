@@ -97,11 +97,63 @@
 	background: transparent !important;
 }
 
-.nouserselect {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+/* 1. Tell Tailwind v4 to scan Tremor's source code */
+@source "../../node_modules/@tremor/react";
+
+@theme {
+  /* 2. Define the Tremor Palette as CSS variables (v4 style) */
+  --color-tremor-brand-faint: #eff6ff;
+  --color-tremor-brand-muted: #bfdbfe;
+  --color-tremor-brand-subtle: #60a5fa;
+  --color-tremor-brand-default: #3b82f6;
+  --color-tremor-brand-emphasis: #1d4ed8;
+  --color-tremor-brand-inverted: #ffffff;
+
+  --color-tremor-background-muted: #f9fafb;
+  --color-tremor-background-subtle: #f3f4f6;
+  --color-tremor-background-default: #ffffff;
+  --color-tremor-background-emphasis: #374151;
+
+  --color-tremor-border-default: #e5e7eb;
+  --color-tremor-ring-default: #e5e7eb;
+
+  --color-tremor-content-subtle: #9ca3af;
+  --color-tremor-content-default: #6b7280;
+  --color-tremor-content-emphasis: #374151;
+  --color-tremor-content-strong: #111827;
+  --color-tremor-content-inverted: #ffffff;
+
+  /* Dark Mode Variables */
+  --color-dark-tremor-brand-faint: #0b1229;
+  --color-dark-tremor-brand-muted: #172554;
+  --color-dark-tremor-brand-subtle: #1e40af;
+  --color-dark-tremor-brand-default: #3b82f6;
+  --color-dark-tremor-brand-emphasis: #60a5fa;
+  --color-dark-tremor-brand-inverted: #030712;
+
+  --color-dark-tremor-background-muted: #131a2b;
+  --color-dark-tremor-background-subtle: #1f2937;
+  --color-dark-tremor-background-default: #111827;
+  --color-dark-tremor-background-emphasis: #d1d5db;
+
+  --color-dark-tremor-border-default: #1f2937;
+  --color-dark-tremor-ring-default: #1f2937;
+
+  --color-dark-tremor-content-subtle: #4b5563;
+  --color-dark-tremor-content-default: #6b7280;
+  --color-dark-tremor-content-emphasis: #e5e7eb;
+  --color-dark-tremor-content-strong: #f9fafb;
+  --color-dark-tremor-content-inverted: #000000;
+}
+
+/* 3. Recharts specific overrides that Tremor needs */
+/* Tremor uses these to map Tailwind colors to Recharts SVG elements */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--color-tremor-border-default);
+}
+
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: var(--color-dark-tremor-border-default);
 }

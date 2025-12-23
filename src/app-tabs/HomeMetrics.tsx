@@ -3,66 +3,27 @@ import { IFileAnalysis } from '../App.props'
 import MetricCards from './MetricCards'
 import {
 	AreaChart,
-	Area,
 	BarChart,
-	Bar,
-	PieChart,
-	Pie,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	ResponsiveContainer,
-	Cell,
-} from 'recharts'
+	DonutChart,
+} from '@tremor/react'
 
 interface HomeMetricsProps {
 	analysis: IFileAnalysis
 }
 
-// Standardized Data Viz Palette (using CSS variables from style.scss)
-const COLORS = [
-	'var(--color-chart-1)', // Blue
-	'var(--color-chart-2)', // Violet
-	'var(--color-chart-3)', // Pink
-	'var(--color-chart-4)', // Orange
-	'var(--color-chart-5)', // Teal
-	'var(--color-chart-6)', // Yellow
-	'var(--color-chart-7)', // Red
-	'var(--color-chart-8)', // Indigo
-	'var(--color-chart-9)', // Emerald
-	'var(--color-chart-10)', // Cyan
+// Tremor chart colors using Tailwind theme colors
+const chartColors = [
+	'blue-400',    // chart-1
+	'violet-400',  // chart-2
+	'pink-400',    // chart-3
+	'orange-400',  // chart-4
+	'teal-400',    // chart-5
+	'yellow-400',  // chart-6
+	'red-400',     // chart-7
+	'indigo-400',  // chart-8
+	'emerald-400', // chart-9
+	'cyan-400',    // chart-10
 ]
-
-// Custom tooltip style
-interface TooltipProps {
-	active?: boolean
-	payload?: Array<{ name: string; value: number; color: string }>
-	label?: string
-}
-
-const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
-	if (active && payload && payload.length) {
-		return (
-			<div className="rounded-lg border border-blue-800/30 shadow-lg" style={{ opacity: 0.98, minWidth: '200px', backgroundColor: '#1e293b' }}>
-				<div className="px-3 py-2 border-b border-blue-800/30" style={{ backgroundColor: '#334155' }}>
-					<strong className="text-sm text-white">{label}</strong>
-				</div>
-				<ul className="divide-y divide-blue-800/20">
-					{payload.map((entry, index) => (
-						<li key={index} className="px-3 py-2 text-white flex justify-between items-center" style={{ backgroundColor: '#1e293b' }}>
-							<span className="text-sm">{entry.name}</span>
-							<span className="badge badge-sm ml-2" style={{ backgroundColor: entry.color, color: '#fff' }}>
-								{entry.value}
-							</span>
-						</li>
-					))}
-				</ul>
-			</div>
-		)
-	}
-	return null
-}
 
 const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	const { file_years, file_types, file_types_by_year, size_categories, total_files } = analysis
@@ -116,60 +77,16 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 					<h5 className="card-title mb-1">Files Over Time by Type</h5>
 					<p className="text-gray-400 text-sm mb-0">Distribution across top file types</p>
 				</div>
-				<ResponsiveContainer width="100%" height={280}>
-					<AreaChart data={timelineData}>
-						<defs>
-							{topTypes.map((type, index) => (
-								<linearGradient key={type} id={`color${type}`} x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.8} />
-									<stop offset="95%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.2} />
-								</linearGradient>
-							))}
-						</defs>
-						<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-						<XAxis
-							dataKey="year"
-							stroke="rgba(255,255,255,0.5)"
-							style={{ fontSize: '0.75rem' }}
-						/>
-						<YAxis
-							stroke="rgba(255,255,255,0.5)"
-							style={{ fontSize: '0.75rem' }}
-						/>
-						<Tooltip content={<CustomTooltip />} />
-						{topTypes.map((type, index) => (
-							<Area
-								key={type}
-								type="monotone"
-								dataKey={type}
-								stackId="1"
-								stroke={COLORS[index % COLORS.length]}
-								strokeWidth={2}
-								fillOpacity={1}
-								fill={`url(#color${type})`}
-								animationDuration={1000 + index * 200}
-							/>
-						))}
-					</AreaChart>
-				</ResponsiveContainer>
-				<div className="flex flex-wrap gap-3 mt-3 justify-center">
-					{[...topTypes].reverse().map((type, reversedIndex) => {
-						const index = topTypes.length - 1 - reversedIndex
-						return (
-							<div key={type} className="flex items-center gap-2">
-								<div
-									className="rounded-full"
-									style={{
-										backgroundColor: COLORS[index % COLORS.length],
-										width: '14px',
-										height: '14px'
-									}}
-								/>
-								<small className="text-gray-400">{type}</small>
-							</div>
-						)
-					})}
-				</div>
+				<AreaChart
+					className="h-72"
+					data={timelineData}
+					index="year"
+					categories={topTypes}
+					colors={chartColors.slice(0, topTypes.length)}
+					showLegend={true}
+					showGridLines={true}
+					showAnimation={true}
+				/>
 			</div>
 		</div>
 	)
@@ -178,23 +95,23 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		// Metric 1: Storage Efficiency
 		const smallFiles = (size_categories.Tiny || 0) + (size_categories.Small || 0)
 		const storageEfficiencyData = [
-			{ name: 'Small Files', value: smallFiles, color: COLORS[0] },
-			{ name: 'Large Files', value: total_files - smallFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Small Files', value: smallFiles },
+			{ name: 'Large Files', value: total_files - smallFiles }
 		]
 
 		// Metric 2: File Type Diversity
 		const topTypeCount = mostCommonType[1]
 		const diversityData = [
-			{ name: mostCommonType[0], value: topTypeCount, color: COLORS[1] },
-			{ name: 'Other Types', value: total_files - topTypeCount, color: 'rgba(255,255,255,0.1)' }
+			{ name: mostCommonType[0], value: topTypeCount },
+			{ name: 'Other Types', value: total_files - topTypeCount }
 		]
 
 		// Metric 3: Size Distribution
 		const largeFiles = (size_categories.Large || 0) + (size_categories.Huge || 0)
 		const mediumSmallFiles = total_files - largeFiles
 		const sizeDistData = [
-			{ name: 'Large Files', value: largeFiles, color: COLORS[4] },
-			{ name: 'Small/Medium', value: mediumSmallFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Large Files', value: largeFiles },
+			{ name: 'Small/Medium', value: mediumSmallFiles }
 		]
 
 		// Metric 4: Recent Activity
@@ -204,36 +121,27 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const recentFiles = (file_years[recentYear] || 0) + (file_years[prevYear] || 0)
 		const olderFiles = total_files - recentFiles
 		const recentActivityData = [
-			{ name: 'Recent (2y)', value: recentFiles, color: COLORS[8] },
-			{ name: 'Older', value: olderFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Recent (2y)', value: recentFiles },
+			{ name: 'Older', value: olderFiles }
 		]
 
-		const renderMiniPieChart = (data: Array<{ name: string; value: number; color: string }>, title: string, percentage: number, subtitle: string) => (
+		const renderMiniDonutChart = (data: Array<{ name: string; value: number }>, title: string, percentage: number, subtitle: string, colorIndex: number) => (
 			<div className="col-span-1">
 				<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 					<div className="card-body text-center p-3">
-						<h6 className="text-white mb-2" style={{ fontSize: '0.85rem' }}>{title}</h6>
+						<h6 className="text-white mb-2 text-sm">{title}</h6>
 						<div className="relative" style={{ height: '120px' }}>
-							<ResponsiveContainer width="100%" height="100%">
-								<PieChart>
-									<Pie
-										data={data}
-										cx="50%"
-										cy="50%"
-										innerRadius={30}
-										outerRadius={50}
-										paddingAngle={2}
-										dataKey="value"
-										animationDuration={800}
-									>
-										{data.map((entry, index) => (
-											<Cell key={`cell-${index}`} fill={entry.color} />
-										))}
-									</Pie>
-								</PieChart>
-							</ResponsiveContainer>
-							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-								<h4 className="mb-0 font-bold text-white" style={{ fontSize: '1.5rem' }}>{percentage}%</h4>
+							<DonutChart
+								data={data}
+								category="value"
+								index="name"
+								colors={[chartColors[colorIndex], 'slate-700']}
+								showLabel={false}
+								showAnimation={true}
+								className="h-full"
+							/>
+							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+								<h4 className="mb-0 font-bold text-white text-2xl">{percentage}%</h4>
 							</div>
 						</div>
 						<p className="text-gray-400 text-sm mb-0 mt-2">{subtitle}</p>
@@ -244,29 +152,33 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 
 		return (
 			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-				{renderMiniPieChart(
+				{renderMiniDonutChart(
 					storageEfficiencyData,
 					'Storage Efficiency',
 					storageEfficiency,
-					`${smallFiles.toLocaleString()} small files`
+					`${smallFiles.toLocaleString()} small files`,
+					0
 				)}
-				{renderMiniPieChart(
+				{renderMiniDonutChart(
 					diversityData,
 					'Type Dominance',
 					Math.round(topTypeCount / total_files * 100),
-					`${mostCommonType[0]} leads`
+					`${mostCommonType[0]} leads`,
+					1
 				)}
-				{renderMiniPieChart(
+				{renderMiniDonutChart(
 					sizeDistData,
 					'Large Files',
 					Math.round(largeFiles / total_files * 100),
-					`${largeFiles.toLocaleString()} large files`
+					`${largeFiles.toLocaleString()} large files`,
+					4
 				)}
-				{renderMiniPieChart(
+				{renderMiniDonutChart(
 					recentActivityData,
 					'Recent Activity',
 					Math.round(recentFiles / total_files * 100),
-					`Last 2 years`
+					`Last 2 years`,
+					8
 				)}
 			</div>
 		)
@@ -280,43 +192,35 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 						<h5 className="card-title mb-1">File Type Distribution</h5>
 						<p className="text-gray-400 text-sm mb-0">Top file types</p>
 					</div>
-					<ResponsiveContainer width="100%" height={220}>
-						<BarChart data={fileTypeData.slice(0, 6).map((item, index) => ({
-							name: item.name,
-							value: item.value,
-							fill: COLORS[index % COLORS.length]
-						}))}>
-							<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-							<XAxis
-								dataKey="name"
-								stroke="rgba(255,255,255,0.5)"
-								style={{ fontSize: '0.75rem' }}
-							/>
-							<YAxis
-								stroke="rgba(255,255,255,0.5)"
-								style={{ fontSize: '0.75rem' }}
-							/>
-							<Tooltip content={<CustomTooltip />} />
-							<Bar
-								dataKey="value"
-								radius={[4, 4, 0, 0]}
-								animationDuration={1000}
-							>
-								{fileTypeData.slice(0, 6).map((_item, index) => (
-									<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-								))}
-							</Bar>
-						</BarChart>
-					</ResponsiveContainer>
-					<div className="flex flex-wrap gap-3 justify-center">
-						{fileTypeData.slice(0, 6).map((item, index) => (
-							<div key={index} className="shrink-0">
-								<div className="text-center px-3 py-2 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] + '40' }}>
-									<small className="text-white block font-semibold text-xs">{item.name}</small>
-									<h5 className="font-light mb-0 text-white">{item.value.toLocaleString()}</h5>
+					<BarChart
+						className="h-64"
+						data={fileTypeData.slice(0, 6)}
+						index="name"
+						categories={['value']}
+						colors={chartColors.slice(0, 6)}
+						showLegend={false}
+						showGridLines={true}
+						showAnimation={true}
+					/>
+					<div className="flex flex-wrap gap-3 justify-center mt-3">
+						{fileTypeData.slice(0, 6).map((item, index) => {
+							const bgColorClasses = [
+								'bg-blue-400/25',
+								'bg-violet-400/25',
+								'bg-pink-400/25',
+								'bg-orange-400/25',
+								'bg-teal-400/25',
+								'bg-yellow-400/25',
+							]
+							return (
+								<div key={index} className="shrink-0">
+									<div className={`text-center px-3 py-2 rounded ${bgColorClasses[index]}`}>
+										<small className="text-white block font-semibold text-xs">{item.name}</small>
+										<h5 className="font-light mb-0 text-white">{item.value.toLocaleString()}</h5>
+									</div>
 								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				</div>
 			</div>
@@ -331,43 +235,39 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 						<h5 className="card-title mb-1">Size Categories</h5>
 						<p className="text-gray-400 text-sm mb-0">Files by size range</p>
 					</div>
-					<ResponsiveContainer width="100%" height={220}>
-						<BarChart data={sizeCategoryData.map((item, index) => ({
-							name: item.name,
-							value: item.files,
-							fill: COLORS[index % COLORS.length]
-						}))}>
-							<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-							<XAxis
-								dataKey="name"
-								stroke="rgba(255,255,255,0.5)"
-								style={{ fontSize: '0.75rem' }}
-							/>
-							<YAxis
-								stroke="rgba(255,255,255,0.5)"
-								style={{ fontSize: '0.75rem' }}
-							/>
-							<Tooltip content={<CustomTooltip />} />
-							<Bar
-								dataKey="value"
-								radius={[4, 4, 0, 0]}
-								animationDuration={1000}
-							>
-								{sizeCategoryData.map((_item, index) => (
-									<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-								))}
-							</Bar>
-						</BarChart>
-					</ResponsiveContainer>
-					<div className="flex flex-wrap gap-3 justify-center">
-						{sizeCategoryData.map((item, index) => (
-							<div key={index} className="shrink-0">
-								<div className="text-center px-3 py-2 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] + '40' }}>
-									<small className="text-white block font-semibold text-xs">{item.name}</small>
-									<h5 className="font-light mb-0 text-white">{item.files.toLocaleString()}</h5>
+					<BarChart
+						className="h-64"
+						data={sizeCategoryData}
+						index="name"
+						categories={['files']}
+						colors={chartColors}
+						showLegend={false}
+						showGridLines={true}
+						showAnimation={true}
+					/>
+					<div className="flex flex-wrap gap-3 justify-center mt-3">
+						{sizeCategoryData.map((item, index) => {
+							const bgColorClasses = [
+								'bg-blue-400/25',
+								'bg-violet-400/25',
+								'bg-pink-400/25',
+								'bg-orange-400/25',
+								'bg-teal-400/25',
+								'bg-yellow-400/25',
+								'bg-red-400/25',
+								'bg-indigo-400/25',
+								'bg-emerald-400/25',
+								'bg-cyan-400/25',
+							]
+							return (
+								<div key={index} className="shrink-0">
+									<div className={`text-center px-3 py-2 rounded ${bgColorClasses[index]}`}>
+										<small className="text-white block font-semibold text-xs">{item.name}</small>
+										<h5 className="font-light mb-0 text-white">{item.files.toLocaleString()}</h5>
+									</div>
 								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				</div>
 			</div>
@@ -378,7 +278,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 
 	return (
 		<div>
-			<MetricCards analysis={analysis}/>
+			<MetricCards analysis={analysis} />
 
 			{/* Charts Grid */}
 			<div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
