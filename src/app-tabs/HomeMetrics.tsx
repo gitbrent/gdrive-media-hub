@@ -8,6 +8,7 @@ import {
 	BarChart,
 	CartesianGrid,
 	Cell,
+	Label,
 	Pie,
 	PieChart,
 	XAxis,
@@ -173,7 +174,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const largeFiles = (size_categories.Large || 0) + (size_categories.Huge || 0)
 		const mediumSmallFiles = total_files - largeFiles
 		const sizeDistData = [
-			{ name: 'Large Files', value: largeFiles, color: COLORS[4] },
+			{ name: 'Large Files', value: largeFiles, color: COLORS[2] },
 			{ name: 'Small/Medium', value: mediumSmallFiles, color: 'rgba(255,255,255,0.1)' }
 		]
 
@@ -184,7 +185,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const recentFiles = (file_years[recentYear] || 0) + (file_years[prevYear] || 0)
 		const olderFiles = total_files - recentFiles
 		const recentActivityData = [
-			{ name: 'Recent (2y)', value: recentFiles, color: COLORS[8] },
+			{ name: 'Recent (2y)', value: recentFiles, color: COLORS[3] },
 			{ name: 'Older', value: olderFiles, color: 'rgba(255,255,255,0.1)' }
 		]
 
@@ -201,17 +202,17 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 				<div className="col-span-1">
 					<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 						<div className="card-body text-center p-3">
-							<h6 className="text-white mb-2" style={{ fontSize: '0.85rem' }}>{title}</h6>
-							<div className="relative" style={{ height: '120px' }}>
-								<ChartContainer config={pieChartConfig} className="h-full">
+							<h6 className="text-white font-bold text-md mb-1">{title}</h6>
+							<div style={{ width: '100%', height: '150px', display: 'flex', justifyContent: 'center' }}>
+								<ChartContainer config={pieChartConfig} className="aspect-square" style={{ width: '150px', height: '150px' }}>
 									<PieChart>
 										<ChartTooltip content={<ChartTooltipContent hideLabel />} />
 										<Pie
 											data={data}
 											cx="50%"
 											cy="50%"
-											innerRadius={30}
-											outerRadius={50}
+											innerRadius={40}
+											outerRadius={65}
 											paddingAngle={2}
 											dataKey="value"
 											animationDuration={800}
@@ -219,14 +220,33 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 											{data.map((entry, index) => (
 												<Cell key={`cell-${index}`} fill={entry.color} />
 											))}
+											<Label
+												content={({ viewBox }) => {
+													if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+														return (
+															<text
+																x={viewBox.cx}
+																y={viewBox.cy}
+																textAnchor="middle"
+																dominantBaseline="middle"
+															>
+																<tspan
+																	x={viewBox.cx}
+																	y={(viewBox.cy || 0) + 10}
+																	className='fill-foreground text-2xl font-bold'
+																>
+																	{percentage}%
+																</tspan>
+															</text>
+														)
+													}
+												}}
+											/>
 										</Pie>
 									</PieChart>
 								</ChartContainer>
-								<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-									<h4 className="mb-0 font-bold text-white" style={{ fontSize: '1.5rem' }}>{percentage}%</h4>
-								</div>
 							</div>
-							<p className="text-gray-400 text-sm mb-0 mt-2">{subtitle}</p>
+							<div className="text-white opacity-50 text-xs mb-0 mt-1">{subtitle}</div>
 						</div>
 					</div>
 				</div>
