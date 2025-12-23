@@ -64,7 +64,17 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents.slice(0, pagingSize))
+		setDisplayedItems(prevItems => {
+			// If we have previously displayed items with loaded blobs, preserve them
+			if (prevItems.length > 0) {
+				const prevItemsMap = new Map(prevItems.map(item => [item.id, item]))
+				const newSlice = currFolderContents.slice(0, pagingSize)
+				// Merge loaded blob data from previous items
+				return newSlice.map(item => prevItemsMap.get(item.id) || item)
+			}
+			// Initial load or when currFolderContents changes
+			return currFolderContents.slice(0, pagingSize)
+		})
 	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
@@ -224,6 +234,9 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 						/>
 						<div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center z-10">
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
+						</div>
+						<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
+							<div className="text-white opacity-75" title={item.name}>{item.name}</div>
 						</div>
 					</figure>
 				)
