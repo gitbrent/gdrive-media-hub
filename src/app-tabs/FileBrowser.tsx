@@ -469,8 +469,8 @@ const FileBrowser: React.FC = () => {
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
 						</label>
-						<div className="join w-full">
-							<div className={`input input-sm input-bordered flex items-center gap-2 transition-all join-item grow ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
+						<div className={`join w-full transition-all rounded ${isSearchActive ? 'input-primary ring-2 ring-primary' : ''}`}>
+							<div className={`input input-sm input-bordered flex items-center gap-2 join-item grow`}>
 								<i className="bi-search"></i>
 								<input
 									type="search"
