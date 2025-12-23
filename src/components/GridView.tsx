@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile, log, formatBytes } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick, tileSize = 'medium' }) => {
-	const SHOW_CAPTIONS = false
+	const SHOW_CAPTIONS = false // TODO: Implement as a prop
 	//
 	const { getBlobUrlForFile } = useContext(DataContext)
 	//
@@ -64,7 +64,17 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * Load initial set of items
 	 */
 	useEffect(() => {
-		setDisplayedItems(currFolderContents.slice(0, pagingSize))
+		setDisplayedItems(prevItems => {
+			// If we have previously displayed items with loaded blobs, preserve them
+			if (prevItems.length > 0) {
+				const prevItemsMap = new Map(prevItems.map(item => [item.id, item]))
+				const newSlice = currFolderContents.slice(0, pagingSize)
+				// Merge loaded blob data from previous items
+				return newSlice.map(item => prevItemsMap.get(item.id) || item)
+			}
+			// Initial load or when currFolderContents changes
+			return currFolderContents.slice(0, pagingSize)
+		})
 	}, [currFolderContents, pagingSize])
 
 	// --------------------------------------------------------------------------------------------
@@ -156,8 +166,14 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 						item.original = ''
 						item.blobUrlError = 'Blob URL not found'
 					}
-					log(2, `[useEffect] ...done loading video (length = ${selectedFile.original?.length})`)
+					log(2, `[useEffect] ...done loading video (length = ${item.original?.length})`)
 					setSelectedFile(item)
+
+					// Update displayedItems so the thumbnail appears
+					setDisplayedItems(currentItems =>
+						currentItems.map(i => i.id === item.id ? item : i)
+					)
+
 					setIsLoadingFile(false)
 				})
 				.catch(error => {
@@ -177,41 +193,76 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 
 		if ('blobUrlError' in item && item.blobUrlError) {
 			return (
-				<figure key={`${index}${item.id}`} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='text-danger figure-icon'>
-					<i className="bi-warning" />
-					{figCaption}
+				<figure key={`${index}${item.id}`} title={item.blobUrlError} onClick={() => alert(item.blobUrlError)} className='flex flex-col items-center justify-center text-error cursor-pointer hover:opacity-80 transition-opacity'>
+					<i className="bi-warning text-3xl" />
+					<figcaption className="gallery-item-name mt-2 text-center">{item.name}</figcaption>
 				</figure>
 			)
 		} else if (isFolder(item)) {
 			return (
-				<figure key={`${index}${item.id}`} title={itemTitle} onClick={() => handleFolderClick(item.id, item.name)} className='text-warning figure-icon'>
-					<i className={isFolderLoading ? 'bi-hourglass-split' : 'bi-folder'} />
-					<figcaption>{item.name}</figcaption>
+				<figure key={`${index}${item.id}`} title={itemTitle} onClick={() => handleFolderClick(item.id, item.name)} className='flex flex-col items-center justify-center text-warning cursor-pointer hover:opacity-80 transition-opacity'>
+					<i className={isFolderLoading ? 'bi-hourglass-split text-3xl' : 'bi-folder text-3xl'} />
+					<figcaption className="gallery-item-name mt-2 text-center">{item.name}</figcaption>
 				</figure>
 			)
 		} else if (isVideo(item)) {
-			if (isLoadingFile) {
+			const videoSize = item.size ? formatBytes(Number(item.size)) : 'Unknown'
+			const videoDate = item.modifiedByMeTime ? new Date(item.modifiedByMeTime).toLocaleDateString() : 'Unknown'
+			const isLoaded = 'original' in item && item.original
+
+			// If video is already loaded (has blob), show it
+			if (isLoaded) {
 				return (
-					<figure key={`${index}${item.id}`} title={itemTitle} className="text-info figure-icon">
-						{item.id === selectedFile?.id ? <i className="bi-hourglass-split" /> : <i className="bi-camera-video" />}
-						<figcaption>{item.name}</figcaption>
-					</figure>
-				)
-			} else {
-				return (
-					<figure key={`${index}${item.id}`} title={itemTitle} className="text-info figure-icon bg-dark" onClick={() => setSelectedFile(item)}>
-						<i className="bi-camera-video" />
-						<figcaption>{item.name}</figcaption>
+					<figure
+						key={`${index}${item.id}`}
+						title={itemTitle}
+						onClick={() => setSelectedFile(item)}
+						className="flex flex-col items-center justify-center bg-base-900 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden rounded-lg group relative"
+					>
+						<video
+							src={item.original}
+							className="absolute inset-0 w-full h-full object-cover"
+							onMouseEnter={(e) => {
+								const video = e.currentTarget as HTMLVideoElement
+								video.play().catch(() => { })
+							}}
+							onMouseLeave={(e) => {
+								const video = e.currentTarget as HTMLVideoElement
+								video.pause()
+								video.currentTime = 0
+							}}
+						/>
+						<div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center z-10">
+							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
+						</div>
+						<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
+							<div className="text-white opacity-75" title={item.name}>{item.name}</div>
+						</div>
 					</figure>
 				)
 			}
+
+			// Using daisyUI stat class for clean, informative tile
+			return (
+				<figure
+					key={`${index}${item.id}`}
+					className="stat stats-vertical bg-base-200 hover:bg-base-300 cursor-pointer transition-colors rounded-lg shadow-md border border-base-300"
+					onClick={() => !isLoadingFile && setSelectedFile(item)}
+				>
+					<div className="text-info text gallery-item-name" title={item.name}>{item.name}</div>
+					<div className="stat-title text-primary gallery-item-title">{videoSize}</div>
+					<div className="stat-desc text-xs flex flex-col gap-1">
+						{videoDate}
+					</div>
+				</figure>
+			)
 		} else if (isImage(item) || isGif(item)) {
 			if ('original' in item && item.original) {
 				return (
 					<Item {...item} key={`${index}${item.id}`}>
 						{({ ref, open }) => (
-							<figure>
-								<img ref={ref} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={itemTitle} alt={item.name} />
+							<figure className="overflow-hidden rounded-lg">
+								<img ref={ref} onClick={open} src={item.original} onError={(e) => console.error('Error loading image:', e)} title={itemTitle} alt={item.name} className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" />
 								{figCaption}
 							</figure>
 						)}
@@ -219,37 +270,31 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			} else {
 				return (
-					<figure key={`${index}${item.id}`} title={itemTitle} className="text-muted figure-icon">
-						<i className="bi-hourglass-split" />
-						<figcaption>{item.name}</figcaption>
+					<figure key={`${index}${item.id}`} title={itemTitle} className="flex flex-col items-center justify-center text-base-content opacity-50">
+						<i className="bi-hourglass-split text-3xl" />
+						<figcaption className="gallery-item-name mt-2 text-center">{item.name}</figcaption>
 					</figure>
 				)
 			}
 		}
 	}
 
-	const renderGrid = () => {
-		return (
+	return (
+		<section>
+			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
+				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
+			}
 			<Gallery id="contImageGrid">
 				<div id="gallery-container" className={`gallery gallery-${tileSize}`}>
 					{displayedItems.map((item, index) => renderGridItem(item, index))}
 				</div>
-				<div className="p-3 bg-darker text-muted text-center">
+				<div className="p-4 bg-base-900 text-base-content text-center text-sm opacity-70">
 					{displayedItems.length < currFolderContents.length
 						? <span>(showing {displayedItems.length} of {currFolderContents.length} - scroll for more files)</span>
 						: <span>(all {displayedItems.length} shown)</span>
 					}
 				</div>
 			</Gallery>
-		)
-	}
-
-	return (
-		<section className="bg-black">
-			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
-				<VideoViewerOverlay selectedFile={selectedFile} setSelectedFile={setSelectedFile} />
-			}
-			{renderGrid()}
 		</section>
 	)
 }

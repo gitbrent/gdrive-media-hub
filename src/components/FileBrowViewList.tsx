@@ -148,22 +148,22 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 			return 'File'
 		}
 
-		// Helper to determine badge color based on type
+		// Helper to determine badge color based on type (DaisyUI badge classes)
 		const getTypeBadgeClass = (item: IGapiFile | IGapiFolder): string => {
-			if (isFolder(item)) return 'bg-warning text-dark'
-			if (isImage(item)) return 'bg-success'
-			if (isGif(item)) return 'bg-primary'
-			if (isVideo(item)) return 'bg-info text-dark'
-			return 'bg-secondary'
+			if (isFolder(item)) return 'badge-warning'
+			if (isImage(item)) return 'badge-success'
+			if (isGif(item)) return 'badge-primary'
+			if (isVideo(item)) return 'badge-info'
+			return 'badge-ghost'
 		}
 
-		// Helper to get progress bar color based on size
+		// Helper to get progress bar color based on size (DaisyUI progress classes)
 		const getSizeProgressColor = (sizeInBytes: number): string => {
 			const sizeInMB = sizeInBytes / (1024 * 1024)
-			if (sizeInMB < 10) return 'bg-success'
-			if (sizeInMB < 100) return 'bg-info'
-			if (sizeInMB < 500) return 'bg-warning'
-			return 'bg-danger'
+			if (sizeInMB < 10) return 'progress-success'
+			if (sizeInMB < 100) return 'progress-info'
+			if (sizeInMB < 500) return 'progress-warning'
+			return 'progress-error'
 		}
 
 		// Helper to extract date only (remove time)
@@ -177,111 +177,119 @@ const FileBrowViewList: React.FC<Props> = ({ handleFolderClick, isFolderLoading,
 			return Math.max(max, size)
 		}, 0)
 
-		return (<table className='table align-middle mb-0'>
-			<thead className='table-dark'>
-				<tr className='text-noselect'>
-					<th style={{ width: '1%' }}>&nbsp;</th>
-					<th>Name</th>
-					<th className='d-none d-lg-table-cell' style={{ width: '8%' }}>Type</th>
-					<th className='d-none d-md-table-cell' style={{ width: '12%' }}>Size</th>
-					<th className='d-none d-xl-table-cell' style={{ width: '8%' }}>Created</th>
-					<th className='d-none d-lg-table-cell' style={{ width: '8%' }}>Modified</th>
-				</tr>
-			</thead>
-			<tbody>
-				{currFolderContents.length > 0
-					? currFolderContents.map((item, index) => {
-						const mimeTextClass = isFolder(item) ? 'text-warning' : isImage(item) ? 'text-success' : isGif(item) ? 'text-primary' : isVideo(item) ? 'text-info' : 'text-muted'
-						const sizeInBytes = Number(item.size || 0)
-						const sizePercent = maxFileSize > 0 ? (sizeInBytes / maxFileSize) * 100 : 0
-						const itemWithLineage = item as ItemWithLineage
+		return (
+			<table className='table'>
+				<thead>
+					<tr className='select-none'>
+						<th className='w-12'></th>
+						<th>Name</th>
+						<th className='hidden lg:table-cell w-24'>Type</th>
+						<th className='hidden md:table-cell w-40'>Size</th>
+						<th className='hidden xl:table-cell w-28 text-center'>Created</th>
+						<th className='hidden lg:table-cell w-28 text-center'>Modified</th>
+					</tr>
+				</thead>
+				<tbody>
+					{currFolderContents.length > 0
+						? currFolderContents.map((item, index) => {
+							const mimeTextClass = isFolder(item) ? 'text-warning' : isImage(item) ? 'text-success' : isGif(item) ? 'text-primary' : isVideo(item) ? 'text-info' : 'text-base-content/50'
+							const sizeInBytes = Number(item.size || 0)
+							const sizePercent = maxFileSize > 0 ? (sizeInBytes / maxFileSize) * 100 : 0
+							const itemWithLineage = item as ItemWithLineage
 
-						return (
-							<tr key={index} className='border-bottom border-dark-subtle file-list-row'>
-								<td>
-									<div className="file-list-icon-wrapper text-body-secondary">
-										<i className={
-											isFolder(item) && isFolderLoading
-												? 'fs-4 bi-arrow-repeat'
-												: isFolder(item)
-													? 'fs-4 bi-folder-fill'
-													: isImage(item)
-														? 'fs-4 bi-image'
-														: isGif(item)
-															? 'fs-4 bi-play-btn'
-															: isVideo(item)
-																? 'fs-4 bi-camera-video'
-																: 'fs-4 bi-file-x text-light'
-										} />
-									</div>
-								</td>
-								<td className='cursor-link'>
-									{isFolder(item)
-										? <div
-											className={`${mimeTextClass} fw-bold text-decoration-none`}
-											onClick={() => !isFolderLoading && handleFolderClick(item.id, item.name)}
-											style={{ cursor: 'pointer' }}>
-											{item.name}
-											{itemWithLineage._lineagePath && (
-												<div className='file-list-path'>
-													{itemWithLineage._lineagePath}
+							return (
+								<tr key={index}>
+									<td>
+										<div className="flex items-center justify-center">
+											<div className="avatar placeholder">
+												<div className="bg-base-300 text-base-content rounded-full w-12 h-12 flex items-center justify-center">
+													<i className={
+														isFolder(item) && isFolderLoading
+															? 'text-2xl bi-arrow-repeat'
+															: isFolder(item)
+																? 'text-2xl bi-folder-fill'
+																: isImage(item)
+																	? 'text-2xl bi-image'
+																	: isGif(item)
+																		? 'text-2xl bi-play-btn'
+																		: isVideo(item)
+																			? 'text-2xl bi-camera-video'
+																			: 'text-2xl bi-file-x opacity-30'
+													} />
 												</div>
-											)}
+											</div>
 										</div>
-										: isMedia(item) ?
-											<div className={mimeTextClass} onClick={() => handleFileClick(item)} style={{ cursor: 'pointer' }}>
+									</td>
+									<td className='cursor-pointer'>
+										{isFolder(item)
+											? <div
+												className={`${mimeTextClass} font-bold no-underline`}
+												onClick={() => !isFolderLoading && handleFolderClick(item.id, item.name)}>
 												{item.name}
 												{itemWithLineage._lineagePath && (
-													<div className='file-list-path'>
+													<div className='badge block badge-ghost badge-sm mt-1'>
 														{itemWithLineage._lineagePath}
 													</div>
 												)}
 											</div>
-											:
-											<div className='text-muted'>{item.name}</div>
-									}
-								</td>
-								<td className='d-none d-lg-table-cell'>
-									{!isFolder(item) && (
-										<span className={`badge ${getTypeBadgeClass(item)}`}>
-											{getTypeLabel(item)}
-										</span>
-									)}
-								</td>
-								<td className='d-none d-md-table-cell'>
-									{!isFolder(item) && item.size && (
-										<div className='hstack gap-2'>
-											<div className='progress flex-grow-1' style={{ height: '6px' }}>
-												<div
-													className={`progress-bar ${getSizeProgressColor(sizeInBytes)}`}
-													style={{ width: `${sizePercent}%` }}
-													role='progressbar'
-													aria-valuenow={sizePercent}
-													aria-valuemin={0}
-													aria-valuemax={100}>
+											: isMedia(item) ?
+												<div className={mimeTextClass} onClick={() => handleFileClick(item)}>
+													{item.name}
+													{itemWithLineage._lineagePath && (
+														<div className='badge block badge-ghost badge-sm mt-1'>
+															{itemWithLineage._lineagePath}
+														</div>
+													)}
 												</div>
+												:
+												<div className='text-base-content/50'>{item.name}</div>
+										}
+									</td>
+									<td className='hidden lg:table-cell'>
+										{!isFolder(item) && (
+											<span className={`badge ${getTypeBadgeClass(item)} badge-soft badge-sm`}>
+												{getTypeLabel(item)}
+											</span>
+										)}
+									</td>
+									<td className='hidden md:table-cell'>
+										{!isFolder(item) && item.size && (
+											<div className='badge badge-ghost'>
+											<div className='flex items-center gap-2'>
+												<progress
+													className={`progress ${getSizeProgressColor(sizeInBytes)} w-20 h-2`}
+													value={sizePercent}
+													max={100}>
+												</progress>
+												<small className='text-base-content/60 whitespace-nowrap text-xs'>
+													{formatBytesToMB(sizeInBytes)}
+												</small>
 											</div>
-											<small className='text-muted text-nowrap'>{formatBytesToMB(sizeInBytes)}</small>
-										</div>
-									)}
-								</td>
-								<td className='text-nowrap d-none d-xl-table-cell text-center text-muted small'>{item.createdTime ? getDateOnly(item.createdTime) : ''}</td>
-								<td className='text-nowrap d-none d-lg-table-cell text-center text-muted small'>{item.modifiedByMeTime ? getDateOnly(item.modifiedByMeTime) : ''}</td>
+											</div>
+										)}
+									</td>
+									<td className='whitespace-nowrap hidden xl:table-cell text-center text-base-content/60 text-sm'>
+										{item.createdTime ? getDateOnly(item.createdTime) : ''}
+									</td>
+									<td className='whitespace-nowrap hidden lg:table-cell text-center text-base-content/60 text-sm'>
+										{item.modifiedByMeTime ? getDateOnly(item.modifiedByMeTime) : ''}
+									</td>
+								</tr>
+							)
+						})
+						: (
+							<tr>
+								<td colSpan={6} className='text-center text-base-content/60 p-8'>(no media files)</td>
 							</tr>
 						)
-					})
-					: (
-						<tr>
-							<td colSpan={6} className='text-center text-muted p-4'>(no media files)</td>
-						</tr>
-					)
-				}
-			</tbody>
-		</table>)
+					}
+				</tbody>
+			</table>
+		)
 	}
 
 	return (
-		<section className={`p-4 bg-black ${isFolderLoading ? 'busy-cursor' : ''}`}>
+		<section className="p-4 bg-base-100">
 			{isMediaLoading
 				? (
 					<div className="media-loading-indicator">

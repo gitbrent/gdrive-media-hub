@@ -2,10 +2,10 @@ import { useContext, useState } from 'react'
 import { DEBUG, APP_BLD, APP_VER, formatBytes } from '../App.props'
 import { AuthContext } from '../api-google/AuthContext'
 import { DataContext } from '../api-google/DataContext'
-import AlertLoading from '../components/AlertLoading'
 import { loadCacheFromIndexedDB, doClearFileCache, cleanupOldCaches, CACHE_DBASE_VER } from '../api/CacheService'
 import { getCurrentUserProfile } from '../api-google'
 import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
+import AlertLoading from '../components/AlertLoading'
 
 const UserProfile: React.FC = () => {
 	const { isSignedIn, signOut } = useContext(AuthContext)
@@ -170,58 +170,53 @@ const UserProfile: React.FC = () => {
 
 	function renderUserAndAppInfo(): JSX.Element {
 		return (
-			<div className="row mt-4">
-				<div className="col-12 col-md-6" data-desc="User Profile">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+				<div data-desc="User Profile">
 					{isSignedIn &&
-						<div className="card h-100">
-							<div className={`card-header ${userProfile?.getName() ? 'text-bg-success' : 'text-bg-warning'}`}>
-								<h5 className="mb-0">Google Account</h5>
-							</div>
-							<div className="card-body bg-black p-4">
-								<div className="row align-items-center">
-									<div className="col-auto">
-										<img src={userProfile?.getImageUrl() || ''} alt="User Avatar" className="rounded-circle" style={{ fontSize: '1rem' }} />
-									</div>
-									<div className="col">
-										<h4 className="mb-0">{userProfile?.getName() || ''}</h4>
-										<h6 className="mt-2">{userProfile?.getEmail() || ''}</h6>
+						<div className="card bg-base-100 card-border border-base-300 border-2 h-full">
+							<div className="card-body">
+								<h2 className="card-title text-success">Google Account</h2>
+								<div className="flex items-center gap-4">
+									<img src={userProfile?.getImageUrl() || ''} alt="User Avatar" className="w-16 h-16 rounded-full" />
+									<div className="flex-1">
+										<h3 className="font-bold text-lg">{userProfile?.getName() || ''}</h3>
+										<p className="text-sm text-base-content/70">{userProfile?.getEmail() || ''}</p>
 									</div>
 								</div>
 							</div>
-							<div className="card-footer text-center">
-								<button type="button" className="btn btn-warning me-2" onClick={() => signOut()}>
-									<i className="bi bi-box-arrow-right me-2"></i>Sign Out
+							<div className="divider my-0"></div>
+							<div className="card-actions justify-center gap-2 p-4">
+								<button type="button" className="btn btn-warning" onClick={() => signOut()}>
+									<i className="bi bi-box-arrow-right"></i>Sign Out
 								</button>
-								<button type="button" className="btn btn-danger" onClick={async () => {
+								<button type="button" className="btn btn-error" onClick={async () => {
 									await doClearFileCache()
 									clearData()
 									signOut()
 								}}>
-									<i className="bi bi-box-arrow-right me-2"></i>
-									<i className="bi bi-trash3 me-2"></i>Sign Out & Clear Cache
+									<i className="bi bi-trash3"></i>Sign Out & Clear Cache
 								</button>
 							</div>
 						</div>
 					}
 				</div>
-				<div className="col-12 col-md-6" data-desc="App Info">
-					<div className="card h-100">
-						<div className="card-header text-bg-info">
-							<h5 className="mb-0">Application Info</h5>
-						</div>
-						<div className="card-body bg-black p-4">
-							<div className="row align-items-center mt-0">
-								<div className="col"><h4 className="fw-light mb-0">Version</h4></div>
-								<div className="col-auto"><h2 className="fw-light mb-0">{APP_VER}</h2></div>
+				<div data-desc="App Info">
+					<div className="card bg-base-100 card-border border-base-300 border-2 h-full">
+						<div className="card-body space-y-4">
+							<h2 className="card-title text-info">Application Info</h2>
+							<div className="flex justify-between items-center">
+								<span className="text-base-content/70">Version</span>
+								<span className="text-2xl">{APP_VER}</span>
 							</div>
-							<div className="row align-items-center mt-4">
-								<div className="col"><h4 className="fw-light mb-0">Build</h4></div>
-								<div className="col-auto"><h2 className="fw-light mb-0">{APP_BLD}</h2></div>
+							<div className="flex justify-between items-center">
+								<span className="text-base-content/70">Build</span>
+								<span className="text-2xl">{APP_BLD}</span>
 							</div>
 						</div>
-						<div className="card-footer text-center">
-							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline-secondary">
-								<i className="bi bi-github me-2"></i>View on GitHub
+						<div className="divider my-0"></div>
+						<div className="card-actions justify-center p-4">
+							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+								<i className="bi bi-github"></i>View on GitHub
 							</a>
 						</div>
 					</div>
@@ -238,84 +233,74 @@ const UserProfile: React.FC = () => {
 		const videoCount = analysis.file_types['video'] || 0
 
 		return (
-			<div className="row mt-4">
-				<div className="col-12">
-					<div className="card">
-						<div className="card-header text-bg-primary">
-							<div className="row align-items-center">
-								<div className="col">
-									<h5 className="mb-0">Media Database Cache</h5>
+			<div className="mt-6">
+				<div className="card bg-base-100 card-border border-base-300 border-2">
+					<div className="card-body pb-2">
+						<div className="grid grid-cols-[1fr_auto] items-start gap-4">
+							<h2 className="card-title text-primary m-0">Media Database Cache</h2>
+							<span className={`badge badge-lg ${cacheTimestamp ? 'badge-success' : 'badge-neutral'}`}>
+								{cacheTimestamp ? 'Active' : 'Empty'}
+							</span>
+						</div>
+					</div>
+					<div className="card-body">
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-warning">
+								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Database Name</h6>
+								<p className="font-light text-2xl text-warning truncate" title={dbName}>
+									{dbName}
+								</p>
+								<div className="badge badge-warning mt-2 text-xs">IndexedDB v{CACHE_DBASE_VER}</div>
+							</div>
+							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-info">
+								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Total Files</h6>
+								<h2 className="font-light text-3xl text-info mb-2">{analysis.total_files}</h2>
+								<div className="badge badge-info text-xs">
+									{imageCount} images · {videoCount} videos
 								</div>
-								<div className="col-auto">
-									<span className="badge bg-light text-dark">{cacheTimestamp ? 'Active' : 'Empty'}</span>
+							</div>
+							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-accent">
+								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Total Size</h6>
+								<h2 className="font-light text-3xl text-accent mb-2">{formatBytes(analysis.total_size)}</h2>
+								<div className="badge text-xs">
+									Avg: {analysis.total_files ? formatBytes(analysis.total_size / analysis.total_files) : '0 B'}
+								</div>
+							</div>
+							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-success">
+								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Last Updated</h6>
+								<h2 className="font-light text-3xl text-success mb-2">
+									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleDateString() : 'Never'}
+								</h2>
+								<div className="badge text-xs" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : ''}>
+									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleTimeString() : 'No cache'}
 								</div>
 							</div>
 						</div>
-						<div className="card-body bg-black p-4">
-							<div className="row g-4">
-								<div className="col-12 col-md-6 col-lg-3">
-									<div className="text-center p-3 bg-dark rounded">
-										<h6 className="text-uppercase text-secondary mb-0">Database Name</h6>
-										<h4 className="fw-light text-warning text-truncate mt-2 mb-0" title={dbName}>
-											{dbName}
-										</h4>
-										<div className="badge text-bg-warning">IndexedDB v{CACHE_DBASE_VER}</div>
-									</div>
-								</div>								<div className="col-12 col-md-6 col-lg-3">
-									<div className="text-center p-3 bg-dark rounded">
-										<h6 className="text-uppercase text-secondary mb-0">Total Files</h6>
-										<h2 className="fw-light text-primary mb-0">{analysis.total_files}</h2>
-										<div className="badge text-bg-primary">
-											{imageCount} images · {videoCount} videos
-										</div>
-									</div>
-								</div>
-								<div className="col-12 col-md-6 col-lg-3">
-									<div className="text-center p-3 bg-dark rounded">
-										<h6 className="text-uppercase text-secondary mb-0">Total Size</h6>
-										<h2 className="fw-light text-info mb-0">{formatBytes(analysis.total_size)}</h2>
-										<div className="badge text-bg-info">
-											Avg: {analysis.total_files ? formatBytes(analysis.total_size / analysis.total_files) : '0 B'}
-										</div>
-									</div>
-								</div>
-								<div className="col-12 col-md-6 col-lg-3">
-									<div className="text-center p-3 bg-dark rounded">
-										<h6 className="text-uppercase text-secondary mb-0">Last Updated</h6>
-										<h2 className="fw-light text-success mb-0">
-											{cacheTimestamp ? new Date(cacheTimestamp).toLocaleDateString() : 'Never'}
-										</h2>
-										<div className="badge text-bg-success" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : ''}>
-											{cacheTimestamp ? new Date(cacheTimestamp).toLocaleTimeString() : 'No cache'}
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className="card-footer text-center">
+					</div>
+					<div className="divider my-0"></div>
+					<div className="card-actions justify-center gap-2 p-4 flex-wrap">
+						<button
+							type="button"
+							className="btn btn-outline"
+							onClick={handleToggleCacheData}
+							disabled={loadingCache}
+						>
+							<i className="bi bi-code-square"></i>
+							{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
+						</button>
+						{DEBUG && (
 							<button
 								type="button"
-								className="btn btn-outline-info me-2"
-								onClick={handleToggleCacheData}
-								disabled={loadingCache}
+								className="btn btn-outline"
+								onClick={handleCleanupOldCaches}
+								title="Remove old misnamed cache databases"
 							>
-								<i className="bi bi-code-square me-2"></i>
-								{loadingCache ? 'Loading...' : showCacheData ? 'Hide Cache Data' : 'Show Cache Data'}
+								<i className="bi bi-recycle"></i>Cleanup Old Caches
 							</button>
-							{DEBUG && (
-								<button
-									type="button"
-									className="btn btn-outline-warning me-2"
-									onClick={handleCleanupOldCaches}
-									title="Remove old misnamed cache databases"
-								>
-									<i className="bi bi-recycle me-2"></i>Cleanup Old Caches
-								</button>
-							)}
-							<button type="button" className="btn btn-outline-danger" onClick={handleClearCache}>
-								<i className="bi bi-trash me-2"></i>Clear Cache
-							</button>
-						</div>
+						)}
+						<button type="button" className="btn btn-error" onClick={handleClearCache}>
+							<i className="bi bi-trash"></i>Clear Cache
+						</button>
 					</div>
 				</div>
 			</div>
@@ -326,20 +311,14 @@ const UserProfile: React.FC = () => {
 
 	function showCacheDataSection(): JSX.Element {
 		return (
-			<div className="card mt-3">
-				<div className="card-header text-bg-secondary">
-					<h6 className="mb-0">Cache Data (IndexedDB)</h6>
-				</div>
-				<div className="card-body bg-dark p-0" style={{ maxHeight: '500px', overflow: 'auto' }}>
-					<pre className="mb-0 p-3" style={{
-						backgroundColor: '#1e1e1e',
-						color: '#d4d4d4',
-						fontSize: '12px',
-						lineHeight: '1.5',
-						fontFamily: 'Consolas, "Courier New", monospace'
-					}}>
-						<code>{cacheData}</code>
-					</pre>
+			<div className="card bg-base-100 shadow-xl mt-4">
+				<div className="card-body">
+					<h2 className="card-title text-base">Cache Data (IndexedDB)</h2>
+					<div className="max-h-96 overflow-auto bg-base-200 p-4 rounded-lg">
+						<pre className="text-xs whitespace-pre-wrap wrap-break-word font-mono">
+							<code>{cacheData}</code>
+						</pre>
+					</div>
 				</div>
 			</div>
 		)
@@ -348,40 +327,34 @@ const UserProfile: React.FC = () => {
 	function renderUploadSection(): JSX.Element {
 		// NOTE: UNUSED - for testing uploads during development
 		return (
-			<div className="row mt-4 d-none">
-				<div className="col">
-					<div className="card">
-						<div className="card-header text-bg-warning">
-							<h5 className="mb-0">Upload Test Media</h5>
+			<div className="hidden mt-4">
+				<div className="card bg-base-100 shadow-xl">
+					<div className="card-body">
+						<h2 className="card-title">Upload Test Media</h2>
+						<div className="form-control">
+							<label className="label">
+								<span className="label-text">Upload images or videos to your Google Drive for testing</span>
+							</label>
+							<input
+								id="fileUpload"
+								type="file"
+								className="file-input file-input-bordered"
+								accept="image/*,video/*"
+								onChange={handleFileUpload}
+								disabled={uploading}
+							/>
 						</div>
-						<div className="card-body bg-black p-4">
-							<div className="mb-3">
-								<label htmlFor="fileUpload" className="form-label">
-									Upload images or videos to your Google Drive for testing
-								</label>
-								<input
-									id="fileUpload"
-									type="file"
-									className="form-control"
-									accept="image/*,video/*"
-									onChange={handleFileUpload}
-									disabled={uploading}
-								/>
+						{uploading && (
+							<div className="alert alert-info">
+								<span className="loading loading-spinner"></span>
+								<span>Uploading file...</span>
 							</div>
-							{uploading && (
-								<div className="alert alert-info mb-0">
-									<div className="spinner-border spinner-border-sm me-2" role="status">
-										<span className="visually-hidden">Uploading...</span>
-									</div>
-									Uploading file...
-								</div>
-							)}
-							{uploadStatus && !uploading && (
-								<div className={`alert ${uploadStatus.startsWith('✓') ? 'alert-success' : 'alert-danger'} mb-0`}>
-									{uploadStatus}
-								</div>
-							)}
-						</div>
+						)}
+						{uploadStatus && !uploading && (
+							<div className={`alert ${uploadStatus.startsWith('✓') ? 'alert-success' : 'alert-error'}`}>
+								<span>{uploadStatus}</span>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

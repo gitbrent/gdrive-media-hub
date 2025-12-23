@@ -12,12 +12,7 @@ const Breadcrumbs: React.FC<BreadcrumbProps> = ({ path, onNavigate, className })
 
 	return (
 		<nav className={navClassName} aria-label="breadcrumb">
-			<ol className="breadcrumb mb-0" style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: '8px',
-				flexWrap: 'wrap'
-			}}>
+			<ol className="flex items-center flex-wrap gap-2">
 				{path.map((segment, index) => {
 					const isLast = index === path.length - 1
 					const isFirst = index === 0
@@ -25,32 +20,16 @@ const Breadcrumbs: React.FC<BreadcrumbProps> = ({ path, onNavigate, className })
 					return (
 						<React.Fragment key={index}>
 							<li
-								className={`breadcrumb-item ${isLast ? 'active text-primary fw-semibold bg-primary bg-opacity-10' : 'text-secondary fw-medium'}`}
+								className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-200 ${isLast
+										? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-100 dark:bg-blue-900 cursor-default'
+										: 'text-gray-600 dark:text-gray-400 font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200'
+									}`}
 								onClick={() => !isLast && onNavigate(index, segment.folderId)}
-								style={{
-									cursor: isLast ? 'default' : 'pointer',
-									padding: '6px 12px',
-									borderRadius: '6px',
-									transition: 'all 0.2s ease',
-									display: 'flex',
-									alignItems: 'center',
-									gap: '6px'
-								}}
-								onMouseEnter={(e) => {
-									if (!isLast) {
-										e.currentTarget.classList.add('bg-dark-subtle', 'text-body')
-									}
-								}}
-								onMouseLeave={(e) => {
-									if (!isLast) {
-										e.currentTarget.classList.remove('bg-dark-subtle', 'text-body')
-									}
-								}}
 							>
-								{isFirst && <i className="bi-house-fill me-1"></i>}
+								{isFirst && <i className="bi-house-fill"></i>}
 								{segment.folderName}
 							</li>
-							{!isLast && <i className="bi-chevron-right text-muted"></i>}
+							{!isLast && <i className="bi-chevron-right text-gray-400 dark:text-gray-600"></i>}
 						</React.Fragment>
 					)
 				})}

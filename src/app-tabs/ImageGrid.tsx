@@ -10,13 +10,14 @@ import 'photoswipe/dist/photoswipe.css'
 import '../css/ImageGrid.css'
 
 type MediaType = 'all' | 'image' | 'gif' | 'video'
+type TileSize = 'small' | 'medium' | 'large'
 
 export default function ImageGrid() {
 	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
 	const [optSortBy, setIptSortBy] = useState<OPT_SORTBY>(OPT_SORTBY.modDate)
 	const [optSortDir, setOptSortDir] = useState<OPT_SORTDIR>(OPT_SORTDIR.desc)
 	const [optSchWord, setOptSchWord] = useState('')
-	const [tileSize, setTileSize] = useState<'small' | 'medium' | 'large'>('medium')
+	const [tileSize, setTileSize] = useState<TileSize>('medium')
 	const [isSearching, setIsSearching] = useState(false)
 	const { mediaFiles } = useContext(DataContext)
 
@@ -71,108 +72,140 @@ export default function ImageGrid() {
 	// --------------------------------------------------------------------------------------------
 
 	function renderMainContBody_TopBar(): JSX.Element {
+		const isSearchActive = optSchWord.length > 0
+
 		return (
-			<nav className="navbar mb-3">
-				<form className="container-fluid px-0">
-					<div className="row w-100 align-items-center justify-content-between">
-						<div className="col-12 col-md-auto">
-							<div className="btn-group" role="group" aria-label="item type switcher">
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'all' ? 'active' : ''}`}
-									title="show all"
-									aria-label="show all"
-									onClick={() => setMediaTypeFilter('all')}>
-									<i className="bi-files" /><span className="ms-2 d-none d-lg-inline">All</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'image' ? 'active' : ''}`}
-									title="show images"
-									aria-label="show images"
-									onClick={() => setMediaTypeFilter('image')}>
-									<i className="bi-image" /><span className="ms-2 d-none d-lg-inline">Image</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'gif' ? 'active' : ''}`}
-									title="show gifs"
-									aria-label="show gifs"
-									onClick={() => setMediaTypeFilter('gif')}>
-									<i className="bi-play-btn" /><span className="ms-2 d-none d-lg-inline">GIF</span>
-								</button>
-								<button
-									type="button"
-									className={`btn btn-outline-secondary ${mediaTypeFilter === 'video' ? 'active' : ''}`}
-									title="show videos"
-									aria-label="show videos"
-									onClick={() => setMediaTypeFilter('video')}>
-									<i className="bi-camera-video" /><span className="ms-2 d-none d-lg-inline">Video</span>
-								</button>
-							</div>
-						</div>
-						<div className="col-12 col-md-auto mt-2 mt-md-0">
-							<div className="btn-group" role="group" aria-label="sort options">
-								<button type="button" aria-label="sort by name"
-									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filName ? 'active' : ''}`}
-									onClick={() => toggleSortOrder(OPT_SORTBY.filName)}>
-									<i className="bi-alphabet-uppercase" /><span className="ms-2 d-none d-lg-inline">Name</span> {optSortBy === OPT_SORTBY.filName && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
-								</button>
-								<button type="button" aria-label="sort by size"
-									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.filSize ? 'active' : ''}`}
-									onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}>
-									<i className="bi-hdd" /><span className="ms-2 d-none d-lg-inline">Size</span> {optSortBy === OPT_SORTBY.filSize && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
-								</button>
-								<button type="button" aria-label="sort by modified"
-									className={`btn btn-outline-secondary text-nowrap ${optSortBy === OPT_SORTBY.modDate ? 'active' : ''}`}
-									onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}>
-									<i className="bi-clock" /><span className="ms-2 d-none d-lg-inline">Modified</span> {optSortBy === OPT_SORTBY.modDate && (optSortDir === OPT_SORTDIR.asce ? '↑' : '↓')}
-								</button>
-							</div>
-						</div>
-						<div className="col-12 col-md-auto mt-2 mt-md-0">
-							<div className="btn-group" role="group" aria-label="tile size options">
-								<button type="button" aria-label="small tiles"
-									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'small' ? 'active' : ''}`}
-									title="Small tiles"
-									onClick={() => setTileSize('small')}>
-									<i className="bi-grid-3x3-gap" />
-								</button>
-								<button type="button" aria-label="medium tiles"
-									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'medium' ? 'active' : ''}`}
-									title="Medium tiles"
-									onClick={() => setTileSize('medium')}>
-									<i className="bi-grid" />
-								</button>
-								<button type="button" aria-label="large tiles"
-									className={`btn btn-outline-secondary text-nowrap ${tileSize === 'large' ? 'active' : ''}`}
-									title="Large tiles"
-									onClick={() => setTileSize('large')}>
-									<i className="bi-grid-1x2" />
-								</button>
-							</div>
-						</div>
-						<div className="col col-md mt-2 mt-md-0">
-							<div className="input-group">
-								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</div>
-						</div>
-						<div className="col-auto col-md-auto mt-2 mt-md-0 pe-0">
-							<div className="text-muted">
-								{isSearching ? <span>searching...</span>
-									: filtdSortdFiles.length === 0
-										? ('No files to show')
-										: (<span>
-											<b>{filtdSortdFiles.length}</b>&nbsp;of&nbsp;<b>{mediaFiles.length}</b>
-											<span className="d-none d-lg-inline-block">&nbsp;files</span>
-										</span>)
-								}
-							</div>
+			<div className="mb-6">
+				<div className="flex flex-wrap gap-4 items-justify-center">
+					{/* TILE SIZE SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Size</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${tileSize === 'small' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setTileSize('small')}
+								title="Small tiles">
+								<i className="bi-grid-3x3-gap" />
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${tileSize === 'medium' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setTileSize('medium')}
+								title="Medium tiles">
+								<i className="bi-grid" />
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${tileSize === 'large' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setTileSize('large')}
+								title="Large tiles">
+								<i className="bi-grid-1x2" />
+							</button>
 						</div>
 					</div>
-				</form>
-			</nav>
+
+					{/* FILTER SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Type</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('all')}
+								title="Show all">
+								<i className="bi-files" />
+								<span className="hidden lg:inline">All</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'image' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('image')}
+								title="Show images">
+								<i className="bi-image" />
+								<span className="hidden lg:inline">Image</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'gif' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('gif')}
+								title="Show gifs">
+								<i className="bi-play-btn" />
+								<span className="hidden lg:inline">GIF</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'video' ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setMediaTypeFilter('video')}
+								title="Show videos">
+								<i className="bi-camera-video" />
+								<span className="hidden lg:inline">Video</span>
+							</button>
+						</div>
+					</div>
+
+					{/* SORT SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Sort</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.filName ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => toggleSortOrder(OPT_SORTBY.filName)}
+								title="Sort by name">
+								<i className="bi-sort-alpha-down" />
+								<span className="hidden lg:inline">Name</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.filSize ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}
+								title="Sort by size">
+								<i className="bi-hdd-stack" />
+								<span className="hidden lg:inline">Size</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.modDate ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}
+								title="Sort by modified">
+								<i className="bi-clock" />
+								<span className="hidden lg:inline">Modified</span>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm bg-base-900"
+								onClick={() => setOptSortDir(optSortDir === OPT_SORTDIR.asce ? OPT_SORTDIR.desc : OPT_SORTDIR.asce)}
+								title={optSortDir === OPT_SORTDIR.asce ? 'Ascending (A → Z)' : 'Descending (Z → A)'}>
+								<i className={`bi ${optSortDir === OPT_SORTDIR.asce ? 'bi-arrow-up' : 'bi-arrow-down'}`} />
+							</button>
+						</div>
+					</div>
+
+					{/* SEARCH SECTION */}
+					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+						</label>
+						<div className={`input input-sm input-bordered flex items-center gap-2 transition-all ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
+							<i className="bi-search opacity-50"></i>
+							<input
+								type="search"
+								className="grow bg-transparent outline-none"
+								placeholder="Search files..."
+								value={optSchWord}
+								onChange={(ev) => setOptSchWord(ev.currentTarget.value)}
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 		)
 	}
 

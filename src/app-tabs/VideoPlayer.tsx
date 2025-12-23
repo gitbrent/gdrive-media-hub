@@ -4,7 +4,6 @@ import { IMediaFile } from '../App.props'
 import { isVideo } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
-import '../css/VideoPlayer.css'
 
 const VideoPlayer: React.FC = () => {
 	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
@@ -73,38 +72,68 @@ const VideoPlayer: React.FC = () => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar mb-3">
-				<div className="container-fluid">
-					<div className="row w-100 align-items-center justify-content-between">
-						<div className="col">
-							<button className='btn btn-secondary w-100' disabled={usedIndexes.length <= 1} onClick={goToPrevSlide} title="Prev">
-								<i className="bi-chevron-left me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
+			<div className="mb-6">
+				<div className="flex flex-wrap gap-4 items-center justify-center">
+					{/* NAVIGATION SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Control</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className="btn btn-sm btn-ghost"
+								disabled={usedIndexes.length <= 1}
+								onClick={goToPrevSlide}
+								title="Prev">
+								<i className="bi-chevron-left" />
+								<span className="hidden lg:inline">Prev</span>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm btn-ghost"
+								disabled={shfImages.length === 0}
+								onClick={goToNextSlide}
+								title="Next">
+								<span className="hidden lg:inline">Next</span>
+								<i className="bi-chevron-right" />
 							</button>
 						</div>
-						<div className="col">
-							<button className='btn btn-secondary w-100' disabled={shfImages.length === 0} onClick={goToNextSlide} title="Next">
-								<span className="d-none d-lg-inline-block">Next</span><i className="bi-chevron-right ms-0 ms-md-2"></i>
-							</button>
+					</div>
+
+					{/* SEARCH SECTION */}
+					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+						</label>
+						<div className="input input-sm input-bordered flex items-center gap-2">
+							<i className="bi-search opacity-50"></i>
+							<input
+								type="search"
+								className="grow bg-transparent outline-none"
+								placeholder="Search videos..."
+								value={optSchWord}
+								onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }}
+							/>
 						</div>
-						<div className="col mt-3 mt-md-0">
-							<div className="input-group">
-								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</div>
-						</div>
-						<div className="col-auto mt-3 mt-md-0">
-							<div className="text-muted">
-								{shfImages.length === 0
-									? ('No videos to show')
-									: optSchWord
-										? (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{shfImages.length}</b>&nbsp;(<b>{allVideos.length} total)</b></span>)
-										: (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{allVideos.length}</b></span>)
-								}
-							</div>
+					</div>
+
+					{/* STATS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Results</span>
+						</label>
+						<div className="text-sm font-semibold flex items-center justify-center h-9">
+							{shfImages.length === 0
+								? (<span className="text-base-content/60">No videos</span>)
+								: optSchWord
+									? (<span><span className="text-primary font-bold">{currIndex + 1}</span><span className="text-base-content/60"> of {shfImages.length} </span><span className="text-xs opacity-70">({allVideos.length} total)</span></span>)
+									: (<span><span className="text-primary font-bold">{currIndex + 1}</span><span className="text-base-content/60"> of {allVideos.length}</span></span>)
+							}
 						</div>
 					</div>
 				</div>
-			</nav>
+			</div>
 		)
 	}
 
@@ -113,22 +142,22 @@ const VideoPlayer: React.FC = () => {
 			<section>
 				{!currentImageUrl
 					? <AlertLoading />
-					: <section>
-						<div className="position-relative">
-							<div className="position-absolute top-0 start-0 w-100 bg-dark bg-opacity-50 text-opacity-75 text-white px-2 py-1 d-flex align-items-center">
-								<div className='col text-end h6 mb-0 py-2 px-3'>
-									{shfImages[currIndex].name}
-								</div>
-								<div className='col-auto h6 mb-0 py-2 px-3'>
-									{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
-								</div>
-								<div className='col text-start h6 mb-0 py-2 px-3'>
-									{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}
-								</div>
+					: <section className="relative">
+						{/* OVERLAY METADATA */}
+						<div className="absolute top-0 left-0 right-0 bg-black/50 text-white px-2 py-1 flex items-center gap-2 text-sm">
+							<div className="flex-1 text-right truncate">
+								{shfImages[currIndex].name}
+							</div>
+							<div className="shrink-0">
+								{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
+							</div>
+							<div className="flex-1 text-left text-xs hidden sm:block">
+								{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}
 							</div>
 						</div>
-						<div id="video-container">
-							<video id="video-player" controls>
+						{/* VIDEO CONTAINER */}
+						<div className="w-full max-w-full" style={{ maxHeight: 'calc(100vh - 70px - 110px)' }}>
+							<video controls className="w-full h-auto object-contain" style={{ maxHeight: 'calc(100vh - 70px - 110px)' }}>
 								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
 								Your browser does not support the video tag.
 							</video>

@@ -1,6 +1,5 @@
 import React from 'react'
 import { IGapiFile, IMediaFile } from '../App.props'
-import '../css/FileBrowser.css'
 
 interface OverlayButtonsProps {
 	selectedFile: IMediaFile | null
@@ -13,19 +12,25 @@ const OverlayButtons: React.FC<OverlayButtonsProps> = ({ navigateToPrevFile, nav
 	return (
 		<>
 			{navigateToPrevFile &&
-				<button className="h3 chevron-button chevron-left" onClick={navigateToPrevFile}>
+				<button
+					className="fixed top-1/2 left-2.5 z-1022 bg-black/50 border-none text-white cursor-pointer p-2.5 rounded-lg hover:bg-black/70 transition-all text-3xl"
+					onClick={navigateToPrevFile}>
 					<i className="bi bi-chevron-left"></i>
 				</button>
 			}
 			{navigateToNextFile &&
-				<button className="h3 chevron-button chevron-right" onClick={navigateToNextFile}>
+				<button
+					className="fixed top-1/2 right-2.5 z-1022 bg-black/50 border-none text-white cursor-pointer p-2.5 rounded-lg hover:bg-black/70 transition-all text-3xl"
+					onClick={navigateToNextFile}>
 					<i className="bi bi-chevron-right"></i>
 				</button>
 			}
-			<button className="h3 btn-close-overlay" onClick={(e) => {
-				e.stopPropagation()
-				setSelectedFile(null)
-			}}>
+			<button
+				className="fixed top-2.5 right-2.5 z-1022 bg-black/50 border-none text-white cursor-pointer p-2.5 rounded-lg hover:bg-black/70 transition-all text-3xl"
+				onClick={(e) => {
+					e.stopPropagation()
+					setSelectedFile(null)
+				}}>
 				<i className="bi bi-x-lg"></i>
 			</button>
 		</>
@@ -38,9 +43,13 @@ export const ImageViewerOverlay: React.FC<OverlayButtonsProps> = (
 	if (!selectedFile) return null
 
 	return (
-		<div className="image-viewer-overlay">
-			<div className="image-viewer-content">
-				<img src={selectedFile.original} alt={selectedFile.name} />
+		<div className="fixed inset-0 w-full h-full bg-black/80 z-1021 flex items-center justify-center">
+			<div className="text-center">
+				<img
+					src={selectedFile.original}
+					alt={selectedFile.name}
+					className="max-h-[98vh] max-w-[98vw] m-auto object-contain"
+				/>
 			</div>
 			<OverlayButtons
 				selectedFile={selectedFile}
@@ -58,9 +67,12 @@ export const VideoViewerOverlay: React.FC<OverlayButtonsProps> = (
 	if (!selectedFile) return null
 
 	return (
-		<div className="video-viewer-overlay">
-			<div className="video-viewer-content">
-				<video id="video-player" controls>
+		<div className="fixed inset-0 w-full h-full bg-black/80 z-1021 flex items-center justify-center">
+			<div className="flex items-center w-full max-w-[90%] max-h-[90vh]">
+				<video
+					id="video-player"
+					controls
+					className="w-full h-auto max-h-[calc(100vh-70px)] object-contain">
 					<source src={selectedFile.original} type={selectedFile.mimeType} />
 					Your browser does not support the video tag.
 				</video>

@@ -1,5 +1,6 @@
 import React from 'react'
-import { IFileAnalysis, formatBytes } from '../App.props'
+import { IFileAnalysis } from '../App.props'
+import MetricCards from './MetricCards'
 import {
 	AreaChart,
 	Area,
@@ -14,24 +15,23 @@ import {
 	ResponsiveContainer,
 	Cell,
 } from 'recharts'
-import '../css/HomeMetrics.css'
 
 interface HomeMetricsProps {
 	analysis: IFileAnalysis
 }
 
-// Standardized Data Viz Palette (Tailwind 400 series for Dark Mode)
+// Standardized Data Viz Palette (using CSS variables from style.scss)
 const COLORS = [
-	'#60a5fa', // Blue
-	'#a78bfa', // Violet
-	'#f472b6', // Pink
-	'#fb923c', // Orange
-	'#2dd4bf', // Teal
-	'#facc15', // Yellow
-	'#f87171', // Red
-	'#818cf8', // Indigo
-	'#34d399', // Emerald
-	'#22d3ee', // Cyan
+	'var(--color-chart-1)', // Blue
+	'var(--color-chart-2)', // Violet
+	'var(--color-chart-3)', // Pink
+	'var(--color-chart-4)', // Orange
+	'var(--color-chart-5)', // Teal
+	'var(--color-chart-6)', // Yellow
+	'var(--color-chart-7)', // Red
+	'var(--color-chart-8)', // Indigo
+	'var(--color-chart-9)', // Emerald
+	'var(--color-chart-10)', // Cyan
 ]
 
 // Custom tooltip style
@@ -44,15 +44,15 @@ interface TooltipProps {
 const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
 	if (active && payload && payload.length) {
 		return (
-			<div className="card text-white border-secondary shadow-lg" style={{ opacity: 0.98, minWidth: '200px', backgroundColor: '#1e293b' }}>
-				<div className="card-header text-white py-2" style={{ backgroundColor: '#334155' }}>
-					<strong className="small">{label}</strong>
+			<div className="rounded-lg border border-blue-800/30 shadow-lg" style={{ opacity: 0.98, minWidth: '200px', backgroundColor: '#1e293b' }}>
+				<div className="px-3 py-2 border-b border-blue-800/30" style={{ backgroundColor: '#334155' }}>
+					<strong className="text-sm text-white">{label}</strong>
 				</div>
-				<ul className="list-group list-group-flush">
+				<ul className="divide-y divide-blue-800/20">
 					{payload.map((entry, index) => (
-						<li key={index} className="list-group-item text-white border-secondary py-2 d-flex justify-content-between align-items-center" style={{ backgroundColor: '#1e293b' }}>
-							<span className="small">{entry.name}</span>
-							<span className="badge rounded-pill" style={{ backgroundColor: entry.color, color: '#fff' }}>
+						<li key={index} className="px-3 py-2 text-white flex justify-between items-center" style={{ backgroundColor: '#1e293b' }}>
+							<span className="text-sm">{entry.name}</span>
+							<span className="badge badge-sm ml-2" style={{ backgroundColor: entry.color, color: '#fff' }}>
 								{entry.value}
 							</span>
 						</li>
@@ -65,7 +65,7 @@ const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
 }
 
 const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
-	const { file_years, file_types, file_types_by_year, size_categories, total_files, total_size } = analysis
+	const { file_years, file_types, file_types_by_year, size_categories, total_files } = analysis
 
 	// Get top file types for the timeline
 	const topTypes = Object.entries(file_types)
@@ -98,12 +98,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	}))
 
 	// Calculate metrics
-	const avgFileSize = total_files > 0 ? total_size / total_files : 0
-
-	const largestCategory: [string, number] = Object.entries(size_categories).length > 0
-		? Object.entries(size_categories).reduce((a, b) => a[1] > b[1] ? a : b)
-		: ['N/A', 0]
-
 	const mostCommonType: [string, number] = Object.entries(file_types).length > 0
 		? Object.entries(file_types).reduce((a, b) => a[1] > b[1] ? a : b)
 		: ['N/A', 0]
@@ -115,95 +109,12 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 
 	// ============================================================================
 
-	const renderKpiCards = () => (
-		<div className="row g-4 mb-4">
-			<div className="col-12 col-sm-6 col-lg-3" data-description="Total Files">
-				<div className="card text-white h-100 kpi-card kpi-card-purple">
-					<div className="kpi-card-icon-bg">
-						<i className="bi bi-images"></i>
-					</div>
-					<div className="card-body kpi-card-body">
-						<div className="d-flex align-items-center mb-2">
-							<div className="rounded-circle d-flex align-items-center justify-content-center me-2 kpi-icon-circle">
-								<i className="bi bi-images kpi-icon"></i>
-							</div>
-							<h6 className="mb-0 opacity-90 small">Total Files Loaded</h6>
-						</div>
-						<h2 className="mb-1 fw-bold kpi-title">{total_files.toLocaleString()}</h2>
-						<div className="d-flex justify-content-between align-items-center">
-							<small className="kpi-subtitle">{Object.keys(file_types).length} types</small>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div className="col-12 col-sm-6 col-lg-3" data-description="Largest file size category">
-				<div className="card text-white h-100 kpi-card kpi-card-green">
-					<div className="kpi-card-icon-bg">
-						<i className="bi bi-box-fill"></i>
-					</div>
-					<div className="card-body kpi-card-body">
-						<div className="d-flex align-items-center mb-2">
-							<div className="rounded-circle d-flex align-items-center justify-content-center me-2 kpi-icon-circle">
-								<i className="bi bi-box-fill kpi-icon"></i>
-							</div>
-							<h6 className="mb-0 opacity-90 small">Largest Size Group</h6>
-						</div>
-						<h2 className="mb-1 fw-bold kpi-title">{largestCategory[0]}</h2>
-						<div className="d-flex justify-content-between align-items-center">
-							<small className="kpi-subtitle">{largestCategory[1].toLocaleString()} files</small>
-							<small className="kpi-subtitle">{Math.round(largestCategory[1] / total_files * 100)}%</small>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div className="col-12 col-sm-6 col-lg-3" data-description="Most Common File Type">
-				<div className="card text-white h-100 kpi-card kpi-card-blue">
-					<div className="kpi-card-icon-bg">
-						<i className="bi bi-trophy-fill"></i>
-					</div>
-					<div className="card-body kpi-card-body">
-						<div className="d-flex align-items-center mb-2">
-							<div className="rounded-circle d-flex align-items-center justify-content-center me-2 kpi-icon-circle">
-								<i className="bi bi-trophy-fill kpi-icon"></i>
-							</div>
-							<h6 className="mb-0 opacity-90 small">Most Common Type</h6>
-						</div>
-						<h2 className="mb-1 fw-bold kpi-title">{mostCommonType[0]}</h2>
-						<div className="d-flex justify-content-between align-items-center">
-							<small className="kpi-subtitle">{mostCommonType[1].toLocaleString()} files</small>
-							<small className="kpi-subtitle">{Math.round(mostCommonType[1] / total_files * 100)}%</small>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div className="col-12 col-sm-6 col-lg-3" data-description="Total Storage Used">
-				<div className="card text-white h-100 kpi-card kpi-card-red">
-					<div className="kpi-card-icon-bg">
-						<i className="bi bi-floppy"></i>
-					</div>
-					<div className="card-body kpi-card-body">
-						<div className="d-flex align-items-center mb-2">
-							<div className="rounded-circle d-flex align-items-center justify-content-center me-2 kpi-icon-circle">
-								<i className="bi bi-floppy kpi-icon"></i>
-							</div>
-							<h6 className="mb-0 opacity-90 small">Total Storage Used</h6>
-						</div>
-						<h2 className="mb-1 fw-bold kpi-title">{formatBytes(total_size)}</h2>
-						<div className="d-flex justify-content-between align-items-center">
-							<small className="kpi-subtitle">{formatBytes(avgFileSize)} avg</small>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	)
-
 	const renderTimelineChart = () => (
-		<div className="card shadow-sm border-0 h-100 chart-card-dark">
+		<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg">
 			<div className="card-body text-white">
 				<div className="mb-3">
 					<h5 className="card-title mb-1">Files Over Time by Type</h5>
-					<p className="text-white-50 small mb-0">Distribution across top file types</p>
+					<p className="text-gray-400 text-sm mb-0">Distribution across top file types</p>
 				</div>
 				<ResponsiveContainer width="100%" height={280}>
 					<AreaChart data={timelineData}>
@@ -241,20 +152,20 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 						))}
 					</AreaChart>
 				</ResponsiveContainer>
-				<div className="d-flex flex-wrap gap-3 mt-3 justify-content-center">
+				<div className="flex flex-wrap gap-3 mt-3 justify-center">
 					{[...topTypes].reverse().map((type, reversedIndex) => {
 						const index = topTypes.length - 1 - reversedIndex
 						return (
-							<div key={type} className="d-flex align-items-center gap-2">
+							<div key={type} className="flex items-center gap-2">
 								<div
-									className="rounded-circle chart-legend-dot"
+									className="rounded-full"
 									style={{
 										backgroundColor: COLORS[index % COLORS.length],
 										width: '14px',
 										height: '14px'
 									}}
 								/>
-								<small className="text-white-50">{type}</small>
+								<small className="text-gray-400">{type}</small>
 							</div>
 						)
 					})}
@@ -298,11 +209,11 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		]
 
 		const renderMiniPieChart = (data: Array<{ name: string; value: number; color: string }>, title: string, percentage: number, subtitle: string) => (
-			<div className="col-6">
-				<div className="card shadow-sm border-0 h-100 chart-card-dark">
+			<div className="col-span-1">
+				<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 					<div className="card-body text-center p-3">
 						<h6 className="text-white mb-2" style={{ fontSize: '0.85rem' }}>{title}</h6>
-						<div className="position-relative" style={{ height: '120px' }}>
+						<div className="relative" style={{ height: '120px' }}>
 							<ResponsiveContainer width="100%" height="100%">
 								<PieChart>
 									<Pie
@@ -321,18 +232,18 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 									</Pie>
 								</PieChart>
 							</ResponsiveContainer>
-							<div className="position-absolute top-50 start-50 translate-middle text-center">
-								<h4 className="mb-0 fw-bold text-white" style={{ fontSize: '1.5rem' }}>{percentage}%</h4>
+							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+								<h4 className="mb-0 font-bold text-white" style={{ fontSize: '1.5rem' }}>{percentage}%</h4>
 							</div>
 						</div>
-						<p className="text-white-50 small mb-0 mt-2">{subtitle}</p>
+						<p className="text-gray-400 text-sm mb-0 mt-2">{subtitle}</p>
 					</div>
 				</div>
 			</div>
 		)
 
 		return (
-			<div className="row g-4">
+			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 				{renderMiniPieChart(
 					storageEfficiencyData,
 					'Storage Efficiency',
@@ -362,12 +273,12 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	}
 
 	const renderFileTypeChart = () => (
-		<div className="col-12 col-lg-6">
-			<div className="card shadow-sm border-0 h-100 chart-card-dark">
+		<div className="col-span-1 lg:col-span-1">
+			<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 				<div className="card-body text-white">
 					<div className="mb-3">
 						<h5 className="card-title mb-1">File Type Distribution</h5>
-						<p className="text-white-50 small mb-0">Top file types</p>
+						<p className="text-gray-400 text-sm mb-0">Top file types</p>
 					</div>
 					<ResponsiveContainer width="100%" height={220}>
 						<BarChart data={fileTypeData.slice(0, 6).map((item, index) => ({
@@ -397,12 +308,12 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 							</Bar>
 						</BarChart>
 					</ResponsiveContainer>
-					<div className="row g-3 justify-content-center">
+					<div className="flex flex-wrap gap-3 justify-center">
 						{fileTypeData.slice(0, 6).map((item, index) => (
-							<div key={index} className="col-auto">
-								<div className="file-type-badge" style={{ backgroundColor: COLORS[index % COLORS.length] }}>
-									<small className="text-white d-block fw-semibold file-type-badge-label">{item.name}</small>
-									<h5 className="fw-light mb-0 file-type-badge-value">{item.value.toLocaleString()}</h5>
+							<div key={index} className="shrink-0">
+								<div className="text-center px-3 py-2 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] + '40' }}>
+									<small className="text-white block font-semibold text-xs">{item.name}</small>
+									<h5 className="font-light mb-0 text-white">{item.value.toLocaleString()}</h5>
 								</div>
 							</div>
 						))}
@@ -413,12 +324,12 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	)
 
 	const renderSizeCategoriesChart = () => (
-		<div className="col-12 col-lg-6">
-			<div className="card shadow-sm border-0 h-100 chart-card-dark">
+		<div className="col-span-1 lg:col-span-1">
+			<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 				<div className="card-body text-white">
 					<div className="mb-3">
 						<h5 className="card-title mb-1">Size Categories</h5>
-						<p className="text-white-50 small mb-0">Files by size range</p>
+						<p className="text-gray-400 text-sm mb-0">Files by size range</p>
 					</div>
 					<ResponsiveContainer width="100%" height={220}>
 						<BarChart data={sizeCategoryData.map((item, index) => ({
@@ -448,12 +359,12 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 							</Bar>
 						</BarChart>
 					</ResponsiveContainer>
-					<div className="row g-3 justify-content-center">
+					<div className="flex flex-wrap gap-3 justify-center">
 						{sizeCategoryData.map((item, index) => (
-							<div key={index} className="col-auto">
-								<div className="file-type-badge" style={{ backgroundColor: COLORS[index % COLORS.length] }}>
-									<small className="text-white d-block fw-semibold file-type-badge-label">{item.name}</small>
-									<h5 className="fw-light mb-0 file-type-badge-value">{item.files.toLocaleString()}</h5>
+							<div key={index} className="shrink-0">
+								<div className="text-center px-3 py-2 rounded" style={{ backgroundColor: COLORS[index % COLORS.length] + '40' }}>
+									<small className="text-white block font-semibold text-xs">{item.name}</small>
+									<h5 className="font-light mb-0 text-white">{item.files.toLocaleString()}</h5>
 								</div>
 							</div>
 						))}
@@ -466,21 +377,21 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 	// ============================================================================
 
 	return (
-		<div className="mb-4">
-			{renderKpiCards()}
+		<div>
+			<MetricCards analysis={analysis}/>
 
 			{/* Charts Grid */}
-			<div className="row g-4 mb-4">
-				<div className="col-12 col-lg-8">
+			<div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
+				<div className="lg:col-span-2">
 					{renderTimelineChart()}
 				</div>
-				<div className="col-12 col-lg-4">
+				<div className="lg:col-span-1">
 					{renderMetricsPieCharts()}
 				</div>
 			</div>
 
 			{/* Bottom Charts */}
-			<div className="row g-4">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				{renderFileTypeChart()}
 				{renderSizeCategoriesChart()}
 			</div>

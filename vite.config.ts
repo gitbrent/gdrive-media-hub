@@ -1,22 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 // [BDE]: Use port 3000 like CRA as thats what google API is expecting
 export default defineConfig({
-	plugins: [react()],
+	plugins: [react(), tailwindcss()],
 	server: {
 		port: 3000,
 		strictPort: true, // Recommended to ensure Google API callback doesn't break
-	},
-	css: {
-		preprocessorOptions: {
-			scss: {
-				//api: 'modern-compiler', // REQUIRED for Vite 7: Specify the modern API
-				silenceDeprecations: ['color-functions', 'global-builtin', 'import'],
-				quietDeps: true, // Add this line to suppress warnings (above needed for bootstrap SCSS Dart messages)
-			},
-		},
 	},
 	/* following is suppress: `node_modules/gapi-script/gapiScript.js (44:36): Use of eval in "node_modules/gapi-script/gapiScript.js" is [...].` */
 	build: {
