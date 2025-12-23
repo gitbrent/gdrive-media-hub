@@ -186,7 +186,7 @@ export default function AppMainUI() {
 	}
 
 	return (
-		<section className="bg-base-300 w-full">
+		<section>
 			{!isSignedIn ?
 				renderLogin()
 				:
