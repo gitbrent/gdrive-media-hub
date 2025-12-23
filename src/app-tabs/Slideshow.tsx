@@ -3,7 +3,6 @@ import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
 import { isImage } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
-import '../css/Slideshow.css'
 
 enum SlideShowDelay {
 	Fast = 2,
@@ -154,78 +153,121 @@ const Slideshow: React.FC = () => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<nav className="navbar mb-3">
-				<div className="container-fluid">
-					<div className="row w-100 align-items-center">
-						<div className="col-12 col-md">
-							<button className="btn btn-primary w-100" onClick={() => { setIsPaused(!isPaused) }} title="play/pause (space)">
-								{isPaused
-									? <span><i className='bi-play  me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Play</span></span>
-									: <span><i className='bi-pause me-0 me-md-2'></i><span className="d-none d-lg-inline-block">Pause ({remainingSecs} sec)</span></span>
-								}
+			<div className="mb-6">
+				<div className="flex flex-wrap gap-4 items-center justify-center">
+					{/* PLAY/PAUSE SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Control</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className="btn btn-sm flex-1 btn-primary"
+								onClick={() => { setIsPaused(!isPaused) }}
+								title="play/pause (space)">
+								<i className={`bi ${isPaused ? 'bi-play' : 'bi-pause'}`} />
+								<span className="hidden lg:inline">
+									{isPaused
+										? 'Play'
+										: `Pause (${remainingSecs}s)`
+									}
+								</span>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm btn-ghost"
+								disabled={usedIndices.length <= 1}
+								onClick={goToPrevSlide}
+								title="prev (left-arrow)">
+								<i className="bi-chevron-left" />
+								<span className="hidden lg:inline">Prev</span>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm btn-ghost"
+								disabled={filteredImages.length === 0}
+								onClick={goToNextSlide}
+								title="next (right-arrow)">
+								<span className="hidden lg:inline">Next</span>
+								<i className="bi-chevron-right" />
 							</button>
 						</div>
-						<div className="col-5 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={usedIndices.length <= 1} onClick={goToPrevSlide} title="prev (left-arrow)">
-								<i className="bi-chevron-left me-0 me-md-2"></i><span className="d-none d-lg-inline-block">Prev</span>
+					</div>
+
+					{/* DELAY SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Delay</span>
+						</label>
+						<div className="dropdown w-full">
+							<button
+								type="button"
+								className="btn btn-sm btn-ghost w-full"
+								tabIndex={0}>
+								<span className="hidden lg:inline">Delay:&nbsp;</span>{optSlideshowSecs}<span className="hidden lg:inline">&nbsp;sec</span>
+								<i className="bi-chevron-down" />
 							</button>
+							<ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow">
+								{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
+									<li key={key + value}>
+										<button
+											className={optSlideshowSecs === value ? 'active' : ''}
+											onClick={() => setOptSlideshowSecs(value as SlideShowDelay)}>
+											{value} seconds ({key})
+										</button>
+									</li>
+								))}
+							</ul>
 						</div>
-						<div className="col-5 col-md-auto">
-							<button className='btn btn-secondary w-100' disabled={filteredImages.length === 0} onClick={goToNextSlide} title="next (right-arrow)">
-								<span className="d-none d-lg-inline-block">Next</span><i className="bi-chevron-right ms-0 ms-md-2"></i>
-							</button>
+					</div>
+
+					{/* SEARCH SECTION */}
+					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+						</label>
+						<div className="input input-sm input-bordered flex items-center gap-2">
+							<i className="bi-search opacity-50"></i>
+							<input
+								type="search"
+								className="grow bg-transparent outline-none"
+								placeholder="Search files..."
+								value={optSchWord}
+								onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }}
+							/>
 						</div>
-						<div className="col-2 col-md-auto">
-							<div className="dropdown">
-								<button className="btn btn-secondary dropdown-toggle" type="button" id="delayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-									<span className="d-none d-lg-inline-block">Delay:&nbsp;</span>{optSlideshowSecs}<span className="d-none d-lg-inline-block">&nbsp;sec</span>
-								</button>
-								<ul className="dropdown-menu" aria-labelledby="delayDropdown">
-									{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
-										<li key={key + value}>
-											<button
-												className={`dropdown-item ${optSlideshowSecs === value ? 'disabled' : ''}`}
-												onClick={() => setOptSlideshowSecs(value as SlideShowDelay)}
-											>
-												{value} seconds ({key})
-											</button>
-										</li>
-									))}
-								</ul>
-							</div>
-						</div>
-						<div className="col col-md mt-3 mt-md-0">
-							<div className="input-group">
-								<span id="grp-search" className="input-group-text"><i className="bi-search"></i></span>
-								<input type="search" placeholder="Search" aria-label="Search" aria-describedby="grp-search" className="form-control" value={optSchWord} onChange={(ev) => { setOptSchWord(ev.currentTarget.value) }} />
-							</div>
-						</div>
-						<div className="col-auto col-md-auto mt-3 mt-md-0">
-							<div className="text-muted">
-								{filteredImages.length === 0
-									? (<span><b>{0}</b>&nbsp;of&nbsp;<b>{randomizedImages.length}</b></span>)
-									: optSchWord
-										? (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{filteredImages.length}</b>&nbsp;(<b>{randomizedImages.length} total)</b></span>)
-										: (<span><b>{currIndex + 1}</b>&nbsp;of&nbsp;<b>{randomizedImages.length}</b></span>)
-								}
-							</div>
+					</div>
+
+					{/* STATS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Results</span>
+						</label>
+						<div className="text-sm font-semibold flex items-center justify-center h-9">
+							{filteredImages.length === 0
+								? (<span><span className="text-base-content/60">{0} of {randomizedImages.length}</span></span>)
+								: optSchWord
+									? (<span><span className="text-primary font-bold">{currIndex + 1}</span><span className="text-base-content/60"> of {filteredImages.length} </span><span className="text-xs opacity-70">({randomizedImages.length} total)</span></span>)
+									: (<span><span className="text-primary font-bold">{currIndex + 1}</span><span className="text-base-content/60"> of {randomizedImages.length}</span></span>)
+							}
 						</div>
 					</div>
 				</div>
-			</nav>
+			</div>
 		)
 	}
 
 	return (
 		<section>
 			{renderTopBar()}
-			<div className="slideShowContainer">
-				<div className="slideShowMain">
+			<div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 56px - 64px - 35px - 20px)' }}>
+				<div className="grow flex items-center justify-center w-full overflow-hidden">
 					{filteredImages.length === 0
 						? <AlertNoImages />
 						: currentImageUrl
-							? <img src={currentImageUrl} />
-							: <i title={filteredImages[currIndex]?.name} className="h1 mb-0 bi-arrow-repeat" />
+							? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className="h-full w-full object-contain" />
+							: <i title={filteredImages[currIndex]?.name} className="text-5xl bi-arrow-repeat animate-spin" />
 					}
 				</div>
 			</div>
