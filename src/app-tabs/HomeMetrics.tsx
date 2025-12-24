@@ -19,6 +19,8 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 	ChartConfig,
+	ChartLegend,
+	ChartLegendContent,
 } from '../components/ui/chart'
 
 interface HomeMetricsProps {
@@ -96,7 +98,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 						<h5 className="card-title mb-1">Files Over Time by Type</h5>
 						<p className="text-gray-400 text-sm mb-0">Distribution across top file types</p>
 					</div>
-					<ChartContainer config={timelineChartConfig} className="h-70">
+					<ChartContainer config={timelineChartConfig} className="h-90">
 						<AreaChart data={timelineData}>
 							<defs>
 								{topTypes.map((type, index) => (
@@ -116,7 +118,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 								stroke="rgba(255,255,255,0.5)"
 								style={{ fontSize: '0.75rem' }}
 							/>
-							<ChartTooltip content={<ChartTooltipContent />} />
+							<ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
 							{topTypes.map((type, index) => (
 								<Area
 									key={type}
@@ -130,26 +132,9 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 									animationDuration={1000 + index * 200}
 								/>
 							))}
+							<ChartLegend content={<ChartLegendContent />} />
 						</AreaChart>
 					</ChartContainer>
-					<div className="flex flex-wrap gap-3 mt-3 justify-center">
-						{[...topTypes].reverse().map((type, reversedIndex) => {
-							const index = topTypes.length - 1 - reversedIndex
-							return (
-								<div key={type} className="flex items-center gap-2">
-									<div
-										className="rounded-full"
-										style={{
-											backgroundColor: COLORS[index % COLORS.length],
-											width: '14px',
-											height: '14px'
-										}}
-									/>
-									<small className="text-gray-400">{type}</small>
-								</div>
-							)
-						})}
-					</div>
 				</div>
 			</div>
 		)
@@ -159,14 +144,14 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		// Metric 1: Storage Efficiency
 		const smallFiles = (size_categories.Tiny || 0) + (size_categories.Small || 0)
 		const storageEfficiencyData = [
-			{ name: 'Small Files', value: smallFiles, color: COLORS[0] },
+			{ name: 'Small Files', value: smallFiles, color: "var(--chart-1)" },
 			{ name: 'Large Files', value: total_files - smallFiles, color: 'rgba(255,255,255,0.1)' }
 		]
 
 		// Metric 2: File Type Diversity
 		const topTypeCount = mostCommonType[1]
 		const diversityData = [
-			{ name: mostCommonType[0], value: topTypeCount, color: COLORS[1] },
+			{ name: mostCommonType[0], value: topTypeCount, color: "var(--chart-2)" },
 			{ name: 'Other Types', value: total_files - topTypeCount, color: 'rgba(255,255,255,0.1)' }
 		]
 
@@ -174,7 +159,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const largeFiles = (size_categories.Large || 0) + (size_categories.Huge || 0)
 		const mediumSmallFiles = total_files - largeFiles
 		const sizeDistData = [
-			{ name: 'Large Files', value: largeFiles, color: COLORS[2] },
+			{ name: 'Large Files', value: largeFiles, color: "var(--chart-3)" },
 			{ name: 'Small/Medium', value: mediumSmallFiles, color: 'rgba(255,255,255,0.1)' }
 		]
 
@@ -185,7 +170,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const recentFiles = (file_years[recentYear] || 0) + (file_years[prevYear] || 0)
 		const olderFiles = total_files - recentFiles
 		const recentActivityData = [
-			{ name: 'Recent (2y)', value: recentFiles, color: COLORS[3] },
+			{ name: 'Recent (2y)', value: recentFiles, color: "var(--chart-4)" },
 			{ name: 'Older', value: olderFiles, color: 'rgba(255,255,255,0.1)' }
 		]
 
