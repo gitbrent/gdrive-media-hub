@@ -92,11 +92,11 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		})
 
 		return (
-			<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg">
+			<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 				<div className="card-body text-white">
 					<div className="mb-3">
 						<h5 className="card-title mb-1">Files Over Time by Type</h5>
-						<p className="text-gray-400 text-sm mb-0">Distribution across top file types</p>
+						<p className="text-gray-500 text-sm mb-0">Distribution across top file types</p>
 					</div>
 					<ChartContainer config={timelineChartConfig} className="h-90">
 						<AreaChart data={timelineData}>
@@ -108,7 +108,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 									</linearGradient>
 								))}
 							</defs>
-							<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+							<CartesianGrid strokeDasharray="3 3" stroke="var(--pie-other)" />
 							<XAxis
 								dataKey="year"
 								stroke="rgba(255,255,255,0.5)"
@@ -145,14 +145,14 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const smallFiles = (size_categories.Tiny || 0) + (size_categories.Small || 0)
 		const storageEfficiencyData = [
 			{ name: 'Small Files', value: smallFiles, color: "var(--chart-1)" },
-			{ name: 'Large Files', value: total_files - smallFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Large Files', value: total_files - smallFiles, color: 'var(--pie-other)' }
 		]
 
 		// Metric 2: File Type Diversity
 		const topTypeCount = mostCommonType[1]
 		const diversityData = [
 			{ name: mostCommonType[0], value: topTypeCount, color: "var(--chart-2)" },
-			{ name: 'Other Types', value: total_files - topTypeCount, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Other Types', value: total_files - topTypeCount, color: 'var(--pie-other)' }
 		]
 
 		// Metric 3: Size Distribution
@@ -160,7 +160,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const mediumSmallFiles = total_files - largeFiles
 		const sizeDistData = [
 			{ name: 'Large Files', value: largeFiles, color: "var(--chart-3)" },
-			{ name: 'Small/Medium', value: mediumSmallFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Others', value: mediumSmallFiles, color: 'var(--pie-other)' }
 		]
 
 		// Metric 4: Recent Activity
@@ -171,7 +171,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 		const olderFiles = total_files - recentFiles
 		const recentActivityData = [
 			{ name: 'Recent (2y)', value: recentFiles, color: "var(--chart-4)" },
-			{ name: 'Older', value: olderFiles, color: 'rgba(255,255,255,0.1)' }
+			{ name: 'Older', value: olderFiles, color: 'var(--pie-other)' }
 		]
 
 		const renderMiniPieChart = (data: Array<{ name: string; value: number; color: string }>, title: string, percentage: number, subtitle: string) => {
@@ -231,7 +231,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 									</PieChart>
 								</ChartContainer>
 							</div>
-							<div className="text-white opacity-50 text-xs mb-0 mt-1">{subtitle}</div>
+							<div className="text-gray-500 text-xs mb-0 mt-1">{subtitle}</div>
 						</div>
 					</div>
 				</div>
@@ -283,7 +283,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 					<div className="card-body text-white">
 						<div className="mb-3">
 							<h5 className="card-title mb-1">File Type Distribution</h5>
-							<p className="text-gray-400 text-sm mb-0">Top file types</p>
+							<p className="text-gray-500 text-sm mb-0">Top file types</p>
 						</div>
 						<ChartContainer config={fileTypeChartConfig} className="h-55">
 							<BarChart data={fileTypeData.slice(0, 6).map((item, index) => ({
@@ -291,7 +291,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 								value: item.value,
 								fill: COLORS[index % COLORS.length]
 							}))}>
-								<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+								<CartesianGrid strokeDasharray="3 3" stroke="var(--pie-other)" />
 								<XAxis
 									dataKey="name"
 									stroke="rgba(255,255,255,0.5)"
@@ -344,7 +344,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 					<div className="card-body text-white">
 						<div className="mb-3">
 							<h5 className="card-title mb-1">Size Categories</h5>
-							<p className="text-gray-400 text-sm mb-0">Files by size range</p>
+							<p className="text-gray-500 text-sm mb-0">Files by size range</p>
 						</div>
 						<ChartContainer config={sizeChartConfig} className="h-55">
 							<BarChart data={sizeCategoryData.map((item, index) => ({
@@ -352,7 +352,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 								value: item.files,
 								fill: COLORS[index % COLORS.length]
 							}))}>
-								<CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+								<CartesianGrid strokeDasharray="3 3" stroke="var(--pie-other)" />
 								<XAxis
 									dataKey="name"
 									stroke="rgba(255,255,255,0.5)"
