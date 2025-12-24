@@ -188,7 +188,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 					<div className="card bg-linear-to-br from-blue-900/50 to-blue-950/50 border border-blue-800/30 shadow-lg h-full">
 						<div className="card-body text-center p-3">
 							<h6 className="text-white font-bold text-md mb-1">{title}</h6>
-							<div style={{ width: '100%', height: '150px', display: 'flex', justifyContent: 'center' }}>
+							<div className="w-full h-37.5 flex items-center justify-center">
 								<ChartContainer config={pieChartConfig} className="aspect-square" style={{ width: '150px', height: '150px' }}>
 									<PieChart>
 										<ChartTooltip content={<ChartTooltipContent hideLabel />} />
@@ -217,7 +217,7 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 															>
 																<tspan
 																	x={viewBox.cx}
-																	y={(viewBox.cy || 0) + 10}
+																	y={viewBox.cy}
 																	className='fill-foreground text-2xl font-bold'
 																>
 																	{percentage}%
