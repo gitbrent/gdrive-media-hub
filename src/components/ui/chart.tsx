@@ -3,6 +3,12 @@ import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * IMPORTANT: renamed `--color-border` and `--color-bg` to fix missing color dots on hover cards!
+ * ALSO: Renamed `--indicator-border` and `--indicator-bg` to use parentheses
+ * instead of square brackets to ensure compatibility with certain CSS parsers.
+ */
+
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
@@ -208,7 +214,7 @@ const ChartTooltipContent = React.forwardRef<
                         !hideIndicator && (
                           <div
                             className={cn(
-                              "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                              "shrink-0 rounded-xs border-(--indicator-border) bg-(--indicator-bg)",
                               {
                                 "h-2.5 w-2.5": indicator === "dot",
                                 "w-1": indicator === "line",
@@ -219,8 +225,8 @@ const ChartTooltipContent = React.forwardRef<
                             )}
                             style={
                               {
-                                "--color-bg": indicatorColor,
-                                "--color-border": indicatorColor,
+                                "--indicator-bg": indicatorColor,
+                                "--indicator-border": indicatorColor,
                               } as React.CSSProperties
                             }
                           />
@@ -302,7 +308,7 @@ const ChartLegendContent = React.forwardRef<
                   <itemConfig.icon />
                 ) : (
                   <div
-                    className="h-2 w-2 shrink-0 rounded-[2px]"
+                    className="h-2 w-2 shrink-0 rounded-xs"
                     style={{
                       backgroundColor: item.color,
                     }}
