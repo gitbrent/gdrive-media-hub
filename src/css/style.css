@@ -34,6 +34,7 @@
   --color-warning-content: oklch(98% 0.016 73.684);
   --color-error: oklch(58% 0.253 17.585);
   --color-error-content: oklch(96% 0.015 12.422);
+  --radius: 0.5rem;
   --radius-selector: 2rem;
   --radius-field: 0.5rem;
   --radius-box: 1rem;
@@ -53,7 +54,11 @@
 	background: transparent !important;
 }
 
+/* ============================================================================ */
+/* shadcn charts */
+/* ============================================================================ */
 @theme inline {
+	--radius: 0.5rem;
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
@@ -94,8 +99,42 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 }
 
+:root {
+	--background: oklch(0% 0 0);
+	--foreground: oklch(0% 0 0);
+	--card: oklch(98% 0 0);
+	--card-foreground: oklch(0% 0 0);
+	--popover: oklch(98% 0 0);
+	--popover-foreground: oklch(0% 0 0);
+	--primary: oklch(0.486 0.247 263.902);
+	--primary-foreground: oklch(1 0 0);
+	--secondary: oklch(0.948 0 0);
+	--secondary-foreground: oklch(0% 0 0);
+	--muted: oklch(0.948 0 0);
+	--muted-foreground: oklch(0.4 0 0);
+	--accent: oklch(0.948 0 0);
+	--accent-foreground: oklch(0% 0 0);
+	--destructive: oklch(0.704 0.191 22.216);
+	--border: oklch(0% 0 0 / 15%);
+	--input: oklch(0% 0 0 / 10%);
+	--ring: oklch(0.486 0.247 263.902);
+	--chart-1: oklch(0.488 0.243 264.376);
+	--chart-2: oklch(0.696 0.17 162.48);
+	--chart-3: oklch(0.769 0.188 70.08);
+	--chart-4: oklch(0.627 0.265 303.9);
+	--chart-5: oklch(0.645 0.246 16.439);
+	--sidebar: oklch(98% 0 0);
+	--sidebar-foreground: oklch(0% 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(1 0 0);
+	--sidebar-accent: oklch(0.948 0 0);
+	--sidebar-accent-foreground: oklch(0% 0 0);
+	--sidebar-border: oklch(0% 0 0 / 15%);
+	--sidebar-ring: oklch(0.486 0.247 263.902);
+}
+
 .dark {
-	--background: oklch(0.145 0 0);
+	--background: oklch(26.346% 0.018 262.177); /* match <html> class `bg-base-300` */
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
