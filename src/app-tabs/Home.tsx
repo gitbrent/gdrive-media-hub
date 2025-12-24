@@ -4,7 +4,6 @@ import { getFileAnalysis } from '../api-google/utils/fileAnalysis'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
 import HomeMetrics from './HomeMetrics'
-import '../css/Home.css'
 
 const Home: React.FC = () => {
 	const { mediaFiles, isLoading } = useContext(DataContext)
