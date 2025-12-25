@@ -82,7 +82,7 @@
 	--color-accent: var(--accent);
 	--color-accent-foreground: var(--accent-foreground);
 	--color-destructive: var(--destructive);
-	--color-border: var(--border);
+	--color-border: var(--sidebar-border-color);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
 	--color-chart-1: var(--chart-1);
@@ -116,7 +116,7 @@
 	--accent: oklch(0.948 0 0);
 	--accent-foreground: oklch(0% 0 0);
 	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(0% 0 0 / 15%);
+	--sidebar-border-color: oklch(0% 0 0 / 15%);
 	--input: oklch(0% 0 0 / 10%);
 	--ring: oklch(0.486 0.247 263.902);
 	--chart-1: oklch(0.488 0.243 264.376);
@@ -150,7 +150,7 @@
 	--accent: oklch(0.269 0 0);
 	--accent-foreground: oklch(0.985 0 0);
 	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
+	--sidebar-border-color: oklch(1 0 0 / 10%);
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.556 0 0);
 	--pie-other: rgb(74 85 101); /* `--color-gray-600` */
@@ -175,10 +175,5 @@
   }
   body {
       @apply bg-background text-foreground;
-	  /* fix badge padding issue */
-	  .badge {
-		padding-left: var(--spacing) !important;
-		padding-right: var(--spacing) !important;
-	}
   }
 }
