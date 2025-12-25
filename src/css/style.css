@@ -58,6 +58,7 @@
 /* shadcn charts */
 /* ============================================================================ */
 @theme inline {
+	--spacing: 0.25rem;
 	--radius: 0.5rem;
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
@@ -170,9 +171,14 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-	}
+      @apply border-border outline-ring/50;
+  }
   body {
-    @apply bg-background text-foreground;
+      @apply bg-background text-foreground;
+	  /* fix badge padding issue */
+	  .badge {
+		padding-left: var(--spacing) !important;
+		padding-right: var(--spacing) !important;
 	}
+  }
 }
