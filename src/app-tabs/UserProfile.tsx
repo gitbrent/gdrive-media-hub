@@ -215,7 +215,7 @@ const UserProfile: React.FC = () => {
 						</div>
 						<div className="divider my-0"></div>
 						<div className="card-actions justify-center p-4">
-							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-outline">
+							<a href="https://github.com/brentely/gdrive-media-hub" target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-outline">
 								<i className="bi bi-github"></i>View on GitHub
 							</a>
 						</div>
@@ -244,13 +244,13 @@ const UserProfile: React.FC = () => {
 						</div>
 					</div>
 					<div className="card-body">
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-warning">
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-primary">
 								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Database Name</h6>
-								<p className="font-light text-2xl text-warning truncate" title={dbName}>
+								<p className="font-light text-2xl text-primary truncate" title={dbName}>
 									{dbName}
 								</p>
-								<div className="badge badge-warning mt-2 text-xs">IndexedDB v{CACHE_DBASE_VER}</div>
+								<div className="badge badge-primary mt-2 text-xs">IndexedDB v{CACHE_DBASE_VER}</div>
 							</div>
 							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-info">
 								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Total Files</h6>
@@ -259,10 +259,10 @@ const UserProfile: React.FC = () => {
 									{imageCount} images · {videoCount} videos
 								</div>
 							</div>
-							<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-accent">
-								<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Total Size</h6>
-								<h2 className="font-light text-3xl text-accent mb-2">{formatBytes(analysis.total_size)}</h2>
-								<div className="badge text-xs">
+						<div className="bg-base-300 p-4 rounded-lg text-center border-l-4 border-l-warning">
+							<h6 className="text-xs font-bold text-base-content/60 uppercase mb-2">Total Size</h6>
+							<h2 className="font-light text-3xl text-warning mb-2">{formatBytes(analysis.total_size)}</h2>
+								<div className="badge badge-warning text-xs">
 									Avg: {analysis.total_files ? formatBytes(analysis.total_size / analysis.total_files) : '0 B'}
 								</div>
 							</div>
@@ -271,7 +271,7 @@ const UserProfile: React.FC = () => {
 								<h2 className="font-light text-3xl text-success mb-2">
 									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleDateString() : 'Never'}
 								</h2>
-								<div className="badge text-xs" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : ''}>
+								<div className="badge badge-success text-xs" title={cacheTimestamp ? new Date(cacheTimestamp).toISOString() : ''}>
 									{cacheTimestamp ? new Date(cacheTimestamp).toLocaleTimeString() : 'No cache'}
 								</div>
 							</div>
@@ -281,7 +281,7 @@ const UserProfile: React.FC = () => {
 					<div className="card-actions justify-center gap-2 p-4 flex-wrap">
 						<button
 							type="button"
-							className="btn btn-outline"
+							className="btn btn-info btn-outline"
 							onClick={handleToggleCacheData}
 							disabled={loadingCache}
 						>
@@ -291,7 +291,7 @@ const UserProfile: React.FC = () => {
 						{DEBUG && (
 							<button
 								type="button"
-								className="btn btn-outline"
+								className="btn btn-warning btn-outline"
 								onClick={handleCleanupOldCaches}
 								title="Remove old misnamed cache databases"
 							>
