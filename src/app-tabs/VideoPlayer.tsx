@@ -89,7 +89,7 @@ const VideoPlayer: React.FC = () => {
 
 								{/* Right: Stacked badges */}
 								<div className="grid grid-cols-1 gap-1 sm:grid">
-									<span className='badge badge-soft badge-info'>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}</span>
+									<span className='badge badge-soft badge-info'>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}</span>
 									<span className='badge badge-soft badge-primary'>{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
 								</div>
 							</div>
