@@ -75,6 +75,27 @@ const VideoPlayer: React.FC = () => {
 		return (
 			<div className="mb-6">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
+					{/* NOW PLAYING/METADATA SECTION */}
+					{shfImages.length > 0 && (
+						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+							<div className="grid grid-cols-[1fr_auto] gap-3 items-start p-1">
+								{/* Left: Icon and Title */}
+								<div className="flex items-start gap-2 min-w-0">
+									<i className="bi-info-circle-fill text-xl text-success shrink-0 mt-0.5"></i>
+									<div className="wrap-anywhere opacity-60">
+										{shfImages[currIndex].name}
+									</div>
+								</div>
+
+								{/* Right: Stacked badges */}
+								<div className="grid grid-cols-1 gap-1 sm:grid">
+									<span className='badge badge-soft badge-info'>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}</span>
+									<span className='badge badge-soft badge-primary'>{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{/* NAVIGATION SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
@@ -130,7 +151,7 @@ const VideoPlayer: React.FC = () => {
 					</div>
 
 					{/* SEARCH SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl p-2">
+					<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
 						</label>
@@ -160,27 +181,6 @@ const VideoPlayer: React.FC = () => {
 							}
 						</div>
 					</div>
-
-					{/* METADATA SECTION */}
-					{shfImages.length > 0 && (
-						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
-							<label className="label pb-1">
-								<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Now Playing</span>
-							</label>
-							<div className="text-sm space-y-1">
-								<div className="truncate font-semibold">
-									{shfImages[currIndex].name}
-								</div>
-								<div className="text-xs opacity-70">
-
-								</div>
-								<div className="text-xs opacity-70 hidden sm:block">
-									<span>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}</span>
-									<span>{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
-								</div>
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 		)
@@ -189,7 +189,7 @@ const VideoPlayer: React.FC = () => {
 	return (
 		<section className="h-full flex flex-col">
 			{renderTopCmdBar()}
-			<div className="flex-1 flex items-center justify-center overflow-hidden relative">
+			<div className="flex-1 flex items-center justify-center overflow-hidden relative bg-gray-950">
 				{shfImages.length === 0
 					? <AlertNoImages />
 					: !currentImageUrl
