@@ -261,7 +261,7 @@ const Slideshow: React.FC = () => {
 	return (
 		<section className="h-full flex flex-col">
 			{renderTopBar()}
-			<div className="flex-1 flex items-center justify-center overflow-hidden">
+			<div className="flex-1 flex items-center justify-center overflow-hidden bg-gray-950">
 				{filteredImages.length === 0
 					? <AlertNoImages />
 					: currentImageUrl
