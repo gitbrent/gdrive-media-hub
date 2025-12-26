@@ -2,7 +2,7 @@
  * APP
  * @see [SampleImages](https://unsample.net/)
  */
-export const APP_BLD = '20251225-1914'
+export const APP_BLD = '20251226-1425'
 export const APP_VER = '1.6.0'
 
 /** Debug mode - shows development-only UI/features */
