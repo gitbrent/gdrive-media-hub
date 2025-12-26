@@ -19,6 +19,7 @@ const Slideshow: React.FC = () => {
 	const [optSlideshowSecs, setOptSlideshowSecs] = useState(SlideShowDelay.Normal)
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isPaused, setIsPaused] = useState(true)
+	const [isFullSize, setIsFullSize] = useState(true)
 	//
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
@@ -153,7 +154,7 @@ const Slideshow: React.FC = () => {
 
 	function renderTopBar(): JSX.Element {
 		return (
-			<div className="mb-6">
+			<div className="mb-4">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
 					{/* NOW PLAYING/METADATA SECTION */}
 					{filteredImages.length > 0 && (
@@ -169,8 +170,8 @@ const Slideshow: React.FC = () => {
 
 								{/* Right: Stacked badges */}
 								<div className="grid grid-cols-1 gap-1 sm:grid">
-									<span className='badge badge-soft badge-info'>{new Date(filteredImages[currIndex].modifiedByMeTime).toLocaleString()}</span>
-									<span className='badge badge-soft badge-primary'>{parseFloat((Number(filteredImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
+									<span className='badge badge-soft badge-info'>{new Date(filteredImages[currIndex].modifiedByMeTime).toLocaleDateString()}</span>
+									<span className='badge badge-soft badge-primary w-full'>{parseFloat((Number(filteredImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
 								</div>
 							</div>
 						</div>
@@ -179,39 +180,66 @@ const Slideshow: React.FC = () => {
 					{/* PLAY/PAUSE SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
-							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Control</span>
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Controls</span>
 						</label>
 						<div className="join w-full">
 							<button
 								type="button"
-								className="btn btn-sm flex-1 btn-primary"
+								className="btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 btn-primary"
 								onClick={() => { setIsPaused(!isPaused) }}
 								title="play/pause (space)">
 								<i className={`bi ${isPaused ? 'bi-play' : 'bi-pause'}`} />
-								<span className="hidden lg:inline">
+								<span className="hidden lg:block text-xs">
 									{isPaused
 										? 'Play'
-										: `Pause (${remainingSecs}s)`
+										: `(${remainingSecs}s)`
 									}
 								</span>
 							</button>
 							<button
 								type="button"
-								className="btn btn-sm btn-ghost"
+								className="btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 btn-ghost"
 								disabled={usedIndices.length <= 1}
 								onClick={goToPrevSlide}
 								title="prev (left-arrow)">
 								<i className="bi-chevron-left" />
-								<span className="hidden lg:inline">Prev</span>
+								<span className="hidden lg:block text-xs">Prev</span>
 							</button>
 							<button
 								type="button"
-								className="btn btn-sm btn-ghost"
+								className="btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 btn-ghost"
 								disabled={filteredImages.length === 0}
 								onClick={goToNextSlide}
 								title="next (right-arrow)">
-								<span className="hidden lg:inline">Next</span>
 								<i className="bi-chevron-right" />
+								<span className="hidden lg:block text-xs">Next</span>
+							</button>
+						</div>
+					</div>
+
+					{/* DISPLAY SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Display</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 ${!isFullSize ? 'btn-primary' : 'btn-ghost'}`}
+								disabled={filteredImages.length === 0}
+								onClick={() => setIsFullSize(false)}
+								title="Normal size">
+								<i className="bi-fullscreen" />
+								<span className="hidden lg:block text-xs">Normal</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 ${isFullSize ? 'btn-primary' : 'btn-ghost'}`}
+								disabled={filteredImages.length === 0}
+								onClick={() => setIsFullSize(true)}
+								title="Full size">
+								<i className="bi-fullscreen-exit" />
+								<span className="hidden lg:block text-xs">Full</span>
 							</button>
 						</div>
 					</div>
@@ -221,16 +249,32 @@ const Slideshow: React.FC = () => {
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Delay</span>
 						</label>
-						<select
-							className="select select-sm select-bordered w-full"
-							value={optSlideshowSecs}
-							onChange={(e) => setOptSlideshowSecs(Number(e.target.value) as SlideShowDelay)}>
-							{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
-								<option key={key + value} value={value}>
-									{value} seconds ({key})
-								</option>
-							))}
-						</select>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 ${optSlideshowSecs === SlideShowDelay.Fast ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setOptSlideshowSecs(SlideShowDelay.Fast)}
+								title="Fast (2s)">
+								<i className="bi-lightning" />
+								<span className="hidden lg:block text-xs">Fast</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 ${optSlideshowSecs === SlideShowDelay.Normal ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setOptSlideshowSecs(SlideShowDelay.Normal)}
+								title="Normal (5s)">
+								<i className="bi-circle" />
+								<span className="hidden lg:block text-xs">Normal</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 flex flex-col items-center justify-center gap-0 ${optSlideshowSecs === SlideShowDelay.Slow ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setOptSlideshowSecs(SlideShowDelay.Slow)}
+								title="Slow (10s)">
+								<i className="bi-hourglass-bottom" />
+								<span className="hidden lg:block text-xs">Slow</span>
+							</button>
+						</div>
 					</div>
 
 					{/* SEARCH SECTION */}
@@ -276,7 +320,7 @@ const Slideshow: React.FC = () => {
 				{filteredImages.length === 0
 					? <AlertNoImages />
 					: currentImageUrl
-						? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className="max-h-full max-w-full object-contain" />
+						? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'} />
 						: <i title={filteredImages[currIndex]?.name} className="text-5xl bi-arrow-repeat animate-spin" />
 				}
 			</div>
