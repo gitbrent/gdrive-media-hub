@@ -155,6 +155,27 @@ const Slideshow: React.FC = () => {
 		return (
 			<div className="mb-6">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
+					{/* NOW PLAYING/METADATA SECTION */}
+					{filteredImages.length > 0 && (
+						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+							<div className="grid grid-cols-[1fr_auto] gap-3 items-start p-1">
+								{/* Left: Icon and Title */}
+								<div className="flex items-start gap-2 min-w-0 py-1">
+									<i className="bi-image text-xl text-info shrink-0 mt-0.5"></i>
+									<div className="wrap-anywhere line-clamp-2 opacity-60">
+										{filteredImages[currIndex].name}
+									</div>
+								</div>
+
+								{/* Right: Stacked badges */}
+								<div className="grid grid-cols-1 gap-1 sm:grid">
+									<span className='badge badge-soft badge-info'>{new Date(filteredImages[currIndex].modifiedByMeTime).toLocaleString()}</span>
+									<span className='badge badge-soft badge-primary'>{parseFloat((Number(filteredImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{/* PLAY/PAUSE SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
@@ -200,30 +221,20 @@ const Slideshow: React.FC = () => {
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Delay</span>
 						</label>
-						<div className="dropdown w-full">
-							<button
-								type="button"
-								className="btn btn-sm btn-ghost w-full"
-								tabIndex={0}>
-								<span className="hidden lg:inline">Delay:&nbsp;</span>{optSlideshowSecs}<span className="hidden lg:inline">&nbsp;sec</span>
-								<i className="bi-chevron-down" />
-							</button>
-							<ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow">
-								{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
-									<li key={key + value}>
-										<button
-											className={optSlideshowSecs === value ? 'active' : ''}
-											onClick={() => setOptSlideshowSecs(value as SlideShowDelay)}>
-											{value} seconds ({key})
-										</button>
-									</li>
-								))}
-							</ul>
-						</div>
+						<select
+							className="select select-sm select-bordered w-full"
+							value={optSlideshowSecs}
+							onChange={(e) => setOptSlideshowSecs(Number(e.target.value) as SlideShowDelay)}>
+							{Object.entries(SlideShowDelay).filter(([key]) => isNaN(Number(key))).map(([key, value]) => (
+								<option key={key + value} value={value}>
+									{value} seconds ({key})
+								</option>
+							))}
+						</select>
 					</div>
 
 					{/* SEARCH SECTION */}
-					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
+					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
 						</label>
