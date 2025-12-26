@@ -217,7 +217,6 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 																y={viewBox.cy}
 																textAnchor="middle"
 																dominantBaseline="central"
-																dy="0.75em" // IMPORTANT: use `dy` to properly adjust vertical alignment
 															>
 																<tspan
 																	x={viewBox.cx}
