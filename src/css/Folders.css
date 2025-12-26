@@ -19,7 +19,7 @@
 .folders-main-title {
 	font-size: 3rem;
 	font-weight: 800;
-	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -31,7 +31,7 @@
 }
 
 .folders-main-title i {
-	background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+	background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;

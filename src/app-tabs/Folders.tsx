@@ -11,7 +11,7 @@ interface FolderNode {
 	parentIds: string[]
 	childFolderIds: string[] // Direct children folder IDs
 	mediaFiles: IMediaFile[]
-	gradient: string
+	gradientClass: string
 	dateRange: string
 	totalSize: number
 	formattedSize: string
@@ -57,7 +57,7 @@ const Folders: React.FC = () => {
 			parentIds: [],
 			childFolderIds: [],
 			mediaFiles: [],
-			gradient: '',
+			gradientClass: '',
 			dateRange: '',
 			totalSize: 0,
 			formattedSize: '',
@@ -74,7 +74,7 @@ const Folders: React.FC = () => {
 					parentIds: folder.parents || [],
 					childFolderIds: [],
 					mediaFiles: [],
-					gradient: '',
+					gradientClass: '',
 					dateRange: '',
 					totalSize: 0,
 					formattedSize: '',
@@ -96,7 +96,7 @@ const Folders: React.FC = () => {
 						parentIds: [],
 						childFolderIds: [],
 						mediaFiles: [],
-						gradient: '',
+						gradientClass: '',
 						dateRange: '',
 						totalSize: 0,
 						formattedSize: '',
@@ -122,7 +122,7 @@ const Folders: React.FC = () => {
 						parentIds: [file.parents[0]],
 						childFolderIds: [],
 						mediaFiles: [],
-						gradient: '',
+						gradientClass: '',
 						dateRange: '',
 						totalSize: 0,
 						formattedSize: '',
@@ -149,21 +149,21 @@ const Folders: React.FC = () => {
 		})
 
 		// Calculate metadata for each folder
-		const gradients = [
-			'var(--gradient-purple)',
-			'var(--gradient-blue)',
-			'var(--gradient-green)',
-			'var(--gradient-pink)',
-			'var(--gradient-orange)',
-			'var(--gradient-teal)',
-			'var(--gradient-violet)',
-			'var(--gradient-red)',
-			'var(--gradient-sky)',
+		const gradientClasses = [
+			'bg-gradient-to-br from-violet-600 to-violet-800',
+			'bg-gradient-to-br from-blue-600 to-blue-800',
+			'bg-gradient-to-br from-emerald-600 to-emerald-800',
+			'bg-gradient-to-br from-pink-600 to-pink-800',
+			'bg-gradient-to-br from-orange-600 to-orange-800',
+			'bg-gradient-to-br from-cyan-600 to-cyan-800',
+			'bg-gradient-to-br from-indigo-600 to-indigo-800',
+			'bg-gradient-to-br from-red-600 to-red-800',
+			'bg-gradient-to-br from-sky-600 to-sky-800',
 		]
 
 		let index = 0
 		map.forEach((folder) => {
-			folder.gradient = gradients[index % gradients.length]
+			folder.gradientClass = gradientClasses[index % gradientClasses.length]
 			folder.formattedSize = formatBytes(folder.totalSize)
 
 			// Calculate date range from media files
@@ -312,9 +312,8 @@ const Folders: React.FC = () => {
 					{currentLevelFolders.map((folder, index) => (
 						<div
 							key={folder.id}
-							className={`folder-card ${getCardSize(folder.mediaFiles.length)}`}
+							className={`folder-card ${getCardSize(folder.mediaFiles.length)} ${folder.gradientClass}`}
 							style={{
-								background: folder.gradient,
 								animationDelay: getAnimationDelay(index)
 							}}
 							onClick={() => handleFolderClick(folder)}
@@ -322,15 +321,11 @@ const Folders: React.FC = () => {
 							<div className="folder-card-content">
 								<div className="folder-header-row">
 									<div className="folder-icon">
-										<i className="bi bi-folder2"></i>
+										{folder.mediaFiles.length}
 									</div>
 									<h3 className="folder-name">{folder.name}</h3>
 								</div>
 								<div className="folder-stats">
-									<div className="stat-row">
-										<i className="bi bi-files"></i>
-										<span>{folder.mediaFiles.length} files</span>
-									</div>
 									<div className="stat-row">
 										<i className="bi bi-calendar-range"></i>
 										<span>{folder.dateRange}</span>
