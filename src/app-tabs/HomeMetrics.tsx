@@ -132,7 +132,10 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 									animationDuration={1000 + index * 200}
 								/>
 							))}
-							<ChartLegend content={<ChartLegendContent />} />
+							<ChartLegend
+								content={<ChartLegendContent />}
+								wrapperStyle={{ fontSize: '16px', color: 'var(--color-gray-300)', bottom: 0 }}
+							/>
 						</AreaChart>
 					</ChartContainer>
 				</div>
@@ -213,7 +216,8 @@ const HomeMetrics: React.FC<HomeMetricsProps> = ({ analysis }) => {
 																x={viewBox.cx}
 																y={viewBox.cy}
 																textAnchor="middle"
-																dominantBaseline="middle"
+																dominantBaseline="central"
+																dy="0.75em" // IMPORTANT: use `dy` to properly adjust vertical alignment
 															>
 																<tspan
 																	x={viewBox.cx}
