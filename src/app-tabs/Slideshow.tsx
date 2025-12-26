@@ -259,17 +259,15 @@ const Slideshow: React.FC = () => {
 	}
 
 	return (
-		<section>
+		<section className="h-full flex flex-col">
 			{renderTopBar()}
-			<div className="flex flex-col items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 56px - 64px - 35px - 20px)' }}>
-				<div className="grow flex items-center justify-center w-full overflow-hidden">
-					{filteredImages.length === 0
-						? <AlertNoImages />
-						: currentImageUrl
-							? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className="h-full w-full object-contain" />
-							: <i title={filteredImages[currIndex]?.name} className="text-5xl bi-arrow-repeat animate-spin" />
-					}
-				</div>
+			<div className="flex-1 flex items-center justify-center overflow-hidden">
+				{filteredImages.length === 0
+					? <AlertNoImages />
+					: currentImageUrl
+						? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className="max-h-full max-w-full object-contain" />
+						: <i title={filteredImages[currIndex]?.name} className="text-5xl bi-arrow-repeat animate-spin" />
+				}
 			</div>
 		</section>
 	)

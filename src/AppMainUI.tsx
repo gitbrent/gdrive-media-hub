@@ -186,13 +186,13 @@ export default function AppMainUI() {
 	}
 
 	return (
-		<section>
+		<section className="flex flex-col h-screen overflow-hidden">
 			{!isSignedIn ?
 				renderLogin()
 				:
 				<>
 					{renderTopBar()}
-					<main className="p-4 md:p-6">
+					<main className="flex-1 overflow-y-auto p-4 md:p-6">
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/collections" element={<Collections />} />
