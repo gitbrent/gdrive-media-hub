@@ -82,7 +82,7 @@ const VideoPlayer: React.FC = () => {
 								{/* Left: Icon and Title */}
 								<div className="flex items-start gap-2 min-w-0">
 									<i className="bi-info-circle-fill text-xl text-success shrink-0 mt-0.5"></i>
-									<div className="wrap-anywhere opacity-60">
+									<div className="wrap-anywhere line-clamp-2 opacity-60">
 										{shfImages[currIndex].name}
 									</div>
 								</div>
