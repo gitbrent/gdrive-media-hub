@@ -15,6 +15,7 @@ const VideoPlayer: React.FC = () => {
 	const [currentImageUrl, setCurrentImageUrl] = useState('')
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isFullSize, setIsFullSize] = useState(true)
+	const [showCaptions, setShowCaptions] = useState(false)
 
 	/**
 	 * filter videos from all files and shuffle at startup
@@ -148,6 +149,21 @@ const VideoPlayer: React.FC = () => {
 								<span className="hidden lg:inline">Full</span>
 							</button>
 						</div>
+					</div>
+
+					{/* CAPTIONS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1 block">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
+						</label>
+						<button
+							type="button"
+							className={`btn btn-sm w-full ${showCaptions ? 'btn-primary' : 'btn-ghost'}`}
+							onClick={() => setShowCaptions(!showCaptions)}
+							title="Toggle captions">
+							<i className="bi-chat-left-text text-lg" />
+							<span className="hidden lg:inline">{showCaptions ? 'On' : 'Off'}</span>
+						</button>
 					</div>
 
 					{/* SEARCH SECTION */}

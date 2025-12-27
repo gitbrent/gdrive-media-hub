@@ -20,6 +20,8 @@ export default function ImageGrid() {
 	const [optSchWord, setOptSchWord] = useState('')
 	const [tileSize, setTileSize] = useState<TileSize>('medium')
 	const [isSearching, setIsSearching] = useState(false)
+	const [showCaptions, setShowCaptions] = useState(false)
+	const [showSearch, setShowSearch] = useState(false)
 	const { mediaFiles } = useContext(DataContext)
 	const location = useLocation()
 
@@ -199,40 +201,71 @@ export default function ImageGrid() {
 						</div>
 					</div>
 
-					{/* SEARCH SECTION */}
-					<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+					{/* CAPTIONS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1 block">
-							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
 						</label>
-						<div className={`input input-sm input-bordered flex items-center gap-2 transition-all ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
-							<i className="bi-search opacity-50"></i>
-							<input
-								type="search"
-								className="grow bg-transparent outline-none"
-								placeholder="Search files..."
-								value={optSchWord}
-								onChange={(ev) => setOptSchWord(ev.currentTarget.value)}
-							/>
+						<button
+							type="button"
+							className={`btn btn-sm w-full ${showCaptions ? 'btn-primary' : 'btn-ghost'}`}
+							onClick={() => setShowCaptions(!showCaptions)}
+							title="Toggle captions">
+							<i className="bi-chat-left-text text-lg" />
+							<span className="hidden lg:inline">{showCaptions ? 'On' : 'Off'}</span>
+						</button>
+					</div>
+
+					{/* SEARCH & RESULTS SECTION */}
+					<div className="w-full sm:flex-1 flex items-stretch gap-2 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<div className="flex-1 flex flex-col justify-center">
+							{showSearch && (
+								<label className="label pb-1 block">
+									<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
+								</label>
+							)}
+							{showSearch && (
+								<div className={`input input-sm input-bordered flex items-center gap-2 transition-all ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
+									<i className="bi-search opacity-50"></i>
+									<input
+										type="search"
+										className="grow bg-transparent outline-none"
+										placeholder="Search files..."
+										value={optSchWord}
+										onChange={(ev) => setOptSchWord(ev.currentTarget.value)}
+										autoFocus
+									/>
+								</div>
+							)}
+						</div>
+
+						{/* Search Toggle Button */}
+						<button
+							type="button"
+							className={`btn btn-sm ${showSearch ? 'btn-primary' : 'btn-ghost'}`}
+							onClick={() => setShowSearch(!showSearch)}
+							title="Toggle search">
+							<i className="bi-search text-lg" />
+						</button>
+
+						{/* Results Info */}
+						<div className="flex items-center px-3 py-2 bg-base-200 rounded-lg text-sm font-semibold whitespace-nowrap">
+							{filtdSortdFiles.length === 0 ? (
+								<span className="text-base-content/60">No results</span>
+							) : isSearchActive ? (
+								<>
+									<span className="text-primary font-bold">{filtdSortdFiles.length}</span>
+									<span className="text-base-content/60 ml-1">of {mediaFiles.length}</span>
+								</>
+							) : (
+								<>
+									<span className="text-primary font-bold">{filtdSortdFiles.length}</span>
+									<span className="text-base-content/60 ml-1">files</span>
+								</>
+							)}
 						</div>
 					</div>
 				</div>
-
-				{/* STATS SECTION
-				// FIXME: wraps no matter what, so hiding for now
-				<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
-					<label className="label pb-1">
-						<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Results</span>
-					</label>
-					<div className="text-sm font-semibold items-center justify-center h-9">
-						{filtdSortdFiles.length === 0
-							? (<span className="text-base-content/60">No results</span>)
-							: isSearchActive
-								? (<span><span className="text-primary font-bold">{filtdSortdFiles.length}</span><span className="text-base-content/60"> of {mediaFiles.length}</span></span>)
-								: (<span><span className="text-primary font-bold">{filtdSortdFiles.length}</span><span className="text-base-content/60"> files</span></span>)
-						}
-					</div>
-				</div>
-				*/}
 			</div>
 		)
 	}
@@ -246,6 +279,7 @@ export default function ImageGrid() {
 					isFolderLoading={isSearching}
 					handleFolderClick={() => Promise.resolve()}
 					tileSize={tileSize}
+					showCaptions={showCaptions}
 				/>
 				: filtdSortdFiles.length > 0 ? (
 					<AlertLoading />

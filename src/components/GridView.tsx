@@ -16,10 +16,11 @@ interface Props {
 	isFolderLoading: boolean
 	handleFolderClick: (folderId: string, folderName: string) => Promise<void>
 	tileSize?: 'small' | 'medium' | 'large'
+	showCaptions?: boolean
 }
 
-const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick, tileSize = 'medium' }) => {
-	const SHOW_CAPTIONS = false // TODO: Implement as a prop
+const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handleFolderClick, tileSize = 'medium', showCaptions = false }) => {
+	const SHOW_CAPTIONS = showCaptions
 	//
 	const { getBlobUrlForFile } = useContext(DataContext)
 	//
@@ -235,9 +236,11 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 						<div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center z-10">
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
-						<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
-							<div className="text-white opacity-75" title={item.name}>{item.name}</div>
-						</div>
+						{SHOW_CAPTIONS && (
+							<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
+								<div className="text-white opacity-75" title={item.name}>{item.name}</div>
+							</div>
+						)}
 					</figure>
 				)
 			}
@@ -260,9 +263,11 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 						<div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center z-10">
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
-						<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
-							<div className="text-white opacity-75" title={item.name}>{item.name}</div>
-						</div>
+						{SHOW_CAPTIONS && (
+							<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
+								<div className="text-white opacity-75" title={item.name}>{item.name}</div>
+							</div>
+						)}
 					</figure>
 				)
 			}

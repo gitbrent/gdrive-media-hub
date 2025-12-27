@@ -44,6 +44,7 @@ const FileBrowser: React.FC = () => {
 	const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
 	const [mediaTypeFilter, setMediaTypeFilter] = useState<MediaType>('all')
 	const [tileSize, setTileSize] = useState<TileSize>('medium')
+	const [showCaptions, setShowCaptions] = useState(false)
 
 	// Calculate analysis based on current folder contents
 	const analysis = useFileAnalysis(currFolderContents)
@@ -375,6 +376,23 @@ const FileBrowser: React.FC = () => {
 						</div>
 					)}
 
+					{/* CAPTIONS SECTION - Show only in grid mode */}
+					{viewMode === 'grid' && (
+						<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+							<label className="label pb-1 block">
+								<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
+							</label>
+							<button
+								type="button"
+								className={`btn btn-sm w-full ${showCaptions ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setShowCaptions(!showCaptions)}
+								title="Toggle captions">
+								<i className="bi-chat-left-text text-lg" />
+								<span className="hidden lg:inline">{showCaptions ? 'On' : 'Off'}</span>
+							</button>
+						</div>
+					)}
+
 					{/* FILTER SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
@@ -530,6 +548,7 @@ const FileBrowser: React.FC = () => {
 							isFolderLoading={isFolderLoading}
 							handleFolderClick={handleFolderClick}
 							tileSize={tileSize}
+							showCaptions={showCaptions}
 						/>
 					</section>
 					: <FileBrowViewList
