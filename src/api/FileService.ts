@@ -58,7 +58,7 @@ export const fetchDriveFilesAll = async (lastLoadDate?: string): Promise<IGapiFi
 
 		const response = await gapi.client.drive.files.list({
 			q: query,
-			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime)',
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, thumbnailLink)',
 			//orderBy: 'modifiedByMeTime desc',
 			pageSize: PAGE_SIZE,
 			pageToken: pageToken,

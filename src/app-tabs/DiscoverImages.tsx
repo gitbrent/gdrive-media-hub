@@ -281,9 +281,9 @@ const DiscoverImages: React.FC = () => {
 								}
                         `}
 						>
-							{(isImage(item) || isGif(item)) && item.original ? (
+							{(isImage(item) || isGif(item)) && (item.original || 'thumbnailLink' in item && item.thumbnailLink) ? (
 								<img
-									src={item.original}
+									src={item.original || ('thumbnailLink' in item ? item.thumbnailLink : '')}
 									alt={item.name}
 									className="w-full h-full object-cover"
 									loading="lazy" // Good for performance in lists

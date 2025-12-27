@@ -60,9 +60,7 @@ export const listFiles = async (): Promise<gapi.client.drive.File[]> => {
 		while (true) {
 			const response = await gapi.client.drive.files.list({
 				q: "trashed=false and (mimeType contains 'image/' or mimeType contains 'video/')",
-				fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime)',
-				pageSize: PAGE_SIZE,
-				...(pageToken && { pageToken }),
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, thumbnailLink)',
 			})
 
 			files = files.concat(response.result.files || [])
@@ -164,7 +162,7 @@ export const fetchFolderContents = async (folderId: string): Promise<IDirectory>
 	try {
 		const response = await gapi.client.drive.files.list({
 			q: `'${folderId}' in parents and trashed=false and (mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'image/' or mimeType contains 'video/')`,
-			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, webContentLink)',
+			fields: 'nextPageToken, files(id, name, mimeType, parents, size, createdTime, modifiedByMeTime, webContentLink, thumbnailLink)',
 			pageSize: 1000,
 		})
 

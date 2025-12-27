@@ -36,6 +36,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 					...file,
 					// Initialize or map any additional properties specific to IMediaFile
 					original: '', // *REQUIRED* to hold image blob later
+					thumbnail: (file as any).thumbnailLink || undefined, // Map Google Drive thumbnailLink to thumbnail
 				})) as IMediaFile[];
 			setMediaFiles(mediaFiles);
 			const profile = getCurrentUserProfile();
@@ -86,7 +87,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 	}
 
 	/**
-	 * Retrieves the blob URL for a file, fetching it if not cached.
+	 * Retrieves the blob URL for a file, always fetching full media.
 	 * @param fileId The ID of the file.
 	 * @returns The blob URL as a string, or null if an error occurs.
 	 */
@@ -94,17 +95,18 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 		if (blobUrlCache[fileId]) {
 			// Return the cached blob URL
 			return blobUrlCache[fileId];
+		}
+
+		// Always fetch the full media file
+		const response = await fetchFileImgBlob(fileId);
+		if (response) {
+			const blob = await response.blob();
+			const blobUrl = URL.createObjectURL(blob);
+			// Update the cache
+			setBlobUrlCache((prevCache) => ({ ...prevCache, [fileId]: blobUrl }));
+			return blobUrl;
 		} else {
-			const response = await fetchFileImgBlob(fileId);
-			if (response) {
-				const blob = await response.blob();
-				const blobUrl = URL.createObjectURL(blob);
-				// Update the cache
-				setBlobUrlCache((prevCache) => ({ ...prevCache, [fileId]: blobUrl }));
-				return blobUrl;
-			} else {
-				return null;
-			}
+			return null;
 		}
 	}
 

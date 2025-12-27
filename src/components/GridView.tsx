@@ -99,29 +99,24 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 			const blobFetchPromises: Promise<any>[] = []
 
 			updatedItems.forEach((item) => {
-				// NOTE: only download images
+				// NOTE: only preload full images (not videos or thumbnails)
 				if ((isImage(item) || isGif(item)) && 'original' in item && !item.original && !item.blobUrlError && !loadingRef.current.has(item.id)) {
 					log(2, `[loadBlobs] fetch file.id "${item.id}"`)
 					loadingRef.current.add(item.id)
 
 					const fetchPromise = getBlobUrlForFile(item.id).then(original => {
 						if (original) {
-							if (isImage(item) || isGif(item)) {
-								return loadImage(original).then(({ width, height }) => {
-									item.original = original
-									item.width = width
-									item.height = height
-									item.blobUrlError = ''
-									itemsUpdated = true
-								}).catch(() => {
-									console.error('Error loading image')
-									item.blobUrlError = 'Error loading image'
-									itemsUpdated = true
-								})
-							} else if (isVideo(item)) {
+							return loadImage(original).then(({ width, height }) => {
 								item.original = original
+								item.width = width
+								item.height = height
+								item.blobUrlError = ''
 								itemsUpdated = true
-							}
+							}).catch(() => {
+								console.error('Error loading image')
+								item.blobUrlError = 'Error loading image'
+								itemsUpdated = true
+							})
 						} else {
 							item.blobUrlError = 'Blob URL not found'
 							itemsUpdated = true
@@ -137,8 +132,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					blobFetchPromises.push(fetchPromise)
 				}
 			})
-
-			await Promise.all(blobFetchPromises)
 
 			if (itemsUpdated) {
 				setDisplayedItems(updatedItems)
@@ -242,7 +235,32 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				)
 			}
 
-			// Using daisyUI stat class for clean, informative tile
+			// If thumbnail is available, show it as a placeholder
+			if ('thumbnail' in item && item.thumbnail) {
+				return (
+					<figure
+						key={`${index}${item.id}`}
+						title={itemTitle}
+						onClick={() => setSelectedFile(item)}
+						className="flex flex-col items-center justify-center bg-base-900 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden rounded-lg group relative"
+					>
+						<img
+							src={item.thumbnail}
+							className="absolute inset-0 w-full h-full object-cover"
+							onError={(e) => console.error('Error loading thumbnail:', e)}
+							alt={item.name}
+						/>
+						<div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center z-10">
+							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
+						</div>
+						<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
+							<div className="text-white opacity-75" title={item.name}>{item.name}</div>
+						</div>
+					</figure>
+				)
+			}
+
+			// Using daisyUI stat class for clean, informative tile (fallback if no thumbnail)
 			return (
 				<figure
 					key={`${index}${item.id}`}
