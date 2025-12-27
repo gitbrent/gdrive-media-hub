@@ -189,7 +189,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	// --------------------------------------------------------------------------------------------
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
-		const figCaption = SHOW_CAPTIONS ? <CaptionGrid title={item.name} /> : <span />
+		const figCaption = SHOW_CAPTIONS ? <CaptionGrid title={item.name} size={tileSize} /> : <span />
 		const itemWithLineage = item as ItemWithLineage
 		const itemTitle = itemWithLineage._lineagePath ? `${itemWithLineage._lineagePath}\n${item.name}` : item.name
 
@@ -236,7 +236,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-							<CaptionGrid title={item.name} size="small" />
+							<CaptionGrid title={item.name} size={tileSize} />
 						)}
 					</figure>
 				)
@@ -261,7 +261,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-							<CaptionGrid title={item.name} size="small" />
+							<CaptionGrid title={item.name} size={tileSize} />
 						)}
 					</figure>
 				)
@@ -278,7 +278,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 					<div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
 						<i className="bi-play-circle text-white text-4xl opacity-80" />
 					</div>
-					<CaptionGrid title={item.name} size="small" />
+					<CaptionGrid title={item.name} size={tileSize} />
 				</figure>
 			)
 		} else if (isImage(item) || isGif(item)) {

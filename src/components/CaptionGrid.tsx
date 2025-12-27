@@ -6,18 +6,19 @@ import React from 'react'
  */
 interface CaptionGridProps {
 	title: string
-	size?: 'small' | 'medium'
+	size?: 'small' | 'medium' | 'large'
 }
 
 const CaptionGrid: React.FC<CaptionGridProps> = ({
 	title,
 	size = 'medium',
 }) => {
+	const textSizeClass = size === 'small' ? 'text-xs' : size === 'large' ? 'text-base' : 'text-sm'
 	return (
 		<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/90 via-black/70 to-transparent p-3 z-20">
 			<div className="flex-1 min-w-0">
 				<div
-					className={`text-white font-medium line-clamp-2 ${size === 'small' ? 'text-xs' : 'text-sm'}`}
+					className={`text-white font-medium line-clamp-2 ${textSizeClass}`}
 					title={title}>
 					{title}
 				</div>
