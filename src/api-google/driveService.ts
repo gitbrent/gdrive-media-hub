@@ -173,7 +173,11 @@ export const fetchFolderContents = async (folderId: string): Promise<IDirectory>
 			if (file.mimeType === 'application/vnd.google-apps.folder') {
 				folders.push(file as IGapiFolder)
 			} else {
-				files.push({ ...file, original: '' } as IMediaFile)
+				files.push({
+					...file,
+					original: '',
+					thumbnail: (file as any).thumbnailLink || undefined, // Map Google Drive thumbnailLink to thumbnail
+				} as IMediaFile)
 			}
 		})
 
