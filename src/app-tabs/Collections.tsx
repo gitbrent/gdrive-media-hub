@@ -9,12 +9,12 @@ interface CollectionGroup {
 	prefix: string
 	count: number
 	files: IMediaFile[]
-	gradient: string
+	gradientClass: string
+	videoCount: number
 	dateRange: string
 	avgSize: string
 	totalSize: number
 	imageCount: number
-	videoCount: number
 }
 
 const Collections: React.FC = () => {
@@ -71,16 +71,16 @@ const Collections: React.FC = () => {
 		})
 
 		// Convert to array and filter by minimum count
-		const gradients = [
-			'var(--gradient-purple)',
-			'var(--gradient-blue)',
-			'var(--gradient-green)',
-			'var(--gradient-pink)',
-			'var(--gradient-orange)',
-			'var(--gradient-teal)',
-			'var(--gradient-violet)',
-			'var(--gradient-red)',
-			'var(--gradient-sky)',
+		const gradientClasses = [
+			'bg-gradient-to-br from-violet-600 to-violet-800',
+			'bg-gradient-to-br from-blue-600 to-blue-800',
+			'bg-gradient-to-br from-emerald-600 to-emerald-800',
+			'bg-gradient-to-br from-pink-600 to-pink-800',
+			'bg-gradient-to-br from-orange-600 to-orange-800',
+			'bg-gradient-to-br from-cyan-600 to-cyan-800',
+			'bg-gradient-to-br from-indigo-600 to-indigo-800',
+			'bg-gradient-to-br from-red-600 to-red-800',
+			'bg-gradient-to-br from-sky-600 to-sky-800',
 		]
 
 		const result: CollectionGroup[] = Array.from(prefixMap.entries())
@@ -91,7 +91,7 @@ const Collections: React.FC = () => {
 					prefix: prefix.charAt(0).toUpperCase() + prefix.slice(1),
 					count: files.length,
 					files,
-					gradient: gradients[index % gradients.length],
+					gradientClass: gradientClasses[index % gradientClasses.length],
 					...metadata
 				}
 			})
@@ -217,9 +217,8 @@ const Collections: React.FC = () => {
 					{filteredCollections.map((collection, index) => (
 						<div
 							key={collection.prefix}
-							className={`collection-card ${getCardSize(collection.count)}`}
+							className={`collection-card ${getCardSize(collection.count)} ${collection.gradientClass}`}
 							style={{
-								background: collection.gradient,
 								animationDelay: getAnimationDelay(index)
 							}}
 							onClick={() => handleCollectionClick(collection)}

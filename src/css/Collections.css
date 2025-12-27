@@ -19,7 +19,7 @@
 .collections-main-title {
 	font-size: 3rem;
 	font-weight: 800;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -31,7 +31,7 @@
 }
 
 .collections-main-title i {
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
@@ -131,17 +131,17 @@
 }
 
 .stat-icon.purple {
-	background: var(--gradient-purple);
+	background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
 	box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
 }
 
 .stat-icon.blue {
-	background: var(--gradient-blue);
+	background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
 	box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .stat-icon.green {
-	background: var(--gradient-green);
+	background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
 	box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 

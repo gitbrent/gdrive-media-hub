@@ -14,6 +14,7 @@ const VideoPlayer: React.FC = () => {
 	const [usedIndexes, setUsedIndexes] = useState<number[]>([])
 	const [currentImageUrl, setCurrentImageUrl] = useState('')
 	const [optSchWord, setOptSchWord] = useState('')
+	const [isFullSize, setIsFullSize] = useState(true)
 
 	/**
 	 * filter videos from all files and shuffle at startup
@@ -70,10 +71,31 @@ const VideoPlayer: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
-	function renderTopBar(): JSX.Element {
+	function renderTopCmdBar(): JSX.Element {
 		return (
 			<div className="mb-6">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
+					{/* NOW PLAYING/METADATA SECTION */}
+					{shfImages.length > 0 && (
+						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+							<div className="grid grid-cols-[1fr_auto] gap-3 items-start p-1">
+								{/* Left: Icon and Title */}
+								<div className="flex items-start gap-2 min-w-0">
+									<i className="bi-info-circle-fill text-xl text-success shrink-0 mt-0.5"></i>
+									<div className="wrap-anywhere line-clamp-2 opacity-60">
+										{shfImages[currIndex].name}
+									</div>
+								</div>
+
+								{/* Right: Stacked badges */}
+								<div className="grid grid-cols-1 gap-1 sm:grid">
+									<span className='badge badge-soft badge-info'>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}</span>
+									<span className='badge badge-soft badge-primary'>{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
+								</div>
+							</div>
+						</div>
+					)}
+
 					{/* NAVIGATION SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
@@ -101,8 +123,35 @@ const VideoPlayer: React.FC = () => {
 						</div>
 					</div>
 
+					{/* DISPLAY SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Display</span>
+						</label>
+						<div className="join w-full">
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${!isFullSize ? 'btn-primary' : 'btn-ghost'}`}
+								disabled={shfImages.length === 0}
+								onClick={() => setIsFullSize(false)}
+								title="Normal size">
+								<i className="bi-fullscreen" />
+								<span className="hidden lg:inline">Normal</span>
+							</button>
+							<button
+								type="button"
+								className={`btn btn-sm flex-1 ${isFullSize ? 'btn-primary' : 'btn-ghost'}`}
+								disabled={shfImages.length === 0}
+								onClick={() => setIsFullSize(true)}
+								title="Full size">
+								<i className="bi-fullscreen-exit" />
+								<span className="hidden lg:inline">Full</span>
+							</button>
+						</div>
+					</div>
+
 					{/* SEARCH SECTION */}
-					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
+					<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
 						</label>
@@ -137,41 +186,20 @@ const VideoPlayer: React.FC = () => {
 		)
 	}
 
-	function renderVideo(): JSX.Element {
-		return (
-			<section>
-				{!currentImageUrl
-					? <AlertLoading />
-					: <section className="relative">
-						{/* OVERLAY METADATA */}
-						<div className="absolute top-0 left-0 right-0 bg-black/50 text-white px-2 py-1 flex items-center gap-2 text-sm">
-							<div className="flex-1 text-right truncate">
-								{shfImages[currIndex].name}
-							</div>
-							<div className="shrink-0">
-								{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB
-							</div>
-							<div className="flex-1 text-left text-xs hidden sm:block">
-								{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleString()}
-							</div>
-						</div>
-						{/* VIDEO CONTAINER */}
-						<div className="w-full max-w-full" style={{ maxHeight: 'calc(100vh - 70px - 110px)' }}>
-							<video controls className="w-full h-auto object-contain" style={{ maxHeight: 'calc(100vh - 70px - 110px)' }}>
-								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
-								Your browser does not support the video tag.
-							</video>
-						</div>
-					</section>
-				}
-			</section>
-		)
-	}
-
 	return (
-		<section>
-			{renderTopBar()}
-			{shfImages.length === 0 ? <AlertNoImages /> : renderVideo()}
+		<section className="h-full flex flex-col">
+			{renderTopCmdBar()}
+			<div className="flex-1 flex items-center justify-center overflow-hidden relative bg-gray-950">
+				{shfImages.length === 0
+					? <AlertNoImages />
+					: !currentImageUrl
+						? <AlertLoading />
+						: <video controls className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'}>
+							<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
+							Your browser does not support the video tag.
+						</video>
+				}
+			</div>
 		</section>
 	)
 }

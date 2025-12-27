@@ -25,31 +25,31 @@ export default function AppMainUI() {
 
 	function renderLogin(): JSX.Element {
 		return (
-			<section id="contHome" className="m-5">
-				<div id="loginCont" className="text-center bg-base-300 p-5 pb-4 rounded-box">
-					<div className="flex flex-wrap w-auto justify-center items-center gap-4">
-						<div>
-							<img src="/google-drive.png" alt="Google Drive Logo" style={{ maxWidth: 100 }} />
+			<section className="hero min-h-screen bg-base-200">
+				<div className="hero-content text-center">
+					<div id="loginCont" className="w-full max-w-md">
+						<div className="flex flex-wrap w-auto justify-center items-center gap-4 mb-6">
+							<div>
+								<img src="/google-drive.png" alt="Google Drive Logo" style={{ maxWidth: 100 }} />
+							</div>
+							<div>
+								<img src="/app-logo.png" alt="App Logo" style={{ maxWidth: 100 }} />
+							</div>
 						</div>
-						<div>
-							<img src="/app-logo.png" alt="App Logo" style={{ maxWidth: 100 }} />
+						<h1 className="text-5xl font-bold mb-2">Google Drive</h1>
+						<h2 className="text-5xl font-bold mb-6">Media Viewer</h2>
+						<button type="button" className='btn btn-lg btn-success w-full' onClick={() => signIn(false)}>Sign In with Google</button>
+						<button type="button" className={`btn btn-sm btn-outline btn-warning w-full mt-3 ${!DEBUG ? 'hidden' : ''}`} onClick={() => signIn(true)}>
+							Force Re-authenticate (Dev Only)
+						</button>
+						<div className="mt-6">
+							<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-base-content/50 no-underline text-sm hover:text-base-content/70">Privacy Policy</a>
 						</div>
-					</div>
-					<div className="my-3">
-						<div className="text-4xl font-bold">Google Drive</div>
-						<div className="text-4xl font-bold">Media Viewer</div>
-					</div>
-					<button type="button" className='btn btn-lg btn-success w-full mt-4' onClick={() => signIn(false)}>Sign In with Google</button>
-					<button type="button" className={`btn btn-sm btn-outline btn-warning w-full mt-2 ${!DEBUG ? 'hidden' : ''}`} onClick={() => signIn(true)}>
-						Force Re-authenticate (Dev Only)
-					</button>
-					<div className="mt-3">
-						<a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="text-base-content/50 no-underline text-sm">Privacy Policy</a>
-					</div>
-					<div className={`${!DEBUG ? 'hidden' : ''} mt-4`}>
-						<div className="flex justify-center gap-2 mt-2">
-							<span className="badge badge-primary">{APP_VER}</span>
-							<span className="badge badge-secondary">{APP_BLD}</span>
+						<div className={`${!DEBUG ? 'hidden' : ''} mt-6`}>
+							<div className="flex justify-center gap-2">
+								<span className="badge badge-primary">{APP_VER}</span>
+								<span className="badge badge-secondary">{APP_BLD}</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -186,13 +186,13 @@ export default function AppMainUI() {
 	}
 
 	return (
-		<section>
+		<section className="flex flex-col h-screen overflow-hidden">
 			{!isSignedIn ?
 				renderLogin()
 				:
 				<>
 					{renderTopBar()}
-					<main className="p-4 md:p-6">
+					<main className="flex-1 overflow-y-auto p-4 md:p-6">
 						<Routes>
 							<Route path="/" element={<Home />} />
 							<Route path="/collections" element={<Collections />} />
