@@ -75,50 +75,53 @@ export default function ImageGrid() {
 		const isSearchActive = optSchWord.length > 0
 
 		return (
-			<div className="mb-6">
+			<div className="mb-4">
 				<div className="flex flex-wrap gap-4 items-justify-center">
 					{/* TILE SIZE SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1">
+						<label className="label pb-1 block">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Size</span>
 						</label>
-						<div className="join w-full">
+						<div className="join">
 							<button
 								type="button"
 								className={`btn btn-sm flex-1 ${tileSize === 'small' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setTileSize('small')}
 								title="Small tiles">
-								<i className="bi-grid-3x3-gap" />
+								<i className="bi-grid-3x3-gap text-lg" />
+								<span className="hidden lg:inline">Small</span>
 							</button>
 							<button
 								type="button"
 								className={`btn btn-sm flex-1 ${tileSize === 'medium' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setTileSize('medium')}
 								title="Medium tiles">
-								<i className="bi-grid" />
+								<i className="bi-grid text-lg" />
+								<span className="hidden lg:inline">Medium</span>
 							</button>
 							<button
 								type="button"
 								className={`btn btn-sm flex-1 ${tileSize === 'large' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setTileSize('large')}
 								title="Large tiles">
-								<i className="bi-grid-1x2" />
+								<i className="bi-grid-1x2 text-lg" />
+								<span className="hidden lg:inline">Large</span>
 							</button>
 						</div>
 					</div>
 
 					{/* FILTER SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1">
+						<label className="label pb-1 block">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Type</span>
 						</label>
-						<div className="join w-full">
+						<div className="join">
 							<button
 								type="button"
 								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setMediaTypeFilter('all')}
 								title="Show all">
-								<i className="bi-files" />
+								<i className="bi-files text-lg" />
 								<span className="hidden lg:inline">All</span>
 							</button>
 							<button
@@ -126,7 +129,7 @@ export default function ImageGrid() {
 								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'image' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setMediaTypeFilter('image')}
 								title="Show images">
-								<i className="bi-image" />
+								<i className="bi-image text-lg" />
 								<span className="hidden lg:inline">Image</span>
 							</button>
 							<button
@@ -134,7 +137,7 @@ export default function ImageGrid() {
 								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'gif' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setMediaTypeFilter('gif')}
 								title="Show gifs">
-								<i className="bi-play-btn" />
+								<i className="bi-play-btn text-lg" />
 								<span className="hidden lg:inline">GIF</span>
 							</button>
 							<button
@@ -142,7 +145,7 @@ export default function ImageGrid() {
 								className={`btn btn-sm flex-1 ${mediaTypeFilter === 'video' ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => setMediaTypeFilter('video')}
 								title="Show videos">
-								<i className="bi-camera-video" />
+								<i className="bi-camera-video text-lg" />
 								<span className="hidden lg:inline">Video</span>
 							</button>
 						</div>
@@ -150,16 +153,16 @@ export default function ImageGrid() {
 
 					{/* SORT SECTION */}
 					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1">
+						<label className="label pb-1 block">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Sort</span>
 						</label>
-						<div className="join w-full">
+						<div className="join">
 							<button
 								type="button"
 								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.filName ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => toggleSortOrder(OPT_SORTBY.filName)}
 								title="Sort by name">
-								<i className="bi-sort-alpha-down" />
+								<i className="bi-sort-alpha-down text-lg" />
 								<span className="hidden lg:inline">Name</span>
 							</button>
 							<button
@@ -167,7 +170,7 @@ export default function ImageGrid() {
 								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.filSize ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => toggleSortOrder(OPT_SORTBY.filSize)}
 								title="Sort by size">
-								<i className="bi-hdd-stack" />
+								<i className="bi-hdd-stack text-lg" />
 								<span className="hidden lg:inline">Size</span>
 							</button>
 							<button
@@ -175,22 +178,22 @@ export default function ImageGrid() {
 								className={`btn btn-sm flex-1 ${optSortBy === OPT_SORTBY.modDate ? 'btn-primary' : 'btn-ghost'}`}
 								onClick={() => toggleSortOrder(OPT_SORTBY.modDate)}
 								title="Sort by modified">
-								<i className="bi-clock" />
+								<i className="bi-clock text-lg" />
 								<span className="hidden lg:inline">Modified</span>
 							</button>
 							<button
 								type="button"
-								className="btn btn-sm bg-base-900"
+								className="btn btn-sm btn-outline btn-active bg-base-900"
 								onClick={() => setOptSortDir(optSortDir === OPT_SORTDIR.asce ? OPT_SORTDIR.desc : OPT_SORTDIR.asce)}
 								title={optSortDir === OPT_SORTDIR.asce ? 'Ascending (A → Z)' : 'Descending (Z → A)'}>
-								<i className={`bi ${optSortDir === OPT_SORTDIR.asce ? 'bi-arrow-up' : 'bi-arrow-down'}`} />
+								<i className={`text-xl bi ${optSortDir === OPT_SORTDIR.asce ? 'bi-arrow-up' : 'bi-arrow-down'}`} />
 							</button>
 						</div>
 					</div>
 
 					{/* SEARCH SECTION */}
-					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl p-2">
-						<label className="label pb-1">
+					<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1 block">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Search</span>
 						</label>
 						<div className={`input input-sm input-bordered flex items-center gap-2 transition-all ${isSearchActive ? 'input-primary ring-2 ring-primary/30' : ''}`}>
@@ -205,6 +208,23 @@ export default function ImageGrid() {
 						</div>
 					</div>
 				</div>
+
+				{/* STATS SECTION
+				// FIXME: wraps no matter what, so hiding for now
+				<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
+					<label className="label pb-1">
+						<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Results</span>
+					</label>
+					<div className="text-sm font-semibold items-center justify-center h-9">
+						{filtdSortdFiles.length === 0
+							? (<span className="text-base-content/60">No results</span>)
+							: isSearchActive
+								? (<span><span className="text-primary font-bold">{filtdSortdFiles.length}</span><span className="text-base-content/60"> of {mediaFiles.length}</span></span>)
+								: (<span><span className="text-primary font-bold">{filtdSortdFiles.length}</span><span className="text-base-content/60"> files</span></span>)
+						}
+					</div>
+				</div>
+				*/}
 			</div>
 		)
 	}
