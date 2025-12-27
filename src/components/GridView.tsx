@@ -5,6 +5,7 @@ import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
 import { DataContext } from '../api-google/DataContext'
+import MediaCaption from './MediaCaption'
 import 'photoswipe/dist/photoswipe.css'
 
 interface ItemWithLineage extends IGapiFile {
@@ -188,7 +189,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	// --------------------------------------------------------------------------------------------
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
-		const figCaption = SHOW_CAPTIONS ? <figcaption>{item.name}</figcaption> : <span />
+		const figCaption = SHOW_CAPTIONS ? <MediaCaption title={item.name} variant="card" /> : <span />
 		const itemWithLineage = item as ItemWithLineage
 		const itemTitle = itemWithLineage._lineagePath ? `${itemWithLineage._lineagePath}\n${item.name}` : item.name
 
@@ -237,9 +238,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-							<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
-								<div className="text-white opacity-75" title={item.name}>{item.name}</div>
-							</div>
+						<MediaCaption title={item.name} variant="overlay" size="small" />
 						)}
 					</figure>
 				)
@@ -264,9 +263,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-							<div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2 z-20">
-								<div className="text-white opacity-75" title={item.name}>{item.name}</div>
-							</div>
+						<MediaCaption title={item.name} variant="overlay" size="small" />
 						)}
 					</figure>
 				)

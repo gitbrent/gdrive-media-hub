@@ -4,6 +4,7 @@ import { IMediaFile } from '../App.props'
 import { isVideo } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
+import MediaCaption from '../components/MediaCaption'
 
 const VideoPlayer: React.FC = () => {
 	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
@@ -210,10 +211,20 @@ const VideoPlayer: React.FC = () => {
 					? <AlertNoImages />
 					: !currentImageUrl
 						? <AlertLoading />
-						: <video controls className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'}>
-							<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
-							Your browser does not support the video tag.
-						</video>
+						: <div className="relative w-full h-full flex items-center justify-center">
+							<video controls className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'}>
+								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
+								Your browser does not support the video tag.
+							</video>
+							{showCaptions && (
+								<MediaCaption
+									title={shfImages[currIndex].name}
+									subtitle={new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}
+									variant="overlay"
+									size="medium"
+								/>
+							)}
+						</div>
 				}
 			</div>
 		</section>
