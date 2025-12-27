@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import { IGapiFile, IGapiFolder, IMediaFile, log, formatBytes } from '../App.props'
+import { IGapiFile, IGapiFolder, IMediaFile, log } from '../App.props'
 import { VideoViewerOverlay } from './FileBrowOverlays'
 import { isFolder, isGif, isImage, isVideo } from '../utils/mimeTypes'
 import { Gallery, Item } from 'react-photoswipe-gallery'
 import useCalcMaxGridItems from './useCalcMaxGridItems'
 import { DataContext } from '../api-google/DataContext'
-import MediaCaption from './MediaCaption'
+import CaptionGrid from './CaptionGrid'
 import 'photoswipe/dist/photoswipe.css'
 
 interface ItemWithLineage extends IGapiFile {
@@ -189,7 +189,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	// --------------------------------------------------------------------------------------------
 
 	const renderGridItem = (item: IMediaFile | IGapiFolder, index: number) => {
-		const figCaption = SHOW_CAPTIONS ? <MediaCaption title={item.name} variant="card" /> : <span />
+		const figCaption = SHOW_CAPTIONS ? <CaptionGrid title={item.name} /> : <span />
 		const itemWithLineage = item as ItemWithLineage
 		const itemTitle = itemWithLineage._lineagePath ? `${itemWithLineage._lineagePath}\n${item.name}` : item.name
 
@@ -208,8 +208,6 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				</figure>
 			)
 		} else if (isVideo(item)) {
-			const videoSize = item.size ? formatBytes(Number(item.size)) : 'Unknown'
-			const videoDate = item.modifiedByMeTime ? new Date(item.modifiedByMeTime).toLocaleDateString() : 'Unknown'
 			const isLoaded = 'original' in item && item.original
 
 			// If video is already loaded (has blob), show it
@@ -238,7 +236,7 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-						<MediaCaption title={item.name} variant="overlay" size="small" />
+							<CaptionGrid title={item.name} size="small" />
 						)}
 					</figure>
 				)
@@ -263,24 +261,24 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 							<i className="bi-play-circle text-white text-4xl opacity-80 group-hover:opacity-100 transition-opacity" />
 						</div>
 						{SHOW_CAPTIONS && (
-						<MediaCaption title={item.name} variant="overlay" size="small" />
+							<CaptionGrid title={item.name} size="small" />
 						)}
 					</figure>
 				)
 			}
 
-			// Using daisyUI stat class for clean, informative tile (fallback if no thumbnail)
+			// No thumbnail available - show loading placeholder with overlay style
 			return (
 				<figure
 					key={`${index}${item.id}`}
-					className="stat stats-vertical bg-base-200 hover:bg-base-300 cursor-pointer transition-colors rounded-lg shadow-md border border-base-300"
+					title={itemTitle}
+					className="flex flex-col items-center justify-center bg-base-900 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden rounded-lg group relative"
 					onClick={() => !isLoadingFile && setSelectedFile(item)}
 				>
-					<div className="text-info text gallery-item-name" title={item.name}>{item.name}</div>
-					<div className="stat-title text-primary gallery-item-title">{videoSize}</div>
-					<div className="stat-desc text-xs flex flex-col gap-1">
-						{videoDate}
+					<div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+						<i className="bi-play-circle text-white text-4xl opacity-80" />
 					</div>
+					<CaptionGrid title={item.name} size="small" />
 				</figure>
 			)
 		} else if (isImage(item) || isGif(item)) {

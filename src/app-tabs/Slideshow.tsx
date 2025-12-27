@@ -3,6 +3,7 @@ import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
 import { isImage } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
+import CaptionFull from '../components/CaptionFull'
 
 enum SlideShowDelay {
 	Fast = 2,
@@ -20,6 +21,7 @@ const Slideshow: React.FC = () => {
 	const [optSchWord, setOptSchWord] = useState('')
 	const [isPaused, setIsPaused] = useState(true)
 	const [isFullSize, setIsFullSize] = useState(true)
+	const [showCaptions, setShowCaptions] = useState(false)
 	//
 	const [currIndex, setCurrIndex] = useState(0)
 	const [usedIndices, setUsedIndices] = useState<number[]>([])
@@ -277,6 +279,21 @@ const Slideshow: React.FC = () => {
 						</div>
 					</div>
 
+					{/* CAPTIONS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1 block">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
+						</label>
+						<button
+							type="button"
+							className={`btn btn-sm w-full ${showCaptions ? 'btn-primary' : 'btn-ghost'}`}
+							onClick={() => setShowCaptions(!showCaptions)}
+							title="Toggle captions">
+							<i className="bi-chat-left-text text-lg" />
+							<span className="hidden lg:inline">{showCaptions ? 'On' : 'Off'}</span>
+						</button>
+					</div>
+
 					{/* SEARCH SECTION */}
 					<div className="w-full sm:flex-1 sm:min-w-62.50 bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label pb-1">
@@ -316,11 +333,26 @@ const Slideshow: React.FC = () => {
 	return (
 		<section className="h-full flex flex-col">
 			{renderTopBar()}
-			<div className="flex-1 flex items-center justify-center overflow-hidden bg-gray-950">
+			<div className="flex-1 flex items-center justify-center overflow-hidden relative bg-gray-950">
 				{filteredImages.length === 0
 					? <AlertNoImages />
 					: currentImageUrl
-						? <img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'} />
+						? <div className="relative w-full h-full flex items-center justify-center">
+							<img src={currentImageUrl} alt={filteredImages[currIndex]?.name} className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'} />
+							{showCaptions && (
+								<CaptionFull
+									title={filteredImages[currIndex].name}
+									size={Number(filteredImages[currIndex].size || 0)}
+									modifiedDate={new Date(filteredImages[currIndex].modifiedByMeTime).toLocaleDateString()}
+									dimensions={{
+										width: filteredImages[currIndex].width ? Number(filteredImages[currIndex].width) : undefined,
+										height: filteredImages[currIndex].height ? Number(filteredImages[currIndex].height) : undefined
+									}}
+									mimeType={filteredImages[currIndex].mimeType}
+									position="bottom-left"
+								/>
+							)}
+						</div>
 						: <i title={filteredImages[currIndex]?.name} className="text-5xl bi-arrow-repeat animate-spin" />
 				}
 			</div>

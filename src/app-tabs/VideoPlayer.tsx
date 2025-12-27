@@ -4,7 +4,7 @@ import { IMediaFile } from '../App.props'
 import { isVideo } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
 import AlertLoading from '../components/AlertLoading'
-import MediaCaption from '../components/MediaCaption'
+import CaptionFull from '../components/CaptionFull'
 
 const VideoPlayer: React.FC = () => {
 	const { mediaFiles, getBlobUrlForFile } = useContext(DataContext)
@@ -217,11 +217,12 @@ const VideoPlayer: React.FC = () => {
 								Your browser does not support the video tag.
 							</video>
 							{showCaptions && (
-								<MediaCaption
+								<CaptionFull
 									title={shfImages[currIndex].name}
-									subtitle={new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}
-									variant="overlay"
-									size="medium"
+									size={Number(shfImages[currIndex].size || 0)}
+									modifiedDate={new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}
+									mimeType={shfImages[currIndex].mimeType}
+									position="bottom-left"
 								/>
 							)}
 						</div>
