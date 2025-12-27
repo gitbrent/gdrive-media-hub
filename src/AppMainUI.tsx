@@ -10,6 +10,7 @@ import FileBrowser from './app-tabs/FileBrowser'
 import ImageGrid from './app-tabs/ImageGrid'
 import Slideshow from './app-tabs/Slideshow'
 import VideoPlayer from './app-tabs/VideoPlayer'
+import DiscoverImages from './app-tabs/DiscoverImages'
 import UserProfile from './app-tabs/UserProfile'
 
 export default function AppMainUI() {
@@ -148,6 +149,11 @@ export default function AppMainUI() {
 									</NavLink>
 								</li>
 								<li>
+									<NavLink to="/discovery" title="discovery" aria-label="discovery" className={({ isActive }) => isActive ? 'menu-active' : ''}>
+										Discovery
+									</NavLink>
+								</li>
+								<li>
 									<NavLink to="/video-player" title="video grid" aria-label="video grid" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Video Grid
 									</NavLink>
@@ -200,6 +206,7 @@ export default function AppMainUI() {
 							<Route path="/file-browser" element={<FileBrowser />} />
 							<Route path="/image-grid" element={<ImageGrid />} />
 							<Route path="/slide-show" element={<Slideshow />} />
+							<Route path="/discovery" element={<DiscoverImages />} />
 							<Route path="/video-player" element={<VideoPlayer />} />
 							<Route path="/user-profile" element={<UserProfile />} />
 							<Route path="/login" element={renderLogin()} />
