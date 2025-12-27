@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/set-state-in-render */
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useMemo, useState, useEffect } from 'react'
+import { useLocation } from 'react-router'
 import { IMediaFile, OPT_SORTBY, OPT_SORTDIR } from '../App.props'
 import { isImage, isGif, isMedia, isVideo } from '../utils/mimeTypes'
 import { DataContext } from '../api-google/DataContext'
@@ -20,6 +21,13 @@ export default function ImageGrid() {
 	const [tileSize, setTileSize] = useState<TileSize>('medium')
 	const [isSearching, setIsSearching] = useState(false)
 	const { mediaFiles } = useContext(DataContext)
+	const location = useLocation()
+
+	useEffect(() => {
+		if (location.state?.searchTerm) {
+			setOptSchWord(location.state.searchTerm)
+		}
+	}, [location.state])
 
 	// --------------------------------------------------------------------------------------------
 

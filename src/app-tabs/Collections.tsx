@@ -1,7 +1,7 @@
 import { useContext, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router'
 import { DataContext } from '../api-google/DataContext'
 import AlertLoading from '../components/AlertLoading'
-import GridView from '../components/GridView'
 import { IMediaFile, formatBytes } from '../App.props'
 import '../css/Collections.css'
 
@@ -19,8 +19,8 @@ interface CollectionGroup {
 
 const Collections: React.FC = () => {
 	const { mediaFiles, isLoading } = useContext(DataContext)
-	const [selectedCollection, setSelectedCollection] = useState<CollectionGroup | null>(null)
 	const [searchTerm, setSearchTerm] = useState('')
+	const navigate = useNavigate()
 	const MIN_COUNT = 10
 
 	// Helper to calculate collection metadata
@@ -109,11 +109,7 @@ const Collections: React.FC = () => {
 	}, [collections, searchTerm])
 
 	const handleCollectionClick = (collection: CollectionGroup) => {
-		setSelectedCollection(collection)
-	}
-
-	const handleBackToCollections = () => {
-		setSelectedCollection(null)
+		navigate('/image-grid', { state: { searchTerm: collection.prefix } })
 	}
 
 	const getCardSize = (count: number): string => {
@@ -128,29 +124,6 @@ const Collections: React.FC = () => {
 
 	if (isLoading) return <AlertLoading />
 
-	if (selectedCollection) {
-		return (
-			<section className="collections-container">
-				<div className="collection-header">
-					<button className="btn-back" onClick={handleBackToCollections}>
-						<i className="bi bi-arrow-left"></i>
-						<span>Back to Collections</span>
-					</button>
-					<div className="collection-title">
-						<h2>{selectedCollection.prefix} Collection</h2>
-						<span className="collection-count">{selectedCollection.count} items</span>
-					</div>
-				</div>
-				<GridView
-					currFolderContents={selectedCollection.files}
-					isFolderLoading={false}
-					handleFolderClick={async () => { }}
-					tileSize="medium"
-				/>
-			</section>
-		)
-	}
-
 	return (
 		<section className="collections-container">
 			<div className="collections-hero">
@@ -161,7 +134,6 @@ const Collections: React.FC = () => {
 				<p className="collections-subtitle">
 					Discover patterns and groups in your media library
 				</p>
-
 				<div className="collections-search">
 					<i className="bi bi-search search-icon"></i>
 					<input
@@ -172,7 +144,6 @@ const Collections: React.FC = () => {
 						onChange={(e) => setSearchTerm(e.target.value)}
 					/>
 				</div>
-
 				<div className="collections-stats">
 					<div className="stat-card">
 						<div className="stat-icon purple">
