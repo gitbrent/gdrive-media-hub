@@ -97,11 +97,11 @@ const VideoPlayer: React.FC = () => {
 					)}
 
 					{/* NAVIGATION SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1">
+					<div className="w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label block pb-1">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Control</span>
 						</label>
-						<div className="join w-full">
+						<div className="join">
 							<button
 								type="button"
 								className="btn btn-sm btn-ghost"
