@@ -23,7 +23,8 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	//
 	const { getBlobUrlForFile } = useContext(DataContext)
 	//
-	const loadingRef = useRef(new Set<string>())
+	const loadingRef = useRef<Set<string>>(new Set<string>())
+	const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 	const [selectedFile, setSelectedFile] = useState<IMediaFile | null>(null)
 	const [isLoadingFile, setIsLoadingFile] = useState<boolean>(false)
 	const [displayedItems, setDisplayedItems] = useState<Array<IMediaFile | IGapiFolder>>([])
@@ -38,8 +39,11 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	 * @description Only operational when used from `FileBrowser` as `ImageGrid` only sends enough images to fit on screen
 	 */
 	const handleScroll = () => {
-		const scrollPosition = window.innerHeight + document.documentElement.scrollTop
-		const scrollThreshold = document.documentElement.offsetHeight - 100 // Trigger 100px before bottom
+		const container = scrollContainerRef.current
+		if (!container) return
+
+		const scrollPosition = container.scrollTop + container.clientHeight
+		const scrollThreshold = container.scrollHeight - 100 // Trigger 100px before bottom
 
 		// Only load more if we're near the bottom and there are more items to load
 		if (scrollPosition < scrollThreshold) return
@@ -55,8 +59,11 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 	}
 
 	useEffect(() => {
-		window.addEventListener('scroll', handleScroll)
-		return () => window.removeEventListener('scroll', handleScroll)
+		const container = scrollContainerRef.current
+		if (!container) return
+
+		container.addEventListener('scroll', handleScroll)
+		return () => container.removeEventListener('scroll', handleScroll)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currFolderContents, displayedItems, pagingSize])
 
@@ -297,6 +304,14 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 		}
 	}
 
+	// Find the scrollable container (main element from AppMainUI)
+	useEffect(() => {
+		const main = document.querySelector('main')
+		if (main) {
+			scrollContainerRef.current = main as HTMLDivElement
+		}
+	}, [])
+
 	return (
 		<section>
 			{selectedFile && isVideo(selectedFile) && !isLoadingFile && selectedFile.original &&
@@ -308,8 +323,11 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 				</div>
 				<div className="p-4 bg-base-900 text-base-content text-center text-sm opacity-70">
 					{displayedItems.length < currFolderContents.length
-						? <span>(showing {displayedItems.length} of {currFolderContents.length} - scroll for more files)</span>
-						: <span>(all {displayedItems.length} shown)</span>
+						? <span>
+							<span className="badge badge-soft badge-info me-2">showing <b>{displayedItems.length}</b> of <b>{currFolderContents.length}</b></span>
+							<span className="badge badge-outline badge-info">scroll for more files)</span>
+						</span>
+						: <span className='badge badge-soft badge-info'>all {displayedItems.length} shown</span>
 					}
 				</div>
 			</Gallery>
