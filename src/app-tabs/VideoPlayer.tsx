@@ -209,6 +209,7 @@ const VideoPlayer: React.FC = () => {
 								<CaptionFull
 									title={shfImages[currIndex].name}
 									size={Number(shfImages[currIndex].size || 0)}
+									//FIXME: dimensions={{width:shfImages[currIndex].width as number, height:shfImages[currIndex].height as number}}
 									modifiedDate={new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}
 									mimeType={shfImages[currIndex].mimeType}
 									position="bottom-left"

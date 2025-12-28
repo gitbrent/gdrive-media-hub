@@ -36,7 +36,7 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 		? 'bg-linear-to-r from-black/50 via-black/30 to-transparent'
 		: 'bg-linear-to-b from-black/90 via-black/60 to-transparent'
 
-	const paddingClass = isBottomPosition ? 'pb-4 pt-8' : 'pt-4 pb-8'
+	const paddingClass = isBottomPosition ? 'pb-6 pt-8' : 'pt-4 pb-8'
 
 	return (
 		<div
@@ -58,7 +58,7 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 				{modifiedDate && (
 					<div className='badge badge-soft badge-success'>
 					<div className="flex items-center gap-2">
-						<i className="bi-calendar-event w-4" />
+						<i className="bi-calendar-date-fill w-4" />
 						<span>{modifiedDate}</span>
 					</div>
 					</div>
@@ -68,7 +68,7 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 				{size && (
 					<div className='badge badge-soft badge-warning'>
 						<div className="flex items-center gap-2">
-							<i className="bi-file-earmark w-4" />
+							<i className="bi-hdd-fill w-4" />
 							<span>{formatBytes(size)}</span>
 						</div>
 					</div>
@@ -94,7 +94,7 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 				{mimeType && (
 					<div className='badge badge-soft badge-info'>
 						<div className="flex items-center gap-2">
-							<i className="bi-code w-4" />
+							<i className="bi-file-binary-fill w-4" />
 							<span className="truncate">{mimeType}</span>
 						</div>
 					</div>
