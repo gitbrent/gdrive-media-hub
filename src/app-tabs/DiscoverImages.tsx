@@ -143,30 +143,36 @@ const DiscoverImages: React.FC = () => {
 		return (
 			<div className="mb-4">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
-					{/* NOW PLAYING/METADATA SECTION */}
-					{currentMedia && (
-						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
-							<div className="grid grid-cols-[1fr_auto] gap-3 items-start p-1">
-								{/* Left: Icon and Title */}
-								<div className="flex items-start gap-2 min-w-0 py-1">
-									<i className={`text-xl shrink-0 mt-0.5 ${isGif(currentMedia) ? 'bi-play-btn text-warning' : 'bi-image text-info'}`}></i>
-									<div className="wrap-anywhere line-clamp-2 opacity-60">
-										{currentMedia.name}
-									</div>
-								</div>
-
-								{/* Right: Stacked badges */}
-								<div className="grid grid-cols-1 gap-1 sm:grid">
-									<span className='badge badge-soft badge-info'>{new Date(currentMedia.modifiedByMeTime).toLocaleDateString()}</span>
-									<span className='badge badge-soft badge-primary w-full'>{parseFloat((Number(currentMedia.size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
-								</div>
-							</div>
+					{/* CONTROLS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl p-2">
+						<label className="label pb-1 hidden">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Controls</span>
+						</label>
+						<div className="join">
+							<button
+								type="button"
+								className={`btn btn-sm btn-outline btn-primary flex-1 ${isPlaying ? 'btn-primary' : 'btn-ghost'}`}
+								onClick={() => setIsPlaying(!isPlaying)}
+								title="Play/Pause (space)">
+								<i className={`bi text-lg ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`} />
+								<span className="hidden lg:inline">
+									{isPlaying ? `(${remainingSecs}s)` : 'Play'}
+								</span>
+							</button>
+							<button
+								type="button"
+								className="btn btn-sm flex-1 btn-ghost"
+								onClick={generateNewBatch}
+								title="Load new random batch (R)">
+								<i className="bi-arrow-clockwise text-lg" />
+								<span className="hidden lg:inline">Refresh</span>
+							</button>
 						</div>
-					)}
+					</div>
 
 					{/* MEDIA TYPE FILTER SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1 block">
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl p-2">
+						<label className="label pb-1 hidden">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Type</span>
 						</label>
 						<div className="join">
@@ -198,8 +204,8 @@ const DiscoverImages: React.FC = () => {
 					</div>
 
 					{/* SPEED SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1 block">
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl p-2">
+						<label className="label pb-1 hidden">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Speed</span>
 						</label>
 						<div className="join">
@@ -230,36 +236,9 @@ const DiscoverImages: React.FC = () => {
 						</div>
 					</div>
 
-					{/* CONTROLS SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1 block">
-							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Controls</span>
-						</label>
-						<div className="join">
-							<button
-								type="button"
-								className={`btn btn-sm flex-1 ${isPlaying ? 'btn-primary' : 'btn-ghost'}`}
-								onClick={() => setIsPlaying(!isPlaying)}
-								title="Play/Pause (space)">
-								<i className={`bi text-lg ${isPlaying ? 'bi-pause-fill' : 'bi-play-fill'}`} />
-								<span className="hidden lg:inline">
-									{isPlaying ? `(${remainingSecs}s)` : 'Play'}
-								</span>
-							</button>
-							<button
-								type="button"
-								className="btn btn-sm flex-1 btn-ghost"
-								onClick={generateNewBatch}
-								title="Load new random batch (R)">
-								<i className="bi-arrow-clockwise text-lg" />
-								<span className="hidden lg:inline">Refresh</span>
-							</button>
-						</div>
-					</div>
-
 					{/* CAPTIONS SECTION */}
-					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
-						<label className="label pb-1 block">
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl p-2">
+						<label className="label pb-1 hidden">
 							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
 						</label>
 						<button
