@@ -3,6 +3,7 @@ import { DataContext } from '../api-google/DataContext'
 import { IMediaFile } from '../App.props'
 import { isImage, isGif } from '../utils/mimeTypes'
 import AlertNoImages from '../components/AlertNoImages'
+import CaptionFull from '../components/CaptionFull'
 import { Item } from 'react-photoswipe-gallery'
 import 'photoswipe/dist/photoswipe.css'
 
@@ -20,6 +21,7 @@ const DiscoverImages: React.FC = () => {
 	const [mediaType, setMediaType] = useState<MediaType>('all')
 	const [speed, setSpeed] = useState(DiscoverySpeed.Normal)
 	const [isPlaying, setIsPlaying] = useState(false)
+	const [showCaptions, setShowCaptions] = useState(false)
 	const [randomBatch, setRandomBatch] = useState<IMediaFile[]>([])
 	const [currentMedia, setCurrentMedia] = useState<IMediaFile | null>(null)
 	const [currentMediaUrl, setCurrentMediaUrl] = useState('')
@@ -137,7 +139,7 @@ const DiscoverImages: React.FC = () => {
 
 	// --------------------------------------------------------------------------------------------
 
-	function renderTopBar(): JSX.Element {
+	function renderTopCmdBar(): JSX.Element {
 		return (
 			<div className="mb-4">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
@@ -254,6 +256,21 @@ const DiscoverImages: React.FC = () => {
 							</button>
 						</div>
 					</div>
+
+					{/* CAPTIONS SECTION */}
+					<div className="w-full sm:w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
+						<label className="label pb-1 block">
+							<span className="label-text text-xs font-bold uppercase tracking-wider opacity-50">Captions</span>
+						</label>
+						<button
+							type="button"
+							className={`btn btn-sm w-full ${showCaptions ? 'btn-primary' : 'btn-ghost'}`}
+							onClick={() => setShowCaptions(!showCaptions)}
+							title="Toggle captions">
+							<i className="bi-chat-left-text text-lg" />
+							<span className="hidden lg:inline">{showCaptions ? 'On' : 'Off'}</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		)
@@ -319,7 +336,7 @@ const DiscoverImages: React.FC = () => {
 
 		// Image viewer with PhotoSwipe
 		return (
-			<div className="flex-1 flex items-center justify-center rounded-lg overflow-hidden">
+			<div className="flex-1 flex items-center justify-center rounded-lg overflow-hidden relative">
 				<Item
 					original={currentMediaUrl}
 					thumbnail={currentMediaUrl}
@@ -337,6 +354,19 @@ const DiscoverImages: React.FC = () => {
 						/>
 					)}
 				</Item>
+				{showCaptions && (
+					<CaptionFull
+						title={currentMedia.name}
+						size={Number(currentMedia.size || 0)}
+						modifiedDate={new Date(currentMedia.modifiedByMeTime).toLocaleDateString()}
+						dimensions={{
+							width: currentMedia.imageMediaMetadata?.width ? Number(currentMedia.imageMediaMetadata.width) : undefined,
+							height: currentMedia.imageMediaMetadata?.height ? Number(currentMedia.imageMediaMetadata.height) : undefined
+						}}
+						mimeType={currentMedia.mimeType}
+						position="bottom-left"
+					/>
+				)}
 			</div>
 		)
 	}
@@ -360,7 +390,7 @@ const DiscoverImages: React.FC = () => {
 
 	return (
 		<section className="flex flex-col h-full">
-			{renderTopBar()}
+			{renderTopCmdBar()}
 
 			<div className="flex flex-col gap-4 flex-1 overflow-hidden">
 				{/* Top Filmstrip */}
