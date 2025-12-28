@@ -134,6 +134,11 @@ export default function AppMainUI() {
 									</NavLink>
 								</li>
 								<li>
+									<NavLink to="/discover-images" title="discover images" aria-label="discover images" className={({ isActive }) => isActive ? 'menu-active' : ''}>
+										Discover Images
+									</NavLink>
+								</li>
+								<li>
 									<NavLink to="/file-browser" title="file browser" aria-label="file browser" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										File Browser
 									</NavLink>
@@ -146,11 +151,6 @@ export default function AppMainUI() {
 								<li>
 									<NavLink to="/slide-show" title="slide show" aria-label="slide show" className={({ isActive }) => isActive ? 'menu-active' : ''}>
 										Slide Show
-									</NavLink>
-								</li>
-								<li>
-									<NavLink to="/discovery" title="discovery" aria-label="discovery" className={({ isActive }) => isActive ? 'menu-active' : ''}>
-										Discovery
 									</NavLink>
 								</li>
 								<li>
@@ -172,16 +172,10 @@ export default function AppMainUI() {
 								: <i className="text-2xl bi bi-question-circle-fill" />
 							}
 						</div>
-						{userProfile ?
+						{userProfile &&
 							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
 								<li>
 									<Link to="/user-profile">Profile</Link>
-								</li>
-							</ul>
-							:
-							<ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow bg-base-100 rounded-box w-52">
-								<li>
-									<a role="button" className="cursor-pointer" onClick={() => { alert('TODO:') }}>Clear Cache</a>
 								</li>
 							</ul>
 						}
@@ -201,15 +195,15 @@ export default function AppMainUI() {
 					<main className="flex-1 overflow-y-auto p-4 md:p-6">
 						<Routes>
 							<Route path="/" element={<Home />} />
+							<Route path="/login" element={renderLogin()} />
 							<Route path="/collections" element={<Collections />} />
 							<Route path="/folders" element={<Folders />} />
+							<Route path="/discover-images" element={<DiscoverImages />} />
 							<Route path="/file-browser" element={<FileBrowser />} />
 							<Route path="/image-grid" element={<ImageGrid />} />
 							<Route path="/slide-show" element={<Slideshow />} />
-							<Route path="/discovery" element={<DiscoverImages />} />
 							<Route path="/video-player" element={<VideoPlayer />} />
 							<Route path="/user-profile" element={<UserProfile />} />
-							<Route path="/login" element={renderLogin()} />
 						</Routes>
 					</main>
 				</>
