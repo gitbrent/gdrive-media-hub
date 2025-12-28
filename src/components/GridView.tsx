@@ -293,6 +293,17 @@ const GridView: React.FC<Props> = ({ currFolderContents, isFolderLoading, handle
 						)}
 					</Item>
 				)
+			} else if ('thumbnail' in item && item.thumbnail) {
+				// Show thumbnail as placeholder while full image loads
+				return (
+					<figure key={`${index}${item.id}`} title={itemTitle} className="flex flex-col items-center justify-center overflow-hidden rounded-lg">
+						<img src={item.thumbnail} onError={(e) => console.error('Error loading thumbnail:', e)} alt={item.name} className="w-full h-full object-cover opacity-75" />
+						<div className="absolute inset-0 bg-black/20 flex items-center justify-center z-10">
+							<i className="bi-hourglass-split text-white text-2xl opacity-80" />
+						</div>
+						{figCaption}
+					</figure>
+				)
 			} else {
 				return (
 					<figure key={`${index}${item.id}`} title={itemTitle} className="flex flex-col items-center justify-center text-base-content opacity-50">

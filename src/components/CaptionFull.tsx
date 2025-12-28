@@ -33,7 +33,7 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 	// Determine if gradient should go up or down
 	const isBottomPosition = position.includes('bottom')
 	const gradientClass = isBottomPosition
-		? 'bg-linear-to-t from-black/90 via-black/60 to-transparent'
+		? 'bg-linear-to-r from-black/50 via-black/30 to-transparent'
 		: 'bg-linear-to-b from-black/90 via-black/60 to-transparent'
 
 	const paddingClass = isBottomPosition ? 'pb-4 pt-8' : 'pt-4 pb-8'
@@ -56,39 +56,47 @@ const CaptionFull: React.FC<CaptionFullProps> = ({
 			<div className="flex flex-col gap-2 text-xs sm:text-sm text-white/80">
 				{/* Date */}
 				{modifiedDate && (
+					<div className='badge badge-soft badge-success'>
 					<div className="flex items-center gap-2">
-						<i className="bi-calendar-event text-white/60 w-4" />
+						<i className="bi-calendar-event w-4" />
 						<span>{modifiedDate}</span>
+					</div>
 					</div>
 				)}
 
 				{/* File Size */}
 				{size && (
-					<div className="flex items-center gap-2">
-						<i className="bi-file-earmark text-white/60 w-4" />
-						<span>{formatBytes(size)}</span>
+					<div className='badge badge-soft badge-warning'>
+						<div className="flex items-center gap-2">
+							<i className="bi-file-earmark w-4" />
+							<span>{formatBytes(size)}</span>
+						</div>
 					</div>
 				)}
 
 				{/* Dimensions */}
 				{dimensions && (dimensions.width || dimensions.height) && (
-					<div className="flex items-center gap-2">
-						<i className="bi-aspect-ratio text-white/60 w-4" />
-						<span>
-							{dimensions.width && dimensions.height
-								? `${dimensions.width} × ${dimensions.height}`
-								: dimensions.width
-									? `${dimensions.width}px`
-									: `${dimensions.height}px`}
-						</span>
+					<div className='badge badge-soft badge-info'>
+						<div className="flex items-center gap-2">
+							<i className="bi-aspect-ratio w-4" />
+							<span>
+								{dimensions.width && dimensions.height
+									? `${dimensions.width} × ${dimensions.height}`
+									: dimensions.width
+										? `${dimensions.width}px`
+										: `${dimensions.height}px`}
+							</span>
+						</div>
 					</div>
 				)}
 
 				{/* MIME Type */}
 				{mimeType && (
-					<div className="flex items-center gap-2">
-						<i className="bi-file-type text-white/60 w-4" />
-						<span className="truncate">{mimeType}</span>
+					<div className='badge badge-soft badge-info'>
+						<div className="flex items-center gap-2">
+							<i className="bi-code w-4" />
+							<span className="truncate">{mimeType}</span>
+						</div>
 					</div>
 				)}
 			</div>

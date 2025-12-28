@@ -77,27 +77,6 @@ const VideoPlayer: React.FC = () => {
 		return (
 			<div className="mb-6">
 				<div className="flex flex-wrap gap-4 items-center justify-center">
-					{/* NOW PLAYING/METADATA SECTION */}
-					{shfImages.length > 0 && (
-						<div className="w-full sm:flex-1 bg-base-100 rounded-xl px-3 pt-1 pb-2">
-							<div className="grid grid-cols-[1fr_auto] gap-3 items-start p-1">
-								{/* Left: Icon and Title */}
-								<div className="flex items-start gap-2 min-w-0">
-									<i className="bi-info-circle-fill text-xl text-success shrink-0 mt-0.5"></i>
-									<div className="wrap-anywhere line-clamp-2 opacity-60">
-										{shfImages[currIndex].name}
-									</div>
-								</div>
-
-								{/* Right: Stacked badges */}
-								<div className="grid grid-cols-1 gap-1 sm:grid">
-									<span className='badge badge-soft badge-info'>{new Date(shfImages[currIndex].modifiedByMeTime).toLocaleDateString()}</span>
-									<span className='badge badge-soft badge-primary'>{parseFloat((Number(shfImages[currIndex].size) / 1024 / 1024).toFixed(2))}&nbsp;MB</span>
-								</div>
-							</div>
-						</div>
-					)}
-
 					{/* NAVIGATION SECTION */}
 					<div className="w-auto bg-base-100 rounded-xl px-3 pt-1 pb-2">
 						<label className="label block pb-1">
@@ -210,7 +189,17 @@ const VideoPlayer: React.FC = () => {
 				{shfImages.length === 0
 					? <AlertNoImages />
 					: !currentImageUrl
-						? <AlertLoading />
+						? (
+							<div className="relative w-full h-full flex items-center justify-center">
+								{shfImages[currIndex]?.thumbnail && (
+									<>
+										<img src={shfImages[currIndex].thumbnail} alt={shfImages[currIndex].name} className="absolute inset-0 w-full h-full object-cover" />
+										<div className="absolute inset-0 bg-black/50" />
+									</>
+								)}
+								<AlertLoading />
+							</div>
+						)
 						: <div className="relative w-full h-full flex items-center justify-center">
 							<video controls className={isFullSize ? 'h-full w-full object-contain' : 'max-h-full max-w-full object-contain'}>
 								<source key={currIndex} src={currentImageUrl} type={shfImages[currIndex].mimeType} />
